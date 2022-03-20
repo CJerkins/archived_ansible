@@ -1,0 +1,7 @@
+[goldmann-prosody]
+name=Copr repo for prosody owned by goldmann
+baseurl=http://copr-be.cloud.fedoraproject.org/results/goldmann/prosody/epel-7-$basearch/
+skip_if_unavailable=True
+gpgcheck=1
+gpgkey=http://copr-be.cloud.fedoraproject.org/results/goldmann/prosody/pubkey.gpg
+enabled=1

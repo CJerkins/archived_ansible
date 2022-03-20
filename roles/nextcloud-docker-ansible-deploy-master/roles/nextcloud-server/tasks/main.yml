@@ -1,0 +1,58 @@
+---
+
+- include: tasks/setup_base.yml
+  tags:
+    - setup-all
+
+- include: tasks/setup_main.yml
+  tags:
+    - setup-all
+
+- include: tasks/setup_ssl.yml
+  tags:
+    - setup-all
+    - setup-ssl
+
+- include: tasks/upgrade_postgres.yml
+  tags:
+    - upgrade-postgres
+
+- include: tasks/setup_postgres.yml
+  tags:
+    - setup-all
+    - setup-postgres
+
+- include: tasks/setup_goofys.yml
+  tags:
+    - setup-all
+    - setup-goofys
+
+- include: tasks/setup_nextcloud.yml
+  tags:
+    - setup-all
+    - setup-nextcloud
+    - update
+
+- include: tasks/setup_onlyoffice.yml
+  tags:
+    - setup-all
+    - setup-onlyoffice
+
+# This is meant to be executed subsequently, after Nextcloud is fully setup
+- include: tasks/setup_onlyoffice_app.yml
+  tags:
+    - setup-onlyoffice-app
+
+- include: tasks/setup_nginx_proxy.yml
+  tags:
+    - setup-all
+    - setup-nginx-proxy
+
+- include: tasks/start.yml
+  tags:
+    - start
+    - update
+
+- include: tasks/setup_adjust_config.yml
+  tags:
+    - setup-adjust-config

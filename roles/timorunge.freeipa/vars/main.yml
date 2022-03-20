@@ -1,0 +1,45 @@
+---
+
+# FreeIPA pip dependencies
+# Type: List
+freeipa_pip_dependency_pkgs:
+  - cryptography
+  - custodia
+  - dbus-python
+  - jslint
+  - jwcrypto
+  - kdcproxy
+  - osutil
+  - paramiko==2.2.0
+  - pyasn1
+  - pyasn1-modules
+  - gssapi
+  - python-ldap
+
+# Empty dict to avoid failures
+# Type: Dict
+freeipa_default_patches: {}
+
+# HTTPD modules which have to be enabled
+# Type: List
+freeipa_server_httpd_modules:
+  - auth_gssapi
+  - authz_user
+  - deflate
+  - expires
+  - headers
+  - lookup_identity
+  - proxy
+  - proxy_ajp
+  - proxy_http
+  - rewrite
+  - session
+  - session_cookie
+
+# The FreeIPA service will take care of starting and stopping those services
+# Type: List
+freeipa_server_disabled_services:
+  - krb5-admin-server
+  - slapd
+freeipa_server_disabled_httpd_services:
+  - tomcat8

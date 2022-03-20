@@ -1,0 +1,62 @@
+[Unit]
+Description=Synapse server
+{% for service in matrix_synapse_systemd_required_services_list %}
+Requires={{ service }}
+After={{ service }}
+{% endfor %}
+{% for service in matrix_synapse_systemd_wanted_services_list %}
+Wants={{ service }}
+{% endfor %}
+
+[Service]
+Type=simple
+ExecStartPre=-/usr/bin/docker kill matrix-synapse
+ExecStartPre=-/usr/bin/docker rm matrix-synapse
+{% if matrix_s3_media_store_enabled %}
+# Allow for some time before starting, so that media store can mount.
+# Mounting can happen later too, but if we start writing,
+# we'd write files to the local filesystem and fusermount will complain.
+ExecStartPre=/bin/sleep 5
+{% endif %}
+
+ExecStart=/usr/bin/docker run --rm --name matrix-synapse \
+			--log-driver=none \
+			--user={{ matrix_user_uid }}:{{ matrix_user_gid }} \
+			--cap-drop=ALL \
+			--entrypoint=python \
+			--read-only \
+			--tmpfs=/tmp:rw,noexec,nosuid,size={{ matrix_synapse_tmp_directory_size_mb }}m \
+			--network={{ matrix_docker_network }} \
+			-e SYNAPSE_CACHE_FACTOR={{ matrix_synapse_cache_factor }} \
+			{% if matrix_synapse_container_expose_client_api_port %}
+			-p 127.0.0.1:8008:8008 \
+			{% endif %}
+			{% if matrix_synapse_federation_enabled and matrix_synapse_tls_federation_listener_enabled %}
+			-p 8448:8448 \
+			{% endif %}
+			{% if matrix_synapse_federation_enabled and matrix_synapse_container_expose_federation_api_port %}
+			-p 127.0.0.1:8048:8048 \
+			{% endif %}
+			{% if matrix_synapse_container_expose_metrics_port %}
+			-p 127.0.0.1:{{ matrix_synapse_metrics_port }}:{{ matrix_synapse_metrics_port }} \
+			{% endif %}
+			-v {{ matrix_synapse_config_dir_path }}:/data:ro \
+			-v {{ matrix_synapse_run_path }}:/matrix-run:rw \
+			-v {{ matrix_synapse_base_path }}/storage:/matrix-media-store-parent:slave \
+			{% for volume in matrix_synapse_container_additional_volumes %}
+			-v {{ volume.src }}:{{ volume.dst }}:{{ volume.options }} \
+			{% endfor %}
+			{% for arg in matrix_synapse_container_extra_arguments %}
+			{{ arg }} \
+			{% endfor %}
+			{{ matrix_synapse_docker_image }} \
+			-m synapse.app.homeserver -c /data/homeserver.yaml
+
+ExecStop=-/usr/bin/docker kill matrix-synapse
+ExecStop=-/usr/bin/docker rm matrix-synapse
+ExecReload=/usr/bin/docker exec matrix-synapse kill -HUP 1
+Restart=always
+RestartSec=30
+
+[Install]
+WantedBy=multi-user.target

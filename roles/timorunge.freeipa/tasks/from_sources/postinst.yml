@@ -1,0 +1,48 @@
+---
+
+- name: Run ldconfig
+  command: ldconfig
+  when: freeipa_compile.changed
+  tags:
+    - skip_ansible_lint
+
+- name: Enable httpd modules
+  apache2_module:
+    name: "{{ item }}"
+    state: present
+  with_items: "{{ freeipa_server_httpd_modules }}"
+  when: freeipa_enable_server and
+        freeipa_server_httpd_modules
+  tags:
+    - skip_ansible_lint
+
+- name: Enable redirect from HTTP to HTTPS
+  lineinfile:
+    dest: /etc/apache2/sites-available/000-default.conf
+    insertafter: '^\<VirtualHost \*\:80\>'
+    line: "\tIncludeOptional /etc/apache2/conf-enabled/ipa-rewrite.conf"
+  notify: restart httpd
+  when: freeipa_enable_server
+  tags:
+    - skip_ansible_lint
+
+- name: Stop and disable services which are manged by FreeIPA
+  service:
+    name: "{{ item }}"
+    state: stopped
+    enabled: no
+  loop: "{{ freeipa_server_disabled_services | flatten(levels=1) }}"
+  when: freeipa_server_disabled_services
+  tags:
+    - skip_ansible_lint
+
+- name: Stop and disable httpd services which are manged by FreeIPA
+  service:
+    name: "{{ item }}"
+    state: stopped
+    enabled: no
+  loop: "{{ freeipa_server_disabled_httpd_services | flatten(levels=1) }}"
+  when: freeipa_enable_server and
+        freeipa_server_disabled_httpd_services
+  tags:
+    - skip_ansible_lint

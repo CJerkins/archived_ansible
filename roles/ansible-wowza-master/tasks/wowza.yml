@@ -1,0 +1,49 @@
+---
+- name: Install java8 
+  apt: pkg=openjdk-8-jdk state=present update_cache=true
+
+- name: Get Wowza
+  get_url:
+    url: http://{{ wowza_download_path }}/{{ wowza_file }}
+    dest: /root/{{ wowza_file }}
+    owner: root
+    group: root
+    mode: 0755
+
+# Install expect
+- name: Install expect
+  apt: name={{ item }} update_cache=yes
+  with_items: expect
+
+- name: Push expect templates
+  template:
+    src: script.exp.j2
+    dest: /root/script.exp
+    owner: root
+    group: root
+    mode: 0755
+
+- name: Run expect script, which runs Wowza installer
+  args:
+    creates: /usr/local/WowzaStreamingEngine/conf/Server.license
+  shell: /root/script.exp
+
+- name: Restart WowzaStreamingEngine
+  service: name=WowzaStreamingEngine state=restarted
+
+- name: Restart WowzaStreamingEngineManager
+  service: name=WowzaStreamingEngineManager state=restarted
+
+- name: Chmod /root/script.exp
+  file:
+    path: /root/script.exp
+    owner: root
+    group: root
+    mode: 0400
+
+- name: Chmod /root/{{ wowza_file }}
+  file:
+    path: /root/{{ wowza_file }}
+    owner: root
+    group: root
+    mode: 0400

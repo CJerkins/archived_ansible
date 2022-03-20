@@ -1,0 +1,34 @@
+---
+
+galaxy_info:
+  author: Timo Runge
+  company: N/A
+  description: FreeIPA Identity Management Server provisioning.
+  role_name: freeipa_server
+  license: BSD-3-Clause
+  min_ansible_version: 2.5.0
+  platforms:
+  - name: EL
+    versions:
+      - 7
+  - name: Fedora
+    versions:
+      - 26
+      - 27
+  - name: Ubuntu
+    versions:
+      - xenial
+      - artful
+      - bionic
+  galaxy_tags:
+    - dns
+    - freeipa
+    - identity
+    - idm
+    - kerberos
+    - ldap
+    - ntp
+    - sso
+    - sssd
+    - system
+dependencies: []

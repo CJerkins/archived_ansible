@@ -1,0 +1,14 @@
+---
+galaxy_info:
+  author: Vasily Mikhaylichenko
+  description: Installs and configures the Prosody XMPP servers + a variety of XEP modules
+  company: LxMx
+  license: GPLv3
+  min_ansible_version: 1.2
+  platforms:
+  - name: EL
+    versions:
+    - 7
+  categories:
+  - networking
+dependencies: []

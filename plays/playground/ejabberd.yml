@@ -1,0 +1,139 @@
+---
+- name: Install eJabberd
+  hosts: xmpp
+  become: true
+  
+  tasks:
+  - name: Install packages, nano
+    apt:
+        name: "{{ packages }}"
+    vars:
+        packages:
+        - nano
+
+  - name: Update and upgrade apt packages
+    apt:
+      upgrade: yes
+      update_cache: yes
+
+#  - name: Set the eJabberd Version
+#    shell: export VER="19.02"
+  
+  - name: Download eJabberd dpkg
+    get_url:
+      url: https://www.process-one.net/downloads/ejabberd/19.02/ejabberd_19.02-0_amd64.deb
+      dest: /home/drok
+
+  - name: Install a ejabberd.deb package
+    apt:
+      deb: /home/drok/ejabberd_19.02-0_amd64.deb
+
+  - name: updatedb 
+    command: updatedb
+    register: updated updatedb
+
+  - name: copy eJabberd.service, ejabberdctl, erl to systemd and bin directorys on remote machine
+    copy:
+      src: /opt/ejabberd-19.02/bin/{{item.src}}
+      dest: "{{item.dest}}"
+      mode: "{{item.mode}}"
+      remote_src: yes
+    with_items:
+      - {src: 'ejabberd.service',dest: '/etc/systemd/system',mode: '0644'}
+      - {src: 'ejabberdctl',dest: '/bin',mode: '0755'}
+      - {src: 'erl',dest: '/bin',mode: '0755'}
+
+  - name: copy eJabberd config
+    copy:
+      src: /home/drok/playground/ejabberd.yml
+      dest: /opt/ejabberd/conf/ejabberd.yml
+      mode: 0644
+
+  - name: Create Folders
+    file: 
+      path: /opt/ejabberd/conf/ssl
+      owner: root
+      group: root 
+      mode: 0710
+      state: directory
+
+  - name: Copy SSL certs
+    copy:
+      src: /home/drok/playground/{{item}}
+      dest: /opt/ejabberd/conf/ssl
+      owner: root
+      group: root 
+      mode: 0640
+    with_items:
+      ['certchaincrt.pem','drokdevprokey.pem']
+    notify:
+    - restart ejabberd
+  
+  - name: restart ejabberd and systemd
+    systemd:
+      state: restarted
+      daemon_reload: yes
+      name: ejabberd
+      enabled: yes
+
+  - name: create a user if it does not exists
+    ejabberd_user:
+      username: drok
+      host: drokdev.pro
+      password: drokDROK63
+
+#  - name: add defaut users
+#    shell: ejabberdctl register drok drokdev.pro drokDROK63
+
+  - name: Allow OpenSSH and enable UFW 
+    ufw:
+      state: enabled
+      rule: allow
+      name: OpenSSH
+      
+  - name: Allow "Ports 5222 5280"
+    ufw:  
+      rule: allow
+      port: "{{item}}" 
+    with_items:
+      ['5222','5280']
+    notify:
+    - reload ufw
+
+  handlers:
+    - name: restart ejabberd
+      service:
+        name: ejabberd
+        state: restarted
+
+    - name: reload ufw
+      service: 
+        name: ufw 
+        state: restarted
+
+
+###use this if you get error on fresh install
+  # - name: Systemd to reread configs
+  #   systemd:
+  #     daemon_reload: yes  
+
+  # - name: Make sure a ejabberd is running
+  #   systemd:
+  #     state: started
+  #     name: ejabberd
+  #      enabled: yes
+
+#   - name: create a user if it does not exists
+#   ejabberd_user:
+#     username: test
+#     host: server
+#     password: password
+
+# - name: delete a user if it exists
+#   ejabberd_user:
+#     username: test
+#     host: server
+#     state: absent
+
+#     - name: restart ejabberd
+#   service: name={{ejabberd_service}} state=restarted

@@ -1,0 +1,14 @@
+---
+
+- name: Build FreeIPA
+  args:
+    chdir: "{{ freeipa_install_dir }}/build/freeipa-release-{{ freeipa_version_src_schema }}"
+  shell: "autoreconf -i -f && ./configure {{ freeipa_build_options | join(' ') }}"
+  register: freeipa_build
+  when: >
+        (freeipa_checksum_catalog.changed) or
+        (freeipa_source_files.changed) or
+        (freeipa_patches.changed) or
+        (freeipa_force_build)
+  tags:
+    - skip_ansible_lint

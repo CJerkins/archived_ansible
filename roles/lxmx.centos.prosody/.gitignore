@@ -1,0 +1,3 @@
+playbook.yml
+files/ssl/*.pem
+files/ssl/*.key

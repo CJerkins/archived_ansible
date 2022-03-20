@@ -1,0 +1,28 @@
+- name: install PostgreSQL
+  yum: name=postgresql-server state=installed
+  sudo: yes
+
+- name: initdb
+  command: postgresql-setup initdb creates=/var/lib/pgsql/data/pg_hba.conf
+  sudo: yes
+
+- name: copy pg_hba.conf
+  copy: src=pgsql/pg_hba.conf dest=/var/lib/pgsql/data/pg_hba.conf
+  notify: restart postgresql
+  sudo: yes
+
+- name: enable and start the PostgreSQL server
+  service: name=postgresql enabled=yes state=started
+  sudo: yes
+
+- name: install the python module
+  yum: name=python-psycopg2 state=installed
+  sudo: yes
+
+- name: Provision the prosody user
+  postgresql_user: name=prosody password={{ prosody_db_password }}
+  sudo: yes
+
+- name: Provision the prosody database
+  postgresql_db: name=prosody owner=prosody
+  sudo: yes

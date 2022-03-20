@@ -1,0 +1,53 @@
+---
+- name: Installing traccar docker
+  hosts: traccar
+  become: true
+  tasks:
+  - name: Intiallize traccer docker
+    command: |
+      docker run -d \
+      --restart always \
+      --name traccar \
+      --hostname traccar \
+      -p 8282:8082 \
+      -p 5055:5055 \
+      -p 5002:5002 \
+      -v traccar_logs:/opt/traccar/logs \
+      -v traccar_config:/opt/traccar/conf \
+      -v traccar_database:/opt/traccar/data/database \
+      traccar/traccar
+
+###Firewall rules###
+  - name: Start firewalld
+    service: 
+      name: firewalld
+      state: started
+      enabled: yes
+  - name: Open firewall port for traccar
+    firewalld:
+      port: "{{item}}" 
+      zone: public
+      immediate: yes # this is the firewall-cmd --reload
+      permanent: true
+      state: enabled
+    with_items:
+      ['8282/tcp','5055/tcp','5002/tcp']  
+    when: ansible_facts['distribution'] == "CentOS"
+
+  # - name: Open firewall port for traccar
+  #   ufw:
+  #     state: enabled
+  #     rule: allow
+  #     port: "{{item}}" 
+  #   with_items:
+  #     ['8282', '5055', '5002']
+  #   notify:
+  #   - restart ufw
+  #   when: ansible_facts['distribution'] == "Ubuntu"
+
+  #   handlers:
+  #     - name: restart ufw
+  #       service: 
+  #         name: ufw 
+  #         state: restarted
+  #       when: ansible_facts['distribution'] == "Ubuntu"

@@ -1,0 +1,71 @@
+---
+- name: Install eJabberd
+  hosts: tak
+  become: true
+
+  tasks:
+  - name: Ensure EPEL is enabled 
+    yum: 
+      name: epel-release 
+      state: present 
+ 
+  - name: Install packages, nano
+    yum:
+        name: "{{ packages }}"
+    vars:
+        packages:
+        - nano
+
+  - name: Update and upgrade packages
+    yum:
+      name: '*'
+      state: latest
+
+  - name: Copy takserver rpm
+    copy:
+      src: /home/drok/playground/takserver-1.3.9-RELEASE14.noarch.rpm
+      dest: /home/tak
+      mode: 777
+
+  - name: install takserver rpm from a local file
+    yum:
+      name: /home/tak/takserver-1.3.9-RELEASE14.noarch.rpm
+      state: present
+
+  # - name: run db-utility script ##had to comment out after running the first time running it
+    # shell: /opt/tak/db-utils/takserver-setup-db.sh
+
+  - name: start takserver and enabled
+    systemd:
+      state: started
+      name: takserver
+      enabled: yes
+  
+  - name: add admin user
+    shell: java -jar /opt/tak/utils/UserManager.jar usermod -A -p atakatak admin
+
+  - name: Create Folder
+    file: 
+      path: /opt/tak/certs/files
+      owner: root
+      group: root 
+      mode: 0751
+      state: directory
+
+  # - name: Copy CoreConfig.xml
+  #   copy:
+  #     src: /home/drok/playground/CoreConfig.xml
+  #     dest: /opt/tak
+  #     owner: root
+  #     group: root 
+  #     mode: 0645
+
+  - name: open firewall port for takserver
+    firewalld:
+      port: "{{item}}" 
+      zone: public
+      immediate: yes # this is the firewall-cmd --reload
+      permanent: true
+      state: enabled
+    with_items:
+      ['8087/tcp','8087/udp','8080','5432']      

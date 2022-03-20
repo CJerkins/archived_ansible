@@ -1,0 +1,100 @@
+---
+- name: Ensure apt-key is available
+  apt:
+    pkg: "{{ prosody_repo_packages }}"
+
+- name: Ensure apt_preferences include file for packages.prosody.im is present
+  copy:
+    src: apt/preferences.d/packages.prosody.im.pref
+    dest: /etc/apt/preferences.d/packages.prosody.im.pref
+    mode: 0644
+    owner: root
+    group: root
+
+- name: Ensure repository key for Prosody is in place
+  apt_key:
+    url: https://prosody.im/files/prosody-debian-packages.key
+    state: present
+
+- name: Add Prosody repository
+  apt_repository:
+    repo: 'deb http://packages.prosody.im/debian {{ ansible_distribution_release }} main'
+    update_cache: true
+
+- name: Ensure required packages are present
+  apt:
+    pkg: "{{ prosody_packages }}"
+
+- name: Increase file limit
+  lineinfile:
+    dest: /etc/init.d/prosody
+    line: "MAXFDS={{ prosody_file_limit }}"
+    regexp: "^MAXFDS="
+  when: prosody_file_limit
+
+- name: Get latest registration theme
+  git:
+    repo: "{{ prosody_custom_registration_theme_repo }}"
+    dest: "{{ prosody_custom_registration_theme_path }}"
+  when: prosody_custom_registration_theme
+
+- name: Configure Prosody
+  template:
+    src: prosody.cfg.lua.j2
+    dest: /etc/prosody/prosody.cfg.lua
+    owner: root
+    group: prosody
+    mode: 0640
+  notify: reload prosody config
+
+  
+
+# - name: Create Prosody accounts
+#   command: prosodyctl register {{ item.name }} {{ prosody_virtual_domain }} {{ item.password }}
+#   with_items: prosody_accounts
+
+- name: Get latest prosody modules
+  hg:
+    repo: https://hg.prosody.im/prosody-modules/
+    dest: "{{ prosody_external_modules_dir }}"
+
+- include_tasks: tls.yml
+  with_items: "{{ prosody_virtual_hosts }}"
+  tags:
+    - certs-jabber
+
+- name: Create parameters for Diffie–Hellman (could take a while)
+  command: "openssl dhparam -out /etc/prosody/certs/dh-{{ prosody_dhparam_length }}.pem {{ prosody_dhparam_length }}"
+  args:
+    creates: /etc/prosody/certs/dh-{{ prosody_dhparam_length }}.pem
+  notify: restart prosody
+  when: not __testing|default()
+
+- name: Push proxy TLS cert to /etc/prosody/certs/
+  copy:
+    content: "{{ prosody_proxy_ssl_cert }}"
+    dest: /etc/prosody/certs/proxy.pem
+    owner: root
+    group: prosody
+    mode: 0640
+  when: prosody_proxy_ssl_cert is defined
+  tags:
+    - certs-jabber
+  notify: reload prosody config
+
+- name: Push proxy TLS key to /etc/prosody/certs/
+  copy:
+    content: "{{ prosody_proxy_ssl_key }}"
+    dest: /etc/prosody/certs/proxy.key
+    owner: root
+    group: prosody
+    mode: 0640
+  when: prosody_proxy_ssl_key is defined
+  tags:
+    - certs-jabber
+  notify: reload prosody config
+
+- name: Enable prosody service
+  service:
+    name: prosody
+    enabled: true

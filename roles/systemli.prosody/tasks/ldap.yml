@@ -1,0 +1,49 @@
+---
+
+# kudos: https://blogs.mafia-server.net/nur-bahnhof/2013/12/prosody-authentification-ldapactivedirectory/ and https://wiki.debian.org/InstallingProsody#Cyrus_SASL_with_LDAP
+
+- name: Install ldap dependencies
+  apt:
+    name: "{{ prosody_ldap_packages }}"
+
+- name: Configure saslauthd
+  copy:
+    src: saslauthd
+    dest: /etc/default/saslauthd
+    owner: root
+    group: root
+    mode: 0644
+  notify: restart saslauthd
+
+- name: Configure ldap details
+  template:
+    src: saslauthd.conf.j2
+    dest: /etc/saslauthd.conf
+    owner: root
+    group: root
+    mode: 0644
+  notify: restart saslauthd
+
+- name: Create sasl directory
+  file:
+    dest: /etc/sasl
+    state: directory
+    owner: root
+    group: root
+    mode: 0755
+
+- name: Create SASL prosody config
+  copy:
+    src: prosody.conf
+    dest: /etc/sasl/prosody.conf
+    owner: root
+    group: root
+    mode: 0644
+  notify: restart saslauthd
+
+- name: Add prosody to sasl group
+  user:
+    name: prosody
+    groups: sasl
+    append: true
+  notify: restart prosody

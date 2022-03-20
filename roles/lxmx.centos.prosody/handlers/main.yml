@@ -1,0 +1,7 @@
+- name: restart prosody
+  service: name=prosody state=restarted
+  sudo: yes
+
+- name: restart postgresql
+  service: name=postgresql state=restarted
+  sudo: yes

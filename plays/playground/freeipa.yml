@@ -1,0 +1,31 @@
+---
+- hosts: freeipa-server
+  vars:
+    freeipa_server_admin_password: DroKcoff33QUEENusa6z!pROPE5FRUIT9park@
+    freeipa_server_domain: drokdev.pro
+    freeipa_server_ds_password: DroKcoff33QUEENusa6z!pROPE5FRUIT9park@
+    freeipa_server_fqdn: ipa.drokdev.pro
+    freeipa_server_ip: 172.20.0.2
+    freeipa_server_realm: DROK
+    freeipa_server_install_options:
+      - "--realm={{ freeipa_server_realm }}"
+      - "--domain={{ freeipa_server_domain }}"
+      - "--setup-dns"
+      - "--ds-password {{ freeipa_server_ds_password }}"
+      - "--admin-password {{ freeipa_server_admin_password }}"
+      - "--mkhomedir"
+      - "--hostname={{ freeipa_server_fqdn | default(ansible_fqdn) }}"
+      - "--ip-address={{ freeipa_server_ip }}"
+      - "--ip-address=10.0.0.2"
+      - "--ip-address=192.168.1.85"
+      - "--no-host-dns"
+      - "--no-ntp"
+      - "--idstart=5000"
+      - "--ssh-trust-dns"
+      - "--forwarder=8.8.8.8"
+      - "--auto-forwarders"
+      - "--no-ui-redirect"
+      - "--no-ssh"
+      - "--no-sshd"
+  roles:
+    - timorunge.freeipa_server

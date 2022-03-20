@@ -1,0 +1,13 @@
+---
+- hosts: all
+  become: true
+  tasks:
+    - name: "Update repositories cache Centos"
+      yum:
+        update_cache: yes
+        when: ansible_facts['distribution'] == "CentOS"
+  tasks:
+    - name: "Update repositories cache Ubuntu"
+      apt:
+        update_cache: yes
+        when: ansible_facts['distribution'] == "Ubuntu"

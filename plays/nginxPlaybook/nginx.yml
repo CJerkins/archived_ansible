@@ -1,0 +1,95 @@
+---
+- name: Install nginx
+  hosts: nginx
+  become: true
+
+  tasks:
+  - name: Install "Nano, NGiNX" package
+    apt:
+        name: "{{ packages }}"
+    vars:
+        packages:
+        - nano
+        - nginx
+  
+  - name: Update and upgrade apt packages
+    apt:
+      upgrade: yes
+      update_cache: yes
+ 
+  - name: Create Folders
+    file: 
+      path: "{{item.path}}"
+      owner: root
+      group: root 
+      mode: "{{item.mode}}"
+      state: directory
+    with_items:
+      - {path: '/var/www/html',mode: '0755'}
+      - {path: '/etc/nginx/ssl',mode: '0710'}
+      - {path: '/etc/nginx/nginxconfig.io',mode: '0755'}
+
+  - name: Write the nginx config file
+    copy:
+      src: /home/drok/playground/{{item.src}}
+      dest: /etc/nginx/{{item.dest}}
+      mode: "{{item.mode}}"
+    with_items:
+      - {src: 'test',dest: 'sites-available',mode: '0644'}
+      - {src: 'nginx.conf',dest: '',mode: '0644'}
+      - {src: 'proxy.conf',dest: 'nginxconfig.io',mode: '0644'}
+      - {src: 'letsencrypt.conf',dest: 'nginxconfig.io',mode: '0644'}
+      - {src: 'general.conf',dest: 'nginxconfig.io',mode: '0644'}
+    notify:
+    - restart nginx
+
+  - name: Create symbolic link 
+    file:
+      src: /etc/nginx/sites-available/test
+      dest: /etc/nginx/sites-enabled/test
+      state: link
+
+  - name: Set up HTML file
+    copy: 
+      src: index.html 
+      dest: /var/www/html/index.html 
+      owner: www-data 
+      group: www-data 
+      mode: 0644
+
+  - name: Copy SSL certs
+    copy:
+      src: /home/drok/playground/{{item}}
+      dest: /etc/nginx/ssl
+      owner: root
+      group: root 
+      mode: 0640
+    with_items:
+      ['cert_chain.crt','drokdev_pro.key']
+    notify:
+    - restart nginx
+
+  - name: Allow SSH HTTP HTTPS and enable UFW
+    ufw:
+      state: enabled
+      rule: allow
+      name: "{{item}}" 
+    with_items:
+      ['OpenSSH','NGINX HTTP','NGINX HTTPS']
+    notify:
+    - restart ufw
+
+  handlers:
+    - name: restart nginx
+      service:
+        name: nginx
+        state: restarted
+
+    - name: restart ufw
+      service: 
+        name: ufw 
+        state: restarted
+
+#      ufw:
+ #       state: reloaded
+  #    when: ufw_state == 'enabled'

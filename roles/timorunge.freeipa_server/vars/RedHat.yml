@@ -1,0 +1,11 @@
+---
+
+# List of required packages
+# Type: List
+freeipa_server_pkgs:
+  - bind
+  - bind-dyndb-ldap
+  - ipa-server
+  - ipa-server-common
+  - ipa-server-dns
+  - ipa-server-trust-ad

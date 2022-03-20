@@ -1,0 +1,97 @@
+---
+- hosts: all
+  remote_user: root
+  become: yes
+  become_method: sudo
+
+###Set Hostname from host setup in ansible host
+  vars:
+    LOCAL_HOSTNAME: '{{ inventory_hostname }}'
+    LOCAL_FQDN_NAME: 'dmz.drokdev.pro'
+  tasks:
+    - name: Set the timezone for the server to be UTC
+      command: file state=link /usr/share/zoneinfo/UTC /etc/localtime
+    - name: Set up a unique hostname
+      hostname: name={{ LOCAL_HOSTNAME }}
+    - name: Add the server's domain to the hosts file
+      lineinfile: dest=/etc/hosts
+                  regexp='.*{{ item }}$'
+                  line="{{ hostvars[item].ansible_default_ipv4.address }} {{ LOCAL_FQDN_NAME }} {{ LOCAL_HOSTNAME }}"
+                  state=present
+      when: hostvars[item].ansible_default_ipv4.address is defined
+      with_items: "{{ groups['all'] }}"
+
+###
+    - name: Ensure EPEL is enabled 
+      yum: 
+        name: epel-release 
+        state: present
+      when: ansible_facts['distribution'] == "CentOS"
+
+###Running Updates###
+    - name: "Update repositories cache Centos"
+      yum:
+        name: '*'
+        state: latest
+      when: ansible_facts['distribution'] == "CentOS"
+    - name: "Update repositories cache Ubuntu"
+      apt:
+        name: '*'
+        state: latest
+      when: ansible_facts['distribution'] == "Ubuntu"
+
+###Installing common packages###
+    - name: Install common packages, vim, freeipa-client, ipa-admintools, open-vm-tools
+      yum:
+          name: "{{ packages }}"
+      vars:
+          packages:
+          - vim
+          - freeipa-client 
+          - ipa-admintools 
+          - open-vm-tools
+      when: ansible_facts['distribution'] == "CentOS"
+    - name: Install common packages, vim, freeipa-client, ipa-admintools, open-vm-tools
+      apt:
+          name: "{{ packages }}"
+      vars:
+          packages:
+          - vim
+          - freeipa-client 
+          - ipa-admintools 
+          - open-vm-tools
+      when: ansible_facts['distribution'] == "Ubuntu"
+
+###Firewall rules###
+    - name: Start firewalld
+      service: 
+        name: firewalld
+        state: started
+        enabled: yes
+    - name: Open firewall port for freeipa-client
+      firewalld:
+        service: "{{item}}" 
+        zone: public
+        immediate: yes # this is the firewall-cmd --reload
+        permanent: true
+        state: enabled
+      with_items:
+        ['dns']  
+      when: ansible_facts['distribution'] == "CentOS"
+    - name: Open firewall port for freeipa-client
+      ufw:
+        state: enabled
+        rule: allow
+        port: "{{item}}" 
+      with_items:
+        ['53', '22']
+      notify:
+      - restart ufw
+      when: ansible_facts['distribution'] == "Ubuntu"
+
+  handlers:
+    - name: restart ufw
+      service: 
+        name: ufw 
+        state: restarted
+      when: ansible_facts['distribution'] == "Ubuntu"

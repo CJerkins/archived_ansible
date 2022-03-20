@@ -1,0 +1,9 @@
+ansible all -m ping
+
+ansible hostname -m setup
+
+ansible-playbook --ask-pass -u root initialize_basic_user.yml
+
+openssl passwd -1 
+
+Hashed passwd for yubi- $1$tEUEd11.$N5QSX6NtRIlfmhIokSKGX0

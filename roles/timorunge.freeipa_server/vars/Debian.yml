@@ -1,0 +1,10 @@
+---
+
+# List of required packages
+# Type: List
+freeipa_server_pkgs:
+  - bind9
+  - bind9-dyndb-ldap
+  - freeipa-common
+  - freeipa-server
+  - freeipa-server-dns

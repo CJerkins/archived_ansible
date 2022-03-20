@@ -1,0 +1,26 @@
+---
+
+- include: prosody.yml
+  tags:
+    - prosody
+
+- include: monitoring.yml
+  when: prosody_monitoring
+  tags:
+    - prosody
+    - molecule-notest
+
+- include: inactive.yml
+  tags:
+    - prosody
+
+- include: ldap.yml
+  when: prosody_authentication == "cyrus"
+  tags:
+    - prosody
+    - ldap
+
+- include: web.yml
+  when: prosody_web_dir|default(False) and prosody_web_user|default(False)
+  tags:
+    - web

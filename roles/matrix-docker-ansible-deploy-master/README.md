@@ -1,0 +1,139 @@
+# Matrix (An open network for secure, decentralized communication) server setup using Ansible and Docker
+
+## Purpose
+
+This Ansible playbook is meant to easily let you run your own [Matrix](http://matrix.org/) homeserver.
+
+That is, it lets you join the Matrix network with your own `@<username>:<your-domain>` identifier, all hosted on your own server.
+
+Using this playbook, you can get the following services configured on your server:
+
+- a [Synapse](https://github.com/matrix-org/synapse) homeserver - storing your data and managing your presence in the [Matrix](http://matrix.org/) network
+
+- (optional) [Amazon S3](https://aws.amazon.com/s3/) storage for Synapse's content repository (`media_store`) files using [Goofys](https://github.com/kahing/goofys)
+
+- (optional, default) [PostgreSQL](https://www.postgresql.org/) database for Synapse. [Using an external PostgreSQL server](docs/configuring-playbook-external-postgres.md) is also possible.
+
+- (optional, default) a [coturn](https://github.com/coturn/coturn) STUN/TURN server for WebRTC audio/video calls
+
+- (optional, default) free [Let's Encrypt](https://letsencrypt.org/) SSL certificate, which secures the connection to the Synapse server and the Riot web UI
+
+- (optional, default) a [Riot](https://riot.im/) web UI, which is configured to connect to your own Synapse server by default
+
+- (optional, default) an [mxisd](https://github.com/kamax-io/mxisd) Matrix Identity server
+
+- (optional, default) an [Exim](https://www.exim.org/) mail server, through which all Matrix services send outgoing email (can be configured to relay through another SMTP server)
+
+- (optional, default) an [nginx](http://nginx.org/) web server, listening on ports 80 and 443 - standing in front of all the other services. Using your own webserver [is possible](docs/configuring-playbook-own-webserver.md)
+
+- (optional, advanced) the [matrix-synapse-rest-auth](https://github.com/kamax-io/matrix-synapse-rest-auth) REST authentication password provider module
+
+- (optional, advanced) the [matrix-synapse-shared-secret-auth](https://github.com/devture/matrix-synapse-shared-secret-auth) password provider module
+
+- (optional, advanced) the [matrix-synapse-ldap3](https://github.com/matrix-org/matrix-synapse-ldap3) LDAP Auth password provider module
+
+- (optional, advanced) the [Matrix Corporal](https://github.com/devture/matrix-corporal) reconciliator and gateway for a managed Matrix server
+
+- (optional) the [mautrix-telegram](https://github.com/tulir/mautrix-telegram) bridge for bridging your Matrix server to [Telegram](https://telegram.org/)
+
+- (optional) the [mautrix-whatsapp](https://github.com/tulir/mautrix-whatsapp) bridge for bridging your Matrix server to [Whatsapp](https://www.whatsapp.com/)
+
+- (optional) the [matrix-appservice-irc](https://github.com/TeDomum/matrix-appservice-irc) bridge for bridging your Matrix server to [IRC](https://wikipedia.org/wiki/Internet_Relay_Chat)
+
+- (optional) the [matrix-appservice-discord](https://github.com/Half-Shot/matrix-appservice-discord) bridge for bridging your Matrix server to [Discord](https://discordapp.com/)
+
+- (optional) [Dimension](https://github.com/turt2live/matrix-dimension), an open source integrations manager for matrix clients
+
+Basically, this playbook aims to get you up-and-running with all the basic necessities around Matrix, without you having to do anything else.
+
+**Note**: the list above is exhaustive. It includes optional or even some advanced components that you will most likely not need.
+Sticking with the defaults (which install a subset of the above components) is the best choice, especially for a new installation.
+You can always re-run the playbook later to add or remove components.
+
+
+## What's different about this Ansible playbook?
+
+This is similar to the [EMnify/matrix-synapse-auto-deploy](https://github.com/EMnify/matrix-synapse-auto-deploy) Ansible deployment, but:
+
+- this one is a complete Ansible playbook (instead of just a role), so it's **easier to run** - especially for folks not familiar with Ansible
+
+- this one installs and hooks together **a lot more Matrix-related services** for you (see above)
+
+- this one **can be re-ran many times** without causing trouble
+
+- works on both **CentOS** (7.0+) and Debian-based distributions (**Debian** 9/Stretch+, **Ubuntu** 16.04+)
+
+- this one installs everything in a single directory (`/matrix` by default) and **doesn't "contaminate" your server** with files all over the place
+
+- this one **doesn't necessarily take over** ports 80 and 443. By default, it sets up nginx for you there, but you can also [use your own webserver](docs/configuring-playbook-own-webserver.md)
+
+- this one **runs everything in Docker containers**, so it's likely more predictable and less fragile (see [Docker images used by this playbook](#docker-images-used-by-this-playbook))
+
+- this one retrieves and automatically renews free [Let's Encrypt](https://letsencrypt.org/) **SSL certificates** for you
+
+- this one optionally can store the `media_store` content repository files on [Amazon S3](https://aws.amazon.com/s3/) (but defaults to storing files on the server's filesystem)
+
+- this one optionally **allows you to use an external PostgreSQL server** for Synapse's database (but defaults to running one in a container)
+
+
+## Installation
+
+To configure and install Matrix on your own server, follow the [README in the docs/ directory](docs/README.md).
+
+
+## Changes
+
+This playbook evolves over time, sometimes with backward-incompatible changes.
+
+When updating the playbook, refer to [the changelog](CHANGELOG.md) to catch up with what's new.
+
+
+## Docker images used by this playbook
+
+This playbook sets up your server using the following Docker images:
+
+- [matrixdotorg/synapse](https://hub.docker.com/r/matrixdotorg/synapse/) - the official [Synapse](https://github.com/matrix-org/synapse) Matrix homeserver
+
+- [instrumentisto/coturn](https://hub.docker.com/r/instrumentisto/coturn/) - the [Coturn](https://github.com/coturn/coturn) STUN/TURN server (optional)
+
+- [bubuntux/riot-web](https://hub.docker.com/r/bubuntux/riot-web/) - the [Riot.im](https://about.riot.im/) web client (optional)
+
+- [kamax/mxisd](https://hub.docker.com/r/kamax/mxisd/) - the [mxisd](https://github.com/kamax-io/mxisd) Matrix Identity server (optional)
+
+- [postgres](https://hub.docker.com/_/postgres/) - the [Postgres](https://www.postgresql.org/) database server (optional)
+
+- [ewoutp/goofys](https://hub.docker.com/r/ewoutp/goofys/) - the [Goofys](https://github.com/kahing/goofys) Amazon [S3](https://aws.amazon.com/s3/) file-system-mounting program (optional)
+
+- [devture/exim-relay](https://hub.docker.com/r/devture/exim-relay/) - the [Exim](https://www.exim.org/) email server (optional)
+
+- [devture/matrix-corporal](https://hub.docker.com/r/devture/matrix-corporal/) - [Matrix Corporal](https://github.com/devture/matrix-corporal): reconciliator and gateway for a managed Matrix server (optional)
+
+- [nginx](https://hub.docker.com/_/nginx/) - the [nginx](http://nginx.org/) web server (optional)
+
+- [certbot/certbot](https://hub.docker.com/r/certbot/certbot/) - the [certbot](https://certbot.eff.org/) tool for obtaining SSL certificates from [Let's Encrypt](https://letsencrypt.org/) (optional)
+
+- [tulir/mautrix-telegram](https://hub.docker.com/r/tulir/mautrix-telegram/) - the [mautrix-telegram](https://github.com/tulir/mautrix-telegram) bridge to [Telegram](https://telegram.org/) (optional)
+
+- [tulir/mautrix-whatsapp](https://hub.docker.com/r/tulir/mautrix-whatsapp/) - the [mautrix-whatsapp](https://github.com/tulir/mautrix-whatsapp) bridge to [Whatsapp](https://www.whatsapp.com/) (optional)
+
+- [tedomum/matrix-appservice-irc](https://hub.docker.com/r/tedomum/matrix-appservice-irc/) - the [matrix-appservice-irc](https://github.com/TeDomum/matrix-appservice-irc) bridge to [IRC](https://wikipedia.org/wiki/Internet_Relay_Chat) (optional)
+
+- [halfshot/matrix-appservice-discord](https://hub.docker.com/r/halfshot/matrix-appservice-discord) - the [matrix-appservice-discord](https://github.com/Half-Shot/matrix-appservice-discord) bridge to [Discord](https://discordapp.com/) (optional)
+
+- [turt2live/matrix-dimension](https://hub.docker.com/r/turt2live/matrix-dimension) - the [Dimension](https://dimension.t2bot.io/) integrations manager (optional)
+
+
+## Deficiencies
+
+This Ansible playbook can be improved in the following ways:
+
+- setting up automatic backups to one or more storage providers
+
+
+## Support
+
+- Matrix room: [#matrix-docker-ansible-deploy:devture.com](https://matrix.to/#/#matrix-docker-ansible-deploy:devture.com)
+
+- IRC channel: `#matrix-docker-ansible-deploy` on the [Freenode](https://freenode.net/) IRC network (irc.freenode.net)
+
+- Github issues: [spantaleev/matrix-docker-ansible-deploy/issues](https://github.com/spantaleev/matrix-docker-ansible-deploy/issues)

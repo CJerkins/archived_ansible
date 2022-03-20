@@ -1,0 +1,52 @@
+server {
+	listen 443 ssl http2;
+	listen [::]:443 ssl http2;
+        root /var/www/html;
+        index index.html;
+
+	server_name test.drokdev.pro;
+	
+	# SSL
+	# Letsencrypt Certs installed
+	#ssl_certificate /etc/letsencrypt/live/www.drokdev.pro/fullchain.pem;
+	#ssl_certificate_key /etc/letsencrypt/live/www.drokdev.pro/privkey.pem;
+	#ssl_trusted_certificate /etc/letsencrypt/live/www.drokdev.pro/chain.pem;
+
+	# Namecheap Certs installed
+	ssl_certificate /etc/nginx/ssl/cert_chain.crt;
+	ssl_certificate_key /etc/nginx/ssl/drokdev_pro.key;
+	#ssl_trusted_certificate /etc/etc/nginx/ssl/drokdev_pro/;
+        location / {
+	    try_files $uri $uri/ =404;         
+	}
+
+	include nginxconfig.io/general.conf;
+}
+# subdomains redirect
+server {
+	listen 443 ssl http2;
+	listen [::]:443 ssl http2;
+	server_name *.drokdev.pro;
+	# SSL
+	# Letsencrypt Certs installed
+	#ssl_certificate /etc/letsencrypt/live/www.drokdev.pro/fullchain.pem;
+	#ssl_certificate_key /etc/letsencrypt/live/www.drokdev.pro/privkey.pem;
+	#ssl_trusted_certificate /etc/letsencrypt/live/www.drokdev.pro/chain.pem;
+	
+	# Namecheap Certs installed
+        ssl_certificate /etc/nginx/ssl/cert_chain.crt;
+        ssl_certificate_key /etc/nginx/ssl/drokdev_pro.key;
+        #ssl_trusted_certificate /etc/;
+
+	return 301 https://test.drokdev.pro$request_uri;
+}
+# HTTP redirect
+server {
+	listen 80;
+	listen [::]:80;
+	server_name .drokdev.pro;
+	include nginxconfig.io/letsencrypt.conf;
+	location / {
+		return 301 https://.drokdev.pro$request_uri;
+	}
+}

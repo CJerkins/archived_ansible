@@ -1,0 +1,45 @@
+- include: postgresql.yml
+
+- name: install the prosody COPR repo
+  copy: src=yum.repos.d/goldmann-prosody-epel-7.repo dest=/etc/yum.repos.d
+  sudo: yes
+
+- name: install prosody
+  yum: name={{ item }} state=installed
+  with_items:
+    - epel-release
+    - prosody-0.10
+  sudo: yes
+
+- name: copy the extra modules
+  copy: src=modules dest=/usr/lib64/prosody
+  notify: restart prosody
+  sudo: yes
+
+- name: copy the MAM module
+  copy: src=mod_mam dest=/usr/lib64/prosody/modules
+  notify: restart prosody
+  when: prosody_enable_mam
+  sudo: yes
+
+- name: copy the config
+  template: src=prosody.cfg.lua.j2 dest=/etc/prosody/prosody.cfg.lua owner=prosody group=prosody
+  notify: restart prosody
+  sudo: yes
+
+- name: create the ssl certs directory
+  file: path=/etc/prosody/ssl state=directory owner=prosody group=prosody
+  sudo: yes
+
+- name: copy the ssl certificate
+  copy: src=ssl/{{ prosody_domain }}.{{ item }} dest=/etc/prosody/ssl owner=prosody group=prosody mode=0600
+  notify: restart prosody
+  with_items:
+    - key
+    - pem
+  sudo: yes
+
+- name: enable and start the service
+  service: name=prosody enabled=yes state=started
+  sudo: yes
+

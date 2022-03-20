@@ -1,0 +1,130 @@
+---
+
+- name: Create groups
+  group:
+    name: "{{ item }}"
+    state: present
+  loop:
+    - ipaapi
+
+- name: Create server groups
+  group:
+    name: "{{ item }}"
+    state: present
+  loop:
+    - "{{ freeipa_httpd_group }}"
+    - kdcproxy
+    - pkiuser
+  when: freeipa_enable_server
+
+- name: Create users
+  user:
+    create_home: yes
+    groups: "{{ item }}"
+    name: "{{ item }}"
+    shell: /usr/sbin/nologin
+  loop:
+    - ipaapi
+
+- name: Create server users
+  user:
+    create_home: yes
+    groups: "{{ item }}"
+    name: "{{ item }}"
+    shell: /usr/sbin/nologin
+  loop:
+    - kdcproxy
+    - pkiuser
+  when: freeipa_enable_server
+
+- name: Create httpd user with ipaaapi group
+  user:
+    create_home: yes
+    groups:
+      - "{{ freeipa_httpd_user }}"
+      - ipaapi
+    name: "{{ freeipa_httpd_user }}"
+    shell: /usr/sbin/nologin
+  when: freeipa_enable_server
+
+- name: Create directories
+  file:
+    group: "{{ item.value.group }}"
+    mode: "{{ item.value.mode }}"
+    owner: "{{ item.value.owner }}"
+    path: "{{ item.key }}"
+    state: directory
+  loop: "{{ (freeipa_dirs | combine(freeipa_additional_dirs)) | dict2items }}"
+
+- name: Create httpd directories
+  file:
+    group: "{{ item.value.group }}"
+    mode: "{{ item.value.mode }}"
+    owner: "{{ item.value.owner }}"
+    path: "{{ item.key }}"
+    state: directory
+  loop: "{{ freeipa_httpd_dirs | dict2items }}"
+  when: freeipa_enable_server and
+        freeipa_httpd_dirs
+
+- name: Install FreeIPA dependencies
+  package:
+    name: "{{ freeipa_dependency_pkgs }}"
+    state: present
+    update_cache: "{{ omit if ((ansible_pkg_mgr == 'dnf') and (ansible_version is version('2.7', '<'))) else 'yes' }}"
+  delay: 10
+  register: result
+  retries: 3
+  until: result is succeeded
+
+- name: Install FreeIPA SSSD dependencies
+  package:
+    name: "{{ freeipa_sssd_dependency_pkgs }}"
+    state: present
+    update_cache: "{{ omit if ((ansible_pkg_mgr == 'dnf') and (ansible_version is version('2.7', '<'))) else 'yes' }}"
+  delay: 10
+  register: result
+  retries: 3
+  until: result is succeeded
+  when: not freeipa_3rdparty_sssd_packages
+
+- name: Install FreeIPA server dependencies
+  package:
+    name: "{{ freeipa_dependency_pkgs_srv }}"
+    state: present
+    update_cache: "{{ omit if ((ansible_pkg_mgr == 'dnf') and (ansible_version is version('2.7', '<'))) else 'yes' }}"
+  delay: 10
+  register: result
+  retries: 3
+  until: result is succeeded
+  when: freeipa_enable_server
+
+- name: Install FreeIPA build dependencies
+  package:
+    name: "{{ freeipa_build_dependency_pkgs }}"
+    state: present
+    update_cache: "{{ omit if ((ansible_pkg_mgr == 'dnf') and (ansible_version is version('2.7', '<'))) else 'yes' }}"
+  delay: 10
+  register: result
+  retries: 3
+  until: result is succeeded
+
+- name: Install FreeIPA SSSD build dependencies
+  package:
+    name: "{{ freeipa_build_sssd_dependency_pkgs }}"
+    state: present
+    update_cache: "{{ omit if ((ansible_pkg_mgr == 'dnf') and (ansible_version is version('2.7', '<'))) else 'yes' }}"
+  delay: 10
+  register: result
+  retries: 3
+  until: result is succeeded
+  when: not freeipa_3rdparty_sssd_packages
+
+- name: Install FreeIPA pip dependencies
+  pip:
+    name: "{{ freeipa_pip_dependency_pkgs }}"
+    state: present
+  delay: 10
+  register: result
+  retries: 3
+  until: result is succeeded
