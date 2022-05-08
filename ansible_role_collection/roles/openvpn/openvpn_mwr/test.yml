@@ -1,0 +1,7 @@
+---
+- hosts: mwr
+  gather_facts: true
+  become: yes
+  roles:
+    - {role: openvpn/openvpn_mwr, clients: [client1, client2],
+                        openvpn_port: 1194}

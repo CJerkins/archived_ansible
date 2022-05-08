@@ -1,0 +1,35 @@
+---
+- name: Installing takserver
+  hosts: 
+    - takserver0 
+  become: yes
+  vars:
+    password_takadmin: Paddle#Tibia1
+    user_webadmin: admin
+    password_webadmin: Paddle#Tibia1
+    admincert: webAdmin0
+    name_takclients:
+      - admin0
+      - webAdmin0
+      # - webAdmin1
+      - drok
+      - leann
+      - brooke
+      # - jed3
+      # - jed4
+      # - jed5
+  roles:
+    # - takserver/tak_install
+    - takserver/tak_certs
+    # - takserver/tak_config
+    # - takserver/tak_firewall
+    
+
+
+# - name: Installing openfire
+#   hosts: takserver0
+#   become: yes
+#   roles:
+#     - takserver/openfire
+
+

@@ -1,0 +1,47 @@
+server {
+    listen 443 ssl http2;
+    listen [::]:443 ssl http2;
+
+    server_name pbx0.local.drokdev.pro;
+    root /var/www/pbx0.local.drokdev.pro/public;
+
+    # SSL
+    ssl_certificate {{dir_ssl_key}}/pbx/cert.pem;
+    ssl_certificate_key {{dir_ssl_key}}/pbx/key.pem;
+
+    # security
+    include security.conf;
+
+    # reverse proxy
+    location / {
+        proxy_pass http://172.16.36.4:80;
+        include proxy.conf;
+    }
+
+    # additional config
+    include general.conf;
+}
+
+# subdomains redirect
+server {
+    listen 443 ssl http2;
+    listen [::]:443 ssl http2;
+
+    server_name *.pbx0.local.drokdev.pro;
+
+    # SSL
+    ssl_certificate {{dir_ssl_key}}/pbx/cert.pem;
+    ssl_certificate_key {{dir_ssl_key}}/pbx/key.pem;
+
+    return 301 https://pbx0.local.drokdev.pro$request_uri;
+}
+
+# HTTP redirect
+server {
+    listen 80;
+    listen [::]:80;
+
+    server_name .pbx0.local.drokdev.pro;
+
+    return 301 https://pbx0.local.drokdev.pro$request_uri;
+}

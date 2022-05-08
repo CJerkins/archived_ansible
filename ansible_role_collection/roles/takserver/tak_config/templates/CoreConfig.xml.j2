@@ -1,0 +1,105 @@
+<!--Managed by ansible-->
+
+<Configuration xmlns="http://bbn.com/marti/xml/config">
+    <network multicastTTL="5">
+        {% if input_custom is defined %}
+        {% for input in input_custom %}
+{#             {% if auth is defined %}
+        <input auth="{{ input.auth | default(omit) }}" _name="{{ input.name }}" protocol="{{ input.protocol }}" port="{{ input.port }}"/>
+            {% elif %}
+        <input _name="{{ input.name }}" protocol="{{ input.protocol }}" port="{{ input.port }}"/>
+            {% endif %} #}
+        <input _name="{{ input.name }}" protocol="{{ input.protocol }}" port="{{ input.port }}"/>
+        {% endfor %}
+        {% endif %}
+{% if input_tcp_port is defined %}<input _name="stdtcp" protocol="tcp" port="{{ input_tcp_port }}"/>
+        {% endif %}
+{% if input_udp_port is defined %}<input _name="stdudp" protocol="udp" port="{{ input_udp_port }}"/>
+        {% endif %}
+{% if input_stcp_port is defined %}<input _name="streamtcp" protocol="stcp" port="{{ input_stcp_port }}"/>
+        {% endif %}
+{% if input_tls_port is defined %}<input _name="stdssl" protocol="tls" port="{{ input_tls_port }}"/>
+        {% endif %}
+{% if input_ldap_port is defined %}<input auth="ldap" _name="ldapssl" protocol="tls" port="{{ input_ldap_port }}"/>
+        {% endif %}
+{% if input_ad_port is defined %}<input auth="ldap" _name="adssl" protocol="tls" port="{{ input_ad_port }}"/>
+        {% endif %}
+{% if input_https_port is defined %}<connector port="{{ input_https_port }}" _name="https"/>
+        {% endif %}
+{% if input_federation_port is defined %}<connector port="{{ input_federation_port }}" useFederationTruststore="true" _name="fed_https"/>
+        {% endif %}
+{% if input_clientauth_port is defined %}<connector port="{{ input_clientauth_port }}" clientAuth="false" _name="cert_https"/>
+        {% endif %}
+{% if input_http_port is defined %}<connector port="{{ input_http_port }}" tls="false" _name="http_plaintext"/>
+{% endif %}
+        <announce/>
+    </network>
+    <auth x509groups="true" x509addAnonymous="true">
+{% if input_ldap_port is defined %}
+        <ldap url="{{ ldap_server_url }}"
+            userstring="{{ ldap_userstring }}" 
+            updateinterval="{{ ldap_update_interval }}" 
+            groupprefix="{{ ldap_group_prefix }}"  
+            style="DS" 
+            ldapSecurityType="{{ ldap_security_type }}"
+            serviceAccountDN="{{ ldap_account_domain }}" 
+            groupBaseRDN="{{ ldap_group_basedn }}"
+            />
+{#             serviceAccountCredential="{{ ldap_account_password }}" 
+            groupObjectClass="{{ ldap_group_class }}" #}
+    {% elif input_ad_port is defined %}
+        <ldap url="{{ ad_server_url }}"
+            userstring="{{ ad_userstring }}"
+            updateinterval="{{ ad_update_interval }}"
+            groupprefix="{{ ad_group_prefix }}"
+            style="AD" 
+            ldapSecurityType="{{ ad_security_type }}" 
+            serviceAccountDN="{{ ad_account_domain }}"
+            serviceAccountCredential="{{ ad_account_password }}" 
+            groupObjectClass="{{ ad_group_class }}" 
+            groupBaseRDN="{{ ad_group_basedn }}"
+            />
+    {% else %}
+        <File location="UserAuthenticationFile.xml"/>
+{% endif %}
+</auth>
+    <submission ignoreStaleMessages="false" validateXml="false"/>
+    <subscription reloadPersistent="false"/>
+    <repository enable="true" numDbConnections="64" primaryKeyBatchSize="500" insertionBatchSize="500">
+{% if database_url is defined %}
+        <connection url="{{ database_url }}" username="{{ database_user }}" password="{{ database_pass }}"/>
+{% else %}
+        <connection url="jdbc:postgresql://127.0.0.1:5432/cot" username="martiuser" password="pass4marti"/>
+{% endif %}
+    </repository>
+    <repeater enable="true" periodMillis="3000" staleDelayMillis="15000">
+        <repeatableType initiate-test="/event/detail/emergency[@type='911 Alert']" cancel-test="/event/detail/emergency[@cancel='true']" _name="911"/>
+        <repeatableType initiate-test="/event/detail/emergency[@type='Ring The Bell']" cancel-test="/event/detail/emergency[@cancel='true']" _name="RingTheBell"/>
+        <repeatableType initiate-test="/event/detail/emergency[@type='Geo-fence Breached']" cancel-test="/event/detail/emergency[@cancel='true']" _name="GeoFenceBreach"/>
+        <repeatableType initiate-test="/event/detail/emergency[@type='Troops In Contact']" cancel-test="/event/detail/emergency[@cancel='true']" _name="TroopsInContact"/>
+    </repeater>
+    <filter>
+        <thumbnail/>
+        <urladd host="http://{{ takserver_address }}:8080"/>
+        <flowtag enable="false" text=""/>
+        <streamingbroker enable="true"/>
+        <scrubber enable="false" action="overwrite"/>
+    </filter>
+    <buffer>
+        <latestSA enable="true"/>
+        <queue>
+            <priority/>
+        </queue>
+    </buffer>
+    <dissemination smartRetry="false"/>
+    <security>
+        <tls keystore="JKS" keystoreFile="{{ dir_takserver_key }}/{{ name_takserver }}.jks" keystorePass="{{ password_ca }}" truststore="JKS" truststoreFile="{{ dir_takserver_key }}/truststore-root.jks" truststorePass="{{ password_ca }}" context="TLSv1.2" keymanager="SunX509"/>
+    </security>
+    <federation>
+        <federation-server webBaseUrl="https://{{ takserver_address }}:8443/Marti">
+            <tls keystore="JKS" keystoreFile="{{ dir_takserver_key }}/{{ name_takserver }}.jks" keystorePass="{{ password_ca }}" truststore="JKS" truststoreFile="{{ dir_takserver_key }}/fed-truststore.jks" truststorePass="{{ password_ca }}" keymanager="SunX509"/>
+        </federation-server>
+    </federation>
+    <plugins/>
+    <cluster/>
+</Configuration>

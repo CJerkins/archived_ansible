@@ -1,0 +1,28 @@
+---
+container_state: running
+setenforce: false
+
+### Example varibles ###
+container_name: tasmoadmin
+container_image: raymondmm/tasmoadmin:latest
+container_dir_owner: root
+container_dir_group: root
+container_dir_data: data
+# container_add_cmd_0: ## if you need to run additional cmds proir to running the container. You have to place these in the podman_container_systemd task/main.yml. Any subseqental additional cmd use the first one as a template and label by number.
+# container_add_cmd_1: ## if you need to run additional cmds proir to running the container. You have to place these in the podman_container_systemd task/main.yml. Any subseqental additional cmd use the first one as a template and label by number.
+# container_dir_ssl: ssl
+container_run_args: >-
+  -d
+  -p 5555:80
+  -v "{{podman_exported_container_volumes_basedir}}/{{ container_dir_data }}:/data:Z"
+  --restart=always
+  --net=host
+container_firewall_ports:
+  - 5555/tcp 
+
+## goes to group_vars ##
+# podman_exported_container_volumes_basedir: /var/lib/containers/exported_volumes
+# domain: localdomain
+# timezone: "Europe/Helsinki"
+
+# podman run -d -p 5555:80 -v /var/lib/containers/tasmoadmin/data:/data --name=tasmoadmin --restart=always raymondmm/tasmoadmin

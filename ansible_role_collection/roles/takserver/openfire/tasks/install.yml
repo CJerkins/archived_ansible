@@ -1,0 +1,42 @@
+---
+- name: Install additional packages
+  yum:
+    name: "{{ item }}"
+  with_items:
+    - wget
+    - vim
+    - glibc.i686
+  when: ansible_distribution == 'CentOS'
+# - name: Download openfire server rpm
+#   get_url:
+#     url: https://www.igniterealtime.org/downloads/download-landing.jsp?file=openfire/openfire-4.4.4-1.x86_64.rpm
+#     dest: /tmp
+
+- name: Download openfire server rpm
+  command: wget -O /tmp/openfire-4.4.4-1.x86_64.rpm https://www.igniterealtime.org/downloadServlet?filename=openfire/openfire-4.4.4-1.x86_64.rpm
+
+- name: Install takserver rpm from a local file
+  yum:
+    name: /tmp/openfire-4.4.4-1.x86_64.rpm
+
+- name: Enable and start openfire server
+  systemd:
+    name: openfire
+    state: started
+    enabled: yes
+
+# - name: openfire.xml template
+#   template:
+#     src: "openfire.xml.j2"
+#     dest: /opt/openfire/conf/openfire.xml
+#     owner: daemon
+#     group: daemon
+#     mode: 0644
+
+# - name: security.xml template
+#   template:
+#     src: "security.xml.j2"
+#     dest: /opt/openfire/conf/security.xml
+#     owner: daemon
+#     group: daemon
+#     mode: 0644

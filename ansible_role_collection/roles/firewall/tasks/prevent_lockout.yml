@@ -1,0 +1,61 @@
+---
+- name: Install firewalld
+  package:
+   name: firewalld
+   state: present
+  when: 
+    - ansible_distribution == "CentOS" or ansible_distribution=="RedHat"
+
+- name: Start firewalld
+  systemd:
+    name: firewalld
+    masked: no
+    state: started
+  when: 
+    - ansible_distribution == "CentOS" or ansible_distribution=="RedHat"
+
+- name: Enable SSH Port (firewalld) to prevent lock out
+  firewalld:
+    service: ssh
+    permanent: yes
+    immediate: yes
+    state: enabled
+  when: 
+    - ansible_distribution == "CentOS" or ansible_distribution=="RedHat"
+
+
+
+- name: Install ufw
+  package:
+   name: ufw
+   state: present
+  when: 
+    - ansible_distribution == "Ubuntu"
+
+- name: Start ufw service
+  systemd:
+    name: ufw
+    enabled: true
+    masked: no
+    state: started
+  when: 
+    - ansible_distribution == "Ubuntu"
+
+- name: Enable ufw
+  ufw:
+    direction: incoming
+    state: enabled
+    policy: allow
+  when: 
+    - ansible_distribution == "Ubuntu"
+
+- name: Enable SSH Port (ufw) to prevent lock out
+  ufw:
+    direction: in
+    rule: allow
+    name: OpenSSH
+  when: 
+    - ansible_distribution == "Ubuntu"
+
+
+    

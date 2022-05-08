@@ -1,0 +1,43 @@
+---
+- name: Install LDAP plugin
+  package:
+   name: openvpn-auth-ldap
+   state: present
+  when: openvpn_use_ldap
+
+- name: Create LDAP config directory
+  file:
+    path: "{{ openvpn_base_dir }}/auth"
+    state: directory
+    owner: root
+    group: root
+  when: openvpn_use_ldap
+
+- name: Create log directory
+  file:
+    dest: "{{ openvpn_log_dir }}"
+    owner: root
+    group: root
+    mode: 0755
+
+- name: Create jails directory
+  file:
+    path: "{{ openvpn_base_dir }}/{{openvpn_server_name}}-jail"
+    state: directory
+  when: (openvpn_jails | default(false))
+
+- name: Create jails directory
+  file:
+    path: "{{ openvpn_base_dir }}/{{openvpn_server_name}}-jail/tmp"
+    state: directory
+    mode: '1777'
+  when: (openvpn_jails | default(false))
+
+- name: Create client-config directory
+  file:
+    dest: "{{ openvpn_base_dir }}/ccd"
+    state: directory
+    owner: root
+    group: root
+    mode: 0755
+  when: openvpn_server_address is defined

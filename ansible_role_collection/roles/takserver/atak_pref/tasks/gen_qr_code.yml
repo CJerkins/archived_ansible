@@ -1,0 +1,31 @@
+---
+- name: Install qrencoder
+  packages:
+    name: 
+      - qrencode
+    state: present
+  when: qr_code
+
+- name: create qr code for https_fileserver url
+  command: qrencode -o "{{ tak_device_pref_location }}/{{ item.0 }}.png {{ httpd_domain_name }}/{{ item.0 }}"
+  with_items: "{{ device_name }}"
+
+- name: use find to get the files list which you want to copy/fetch
+  find: 
+    paths: "{{ tak_device_pref_location }}/{{ item.0 }}/*.png"
+  register: fetch_qrcode
+  when: qrcode_fetch_dir is defined
+  tags:
+    - fetch
+
+- name: use fetch to get the files
+  fetch:
+    src: "{{ item.path }}"
+    dest: "{{ qrcode_fetch_dir }}"
+    flat: yes
+  with_items: 
+      - "{{ fetch_qrcode.files }}"
+  when: qrcode_fetch_dir is defined
+  tags:
+    - fetch
+      

@@ -1,0 +1,12 @@
+---
+- name: Playbook to handle hosts
+  hosts: ipaserver
+  
+  tasks:
+  - name: Ensure host host is absent
+    ipa_host:
+      name: host01.vanguard.local
+      state: absent
+      ipa_host: ipaserver.vanguard.local
+      ipa_user: admin
+      ipa_pass: drokDROK63

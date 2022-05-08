@@ -1,0 +1,58 @@
+---
+container_state: running
+available_externally: "false"
+setenforce: false
+
+
+### Example varibles ###
+container_name: Firefly
+container_dir_owner: root
+container_dir_group: root
+container_dir_postgresql: postgresql
+container_dir_mysql: mysql
+container_dir_upload: upload
+container_dir_export: export
+
+docker_firewall_ports:
+  - 8066/tcp 
+
+## goes to group_vars ##
+# docker_exported_container_volumes_basedir: /var/lib/containers/exported_volumes
+# domain: localdomain
+# timezone: "Europe/Helsinki"
+
+
+
+# docker run -d \
+# -v firefly_iii_export:/var/www/firefly-iii/storage/export \
+# -v firefly_iii_upload:/var/www/firefly-iii/storage/upload \ 
+# -p 80:80 \
+# -e APP_KEY=C6781862362779809488981005241096 \
+# -e DB_HOST=CHANGEME \
+# -e DB_PORT=5432 \
+# -e DB_DATABASE=CHANGEME \
+# -e DB_USERNAME=CHANGEME \
+# -e DB_PASSWORD=97001010084566770389 \
+# jc5x/firefly-iii:latest
+
+
+# docker run -d \
+# --name=firefly_iii_db \
+# -e POSTGRES_PASSWORD=97001010084566770389y \
+# -e POSTGRES_USER=firefly \
+# -v firefly_iii_db:/var/lib/postgresql/data \
+# postgres:10
+
+# docker run -d \
+# --name=firefly_iii_app \
+# --link=firefly_iii_db \
+# -e DB_HOST=firefly_iii_db \
+# -e DB_DATABASE=firefly \
+# -e DB_USERNAME=firefly \
+# -e DB_PORT=5432 \
+# -e DB_PASSWORD=97001010084566770389y \
+# -e APP_KEY=6781862362779809488981005241096 \
+# -p 8087:80 \
+# -v firefly_iii_export:/var/www/firefly-iii/storage/export \
+# -v firefly_iii_upload:/var/www/firefly-iii/storage/upload \
+# jc5x/firefly-iii:latest

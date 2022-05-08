@@ -1,0 +1,27 @@
+---
+- name: Update APT package cache
+  apt:
+    update_cache: true
+    cache_valid_time: 3600
+  tags:
+    - wg-install
+
+- name: Install required packages
+  package:
+    name: "{{ packages }}"
+    state: present
+  vars:
+    packages:
+    - software-properties-common
+    - linux-headers-{{ ansible_kernel }}
+    - linux-headers-generic
+  tags:
+    - wg-install
+
+- name: Add WireGuard repository
+  apt_repository:
+    repo: "ppa:wireguard/wireguard"
+    state: present
+    update_cache: yes
+  tags:
+    - wg-install

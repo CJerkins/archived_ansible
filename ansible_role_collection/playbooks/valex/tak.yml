@@ -1,0 +1,203 @@
+---
+# - name: Installing takserver
+#   hosts: 
+#     - takcerts
+#   become: yes
+#   vars:
+# ## -- cert vars -- ##
+#     # dir_takserver_key: /opt/tak/certs/files
+#     dir_cert_creation: /home/tak
+#     # dir_local: /Users/drok/Desktop/tak_certs/
+# ## -- CA vars -- ##
+#     name_ca: takTT # "Please give a name for your CA (no spaces).  It should be unique.  If you don't enter anything, or try something under 5 characters
+#     password_ca: jedi?trop3
+# ## -- config.cfg -- ##
+#     name_country: US
+#     name_state: Pineland
+#     name_city: Backwater
+#     name_company: vangaurd
+#     name_unit: vangaurd
+#     name_common: CN=takserver
+#     password_takadmin: jedi?trop3
+#     user_webadmin: admin
+#     password_webadmin: jedi?trop3
+#     admincert: webAdmin0
+# ## -- server and client certs vars -- ##
+#     name_takserver: takserver
+#     name_xmppserver: tak.vanguard.net 
+#     name_takclients:
+#       - admin0
+#       - admin1
+#       - webAdmin0
+#       - webAdmin1
+#       - jed0
+#       - jed1
+#       - jed2
+#       - jed3
+#       - jed4
+#       - jed5
+#       - jed6
+#       - jed7
+#       - jed8
+#       - jed9
+#       - jed10
+#       - jed11
+#       - jed12
+#       - jed13
+#       - rtf0
+#       - rtf1
+#       - whitecell0
+#       - whitecell1
+#       - whitecell2
+#       - whitecell3
+#   roles:
+#     - takserver/tak_certs
+
+- name: Installing takserver
+  hosts: 
+    - takcerts
+  become: yes
+  vars:
+## -- cert vars -- ##
+    # dir_takserver_key: /opt/tak/certs/files
+    dir_cert_creation: /home/tak
+    # dir_local: /Users/drok/Desktop/tak_certs/
+## -- CA vars -- ##
+    name_ca: takTT # "Please give a name for your CA (no spaces).  It should be unique.  If you don't enter anything, or try something under 5 characters
+    password_ca: pf?troop3
+## -- config.cfg -- ##
+    name_country: US
+    name_state: Pineland
+    name_city: Backwater
+    name_company: vangaurd
+    name_unit: vangaurd
+    name_common: CN=takserver
+    password_takadmin: pf?troop3
+    user_webadmin: admin
+    password_webadmin: pf?troop3
+    admincert: webAdmin0
+## -- server and client certs vars -- ##
+    name_takserver: takserver
+    name_xmppserver: tak.vanguard.net 
+    name_takclients:
+      - admin0
+      - admin1
+      - webAdmin0
+      - webAdmin1
+      - pf0
+      - pf1
+      - pf2
+      - pf4
+      - pf5
+      - pf6
+  roles:
+    - takserver/tak_certs
+
+
+# - name: Installing takserver
+#   hosts: 
+#     - tak
+#   become: yes
+#   vars:
+#     tak_version: 1.3.12-RELEASE6
+#     postgres_package: pgdg-redhat-repo-latest
+#     additional_packages: 
+#       - vim
+#       - htop
+#     firewall_ports:
+#       # - '8087/tcp'
+#       # - '8087/udp'
+#       - '8089/tcp'
+#       # - '8090/tcp'
+#       # - '8080/tcp'
+#       - '8443/tcp'
+#       # - '5432/tcp'
+#       # - '8446/tcp'
+#       # - '8444/tcp'
+#       # - '387/tcp'
+#       # - '636/tcp'
+#       ## vpn ports ##
+#       - '51821/udp'
+#       # - '1194/udp'
+#     ## -- CoreConfig.xml -- ##
+#     # Inputs
+#     # input_tcp_port: 8087
+#     # input_udp_port: 8087
+#     # input_stcp_port: 8088
+#     input_tls_port: 8089
+#     # input_ldap_port: 8090
+#     # input_ad_port: 8091
+#     input_https_port: 8443
+#     input_federation_port: 8444
+#     input_clientauth_port: 8446
+#     input_http_port: 8080
+#     # input_custom:
+#       # - {auth: ldap, name: stdssl, protocol: tls, port: 8092}
+#       # - {name: stdssl, protocol: tls, port: 8092}
+
+#     # LDAP Config
+#     # ldap_server_url: ldap://ipaserver0.local.drokdev.pro/
+#     # ldap_userstring: uid={username},cn=users,cn=accounts,dc=local,dc=drokdev,dc=pro
+#     # ldap_update_interval: 60
+#     # ldap_group_prefix: cn=tak_
+#     # ldap_security_type: simple
+#     # ldap_account_domain: uid=server_tak,cn=users,cn=accounts,dc=local,dc=drokdev,dc=pro
+#     # # ldap_account_password: Paddle#Tibia1#Thirsty
+#     # # ldap_group_class: groups
+#     # ldap_group_basedn: memberof=cn=tak_users,cn=groups,cn=accounts,dc=local,dc=drokdev,dc=pro
+
+#       user_webadmin: 
+#         - webAdmin0
+#         - webAdmin1
+#       takclients:
+#         groups:
+#           admins:
+#             - admin0
+#             - admin1
+#           alpha:
+#             - jed0
+#             - jed1
+#             - jed2
+#             - jed3
+#             - jed4
+#             - jed5
+#             - rtf0
+#             - rtf1
+#             - whitecell0
+#             - whitecell1
+#             - whitecell2
+#             - whitecell3
+#           bravo:
+#             - jed6
+#             - jed7
+#             - jed8
+#             - jed9
+#             - jed10
+#             - jed11
+#             - rtf0
+#             - rtf1
+#             - whitecell0
+#             - whitecell1
+#             - whitecell2
+#             - whitecell3
+#           rtf:
+#             - rtf0
+#             - rtf1
+#             - whitecell0
+#             - whitecell1
+#             - whitecell2
+#             - whitecell3
+#   roles:
+# #     - takserver/tak_install
+# #     - takserver/tak_config
+# #     - takserver/tak_firewall
+#     - takserver/tak_cert_enrollment
+
+
+# - name: Installing openfire
+#   hosts: xmpp.vanguard.local
+#   become: yes
+#   roles:
+#     - takserver/openfire
+
+F2D3OBRHIKUNCJRS

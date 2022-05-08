@@ -1,0 +1,31 @@
+---
+- hosts: ipaserver0
+  gather_facts: yes
+  tasks:
+  - ipa_group:
+      name: home_users
+      user:
+      - drok
+      - leann
+      ipa_host: ipaserver0.local.drokdev.pro
+      ipa_user: admin
+      ipa_pass: DroKcoff33QUEENusa6z!pROPE5FRUIT9park@
+
+  - ipa_group:
+      name: home_tak_users
+      user:
+      - drok
+      - leann
+      ipa_host: ipaserver0.local.drokdev.pro
+      ipa_user: admin
+      ipa_pass: DroKcoff33QUEENusa6z!pROPE5FRUIT9park@
+
+  - ipa_group:
+      name: home_cloud_users
+      user:
+      - drok
+      - leann
+      ipa_host: ipaserver0.local.drokdev.pro
+      ipa_user: admin
+      ipa_pass: DroKcoff33QUEENusa6z!pROPE5FRUIT9park@
+

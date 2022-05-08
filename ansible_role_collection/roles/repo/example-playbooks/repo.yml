@@ -1,0 +1,8 @@
+---
+- name: repo install
+  hosts: repo
+  become: yes
+  become_user: root
+  # vars:
+  roles:
+    - repo

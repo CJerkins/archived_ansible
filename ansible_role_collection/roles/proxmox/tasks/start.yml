@@ -1,0 +1,49 @@
+---
+# tasks file for vm
+- name: State of "{{ vmname | default(random_name) }}"
+  proxmox_kvm:
+    node: "{{ node }}"
+    api_user: "{{ api_user }}"
+    api_password: "{{ api_password }}"
+    api_host: "{{ api_host }}"
+    vmid: "{{ vmnewid | default(random_id) }}" 
+    name: "{{ vmname | default(random_name) }}"
+    state: current  
+  # when: 
+  #   - build_type|default(omit) == 'provision'
+
+- name: Start "{{ vmname | default(random_name) }}"
+  proxmox_kvm:
+    node: "{{ node }}"
+    api_user: "{{ api_user }}"
+    api_password: "{{ api_password }}"
+    api_host: "{{ api_host }}"
+    vmid: "{{ vmnewid | default(random_id) }}" 
+    name: "{{ vmname | default(random_name) }}"
+    state: started
+  # when: 
+  #   - build_type|default(omit) == 'provision'
+
+# - name: State of VMs
+#   proxmox_kvm:
+#     node: "{{ node }}"
+#     api_user: "{{ api_user }}"
+#     api_password: "{{ api_password }}"
+#     api_host: "{{ api_host }}"
+#     vmid: "{{ vmnewid | default(omit) }}" 
+#     name: "{{ vmname | default(omit) }}"
+#     state: current
+#   when: 
+#     - build_type|default(omit) == 'clone'
+
+# - name: Start VMs
+#   proxmox_kvm:
+#     node: "{{ node }}"
+#     api_user: "{{ api_user }}"
+#     api_password: "{{ api_password }}"
+#     api_host: "{{ api_host }}"
+#     vmid: "{{ vmnewid | default(omit) }}" 
+#     name: "{{ vmname | default(omit) }}"
+#     state: started
+#   when: 
+#     - build_type|default(omit) == 'clone'

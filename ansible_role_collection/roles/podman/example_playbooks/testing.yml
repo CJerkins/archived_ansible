@@ -1,0 +1,33 @@
+---
+- hosts: test
+  become: yes
+  vars:
+    container_add_cmd_0: "podman run --rm {{ container_name }} influxd config {{ '> config/influxdb.conf' }}" ## if you need to run additional cmds proir to running the container. You have to place these in the podman_container_systemd task/main.yml. Any subseqental additional cmd use the first one as a template and label by number.
+
+    container_name: influxdb
+    # container_image: grafana/grafana
+    # container_memory: 128M
+    
+    # container_run_args: >-
+    #   -d
+    #   -p 3000:3000/tcp
+    #   --memory="{{ container_memory }}"
+
+  tasks:
+    # - name: running single container, ensure we have up to date container image
+    #   command: "podman run --name {{ container_name }} {{ container_run_args }} {{ container_image }}"
+
+    # - name: running single container, get image Id if it exists
+    #   command: "podman inspect -f '{{ '{{' }}.State.Status{{ '}}' }}'  {{ container_name }}"
+    #   register: pull_status
+
+    - name: Running additional cmd proir to container running
+      command: "{{ container_add_cmd_0 }}"
+      # when: container_add_cmd_0 is defined
+
+
+    # - name: test connection
+    #   ping:
+
+
+# -v "{{podman_exported_container_volumes_basedir}}/{{ container_dir_lib }}:/var/lib/grafana:Z"

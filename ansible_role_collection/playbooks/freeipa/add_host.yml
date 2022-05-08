@@ -1,0 +1,14 @@
+---
+- hosts: ipaserver
+  gather_facts: yes
+  vars:
+    action: add
+    hostname: "{{ inventory_hostname }}"
+    zone_name: local.drokdev.pro
+    description: This entry was provisioned by ansible
+    ip_address: "{{ ansible_host }}"
+    ns_host_location: drok_place
+    ns_os_version: system
+    ns_hardware_platform: virt_env
+  roles:
+    - freeipa

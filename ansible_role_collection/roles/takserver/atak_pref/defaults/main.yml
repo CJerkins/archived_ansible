@@ -1,0 +1,24 @@
+---
+https_fileshare_host: localhost
+httpd_domain_name: local.drokdev.pro
+qrcode_fetch_dir: /Users/drok/Desktop/atak_pref
+tak_device_pref_location: "{{ httpd_fileshare_location }}"
+
+## takserver connection settings ##
+takserver_0: 192.168.57.7:8090:ssl
+takserver0_name: sompe
+
+## waveserver connection settings ##
+waveserver: 192.168.57.10
+
+## takchat connection settings ##
+takchat_server: openfire.sompe.local
+takchat_custom_host: 192.168.57.6
+takchat_custom_port: 5222
+
+## update repo connection settings ##
+atak_updater_url: https://192.168.57.7:8443/update/ATAK_3.12.1.2
+
+
+device_name: []
+qr_code: true

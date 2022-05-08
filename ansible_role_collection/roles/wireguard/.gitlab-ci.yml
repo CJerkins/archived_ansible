@@ -1,0 +1,15 @@
+
+before_script:
+  - apt update -qy
+  - apt install -y python-dev python-pip
+  - pip install --upgrade ansible ansible-lint
+  - ansible --version
+  - ansible-lint --version
+  
+stages:
+  - ansible-lint
+
+ansible-lint:
+  stage: ansible-lint
+  script:
+    - ansible-lint *.yml

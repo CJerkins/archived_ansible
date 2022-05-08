@@ -1,0 +1,102 @@
+---
+- name:
+  block:
+  
+  - file:
+      path: /etc/apt/sources.list.d/freeipa.list
+      state: touch 
+
+  - name: Add lines for debian 9 installs
+    lineinfile:
+      path: /etc/apt/sources.list.d/freeipa.list
+      line: "{{ item }}"
+    with_items: 
+      - deb http://apt.numeezy.fr stretch main
+      - deb-src http://apt.numeezy.fr stretch main
+
+  # - name: add repo
+  #   command: "echo -e 'deb http://apt.numeezy.fr strech main' >> /etc/apt/sources.list.d/sources.list"
+
+  # - name: add repo
+  #   command: "echo -e 'deb-src http://apt.numeezy.fr strech main' >> /etc/apt/sources.list.d/sources.list"
+
+  - name: add repo apt-key
+    apt_key:
+      url: http://apt.numeezy.fr/numeezy.asc
+      state: present
+
+  - name: FreeIPA directories
+    file:
+      path: "{{ item }}"
+      state: directory
+    with_items:
+      - /etc/pki/nssdb 
+      - /var/run/ipa
+
+  # - name: You need to run this "certutil -N -d /etc/pki/nssdb" if hung up then comment out this line when finish
+  #   command: certutil -N -d /etc/pki/nssdb
+
+  - name: remove previous FreeIPA configs
+    file:
+      path: /etc/ipa/default.conf
+      state: absent
+
+  - name: "Update repositories cache debian strech"
+    apt:
+      update_cache: yes
+
+  when: (ansible_facts['distribution'] == 'Debian') and (ansible_facts['distribution_major_version'] == '9') 
+
+
+- name: Install common UBUNTU packages freeipa-client
+  apt:
+    name: freeipa-client
+  when: ansible_facts['os_family'] == "Debian"
+  
+
+# - name: Install common UBUNTU packages ipa-admintools
+#   apt:
+#     name: ipa-admintools
+#   when: (ansible_facts['distribution'] == 'Debian' and ansible_facts['distribution_major_version'] == '10') or (ansible_facts['distribution'] == 'Ubuntu')
+
+- name: Install common CENTOS packages freeipa-client, ipa-admintools
+  yum:
+    name: "{{ centos_freeipa_packages }}"
+  when: ansible_facts['os_family'] == "RedHat"
+
+- name: Run the FreeIPA client installer
+  args:
+    creates: /etc/ipa/default.conf
+  command: "{{ freeipa_client_install_base_command }} {{ freeipa_client_install_options | join(' ') }}"
+#   register: freeipa_result
+#   ignore_errors: True
+#   failed_when: '"error message" in freeipa_result.stderr'   
+
+# - name: fail the play if the previous command did not succeed
+#   fail:
+#     msg: "{{ freeipa_result.stderr }}"
+#   when: 
+#     - "freeipa_result.rc != 3" 
+
+
+- name: echo 'session required pam_mkhomedir.so' >> /etc/pam.d/common-session
+  command: echo 'session required pam_mkhomedir.so' >> /etc/pam.d/common-session
+  when: (ansible_facts['distribution'] == 'Debian' and ansible_facts['distribution_major_version'] == '9') 
+
+
+- name: Add lines for debian 9 installs
+  lineinfile:
+    path: /etc/nsswitch.conf
+    regexp: "{{ item.regexp }}"
+    line: "{{ item.line }}"
+  with_items: 
+    - { regexp: '^passwd:', line: 'passwd: files sss' }
+    - { regexp: '^group:', line: 'group: files sss' }
+    - { regexp: '^shadow:', line: 'shadow: files sss' }
+  when: (ansible_facts['distribution'] == 'Debian' and ansible_facts['distribution_major_version'] == '9') 
+
+
+# ipa-client-install --unattended --domain=local.drokdev.pro --server=ipaserver0.local.drokdev.pro --realm=LOCAL.DROKDEV.PRO --principal=admin --password='DroKcoff33QUEENusa6z!pROPE5FRUIT9park@' --mkhomedir --hostname=openserver.local.drokdev.pro
+
+
+

@@ -1,0 +1,65 @@
+---
+- hosts: adminhost
+
+  tasks:
+
+  - name: Synchronize ansible repo with adminhost
+    synchronize:
+      src: /Users/drok/Documents/1. Active_Projects/ansible/{{ item }}
+      dest: /home/admin/ansible/
+      delete: yes
+      recursive: yes
+    with_items:
+      - ansible.cfg
+
+  - synchronize:
+      src: /Users/drok/Documents/1. Active_Projects/ansible/{{ item }}
+      dest: /home/admin/ansible/inventory/
+      delete: yes
+      recursive: yes
+    with_items:
+      - inventory/hosts
+      - inventory/group_vars
+      - inventory/host_vars
+
+  - synchronize:
+      src: /Users/drok/Documents/1. Active_Projects/ansible/{{ item }}
+      dest: /home/admin/ansible/playbooks/
+      delete: yes
+      recursive: yes
+    with_items:
+      - playbooks/drokdev    
+
+
+  - synchronize:
+      src: /Users/drok/Documents/1. Active_Projects/ansible/{{ item }}
+      dest: /home/admin/ansible/roles/
+      delete: yes
+      recursive: yes
+    with_items:
+      - roles/apache
+      - roles/docker
+      - roles/firewall
+      - roles/freeipa
+      - roles/init_setups
+      - roles/install-freeipa
+      - roles/nginx
+      - roles/openvpn
+      - roles/podman
+      - roles/repo
+      - roles/sftp
+      - roles/wireguard
+
+  # - synchronize:
+  #     src: /Users/drok/Documents/1. Active_Projects/ansible/{{ item }}
+  #     dest: /home/admin/ansible/roles/
+  #     delete: yes
+  #     recursive: yes
+  #     rsync_opts:
+  #       - "--exclude=roles/takserver/tak_install/files/"
+  #       - "--exclude=roles/takserver/openfire/files/"
+  #   with_items:
+  #     - roles/takserver
+
+
+

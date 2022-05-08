@@ -1,0 +1,35 @@
+---
+- name: ensure "{{ container_name }}" container files mount point on host
+  tags: mount
+  file:
+    path: "{{podman_exported_container_volumes_basedir}}/{{ item }}"
+    owner: "{{ container_dir_owner }}" ## Make changes according to your needs
+    group: "{{ container_dir_group }}" ## Make changes according to your needs
+    state: directory
+    recurse: yes
+  with_items:
+    - "{{ container_dir_config }}" ## Make changes according to your needs
+    - "{{ container_dir_logs }}" ## Make changes according to your needs
+
+- name: Template traccar.xml
+  copy:
+    src: traccar.xml
+    owner: "{{ container_dir_owner }}" ## Make changes according to your needs
+    group: "{{ container_dir_group }}" ## Make changes according to your needs
+    dest: "{{podman_exported_container_volumes_basedir}}/{{ container_dir_config }}/traccar.xml"
+
+### Creates a database container ###
+# - name: ensure "{{ container_name }}" container state
+#   tags: container
+#   import_role:
+#     name: podman_containers/influxdb
+#     name: podman_containers/postgres
+
+# - name: Wait for database to init
+#   pause:
+#     seconds: 30
+
+- name: ensure "{{ container_name }}" container state
+  tags: container
+  import_role:
+    name: podman/podman_container_systemd

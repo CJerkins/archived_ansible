@@ -1,0 +1,110 @@
+---
+# tasks file for openvpn
+
+- name: Create openvpn key and config directorys
+  file:
+    path: "{{openvpn_key_dir}}/{{ item }}"
+    state: directory
+  with_items:
+    - keys
+    - configs/clients
+    - configs/server
+
+- name: Install openssl
+  block:
+  - name: Install EPEL
+    package:
+      name: epel-release
+      state: present
+    when: ansible_distribution == "CentOS" or ansible_distribution=="RedHat"
+
+  - name: Install python2-dnf for Fedora dnf support
+    raw: dnf install -y python2-dnf
+    when:
+      - ansible_distribution == "Fedora"
+      - ansible_python.version.major == 2
+    register: fedora_dnf
+    changed_when: '"Nothing to do." not in fedora_dnf.stdout'
+
+  - name: Install openssl
+    package:
+      name: 
+        - openssl
+        - openvpn
+      state: present
+
+- name: Generate server keys
+  include_tasks: server_keys.yml
+  tags:
+    - server_keys
+
+# ignoreerrors is required for CentOS/RHEL 6
+# http://serverfault.com/questions/477718/sysctl-p-etc-sysctl-conf-returns-error
+- name: Generate client configs
+  include_tasks: client_keys.yml
+  when: clients is defined
+  tags:
+    - client_keys
+
+## Compress openvpn key directory
+# - name: Compress directory {{ openvpn_key_dir }}  into {{ openvpn_server_name }}.tgz
+#   archive:
+#     path: "{{ openvpn_key_dir }}"
+#     dest: "{{ openvpn_key_dir }}/{{ openvpn_server_name }}.tgz"
+#   when: openvpn_fetch_config_dir is defined
+#   tags:
+#     - fetch
+
+# - name: use fetch to get the files
+#   fetch:
+#     src: "{{ openvpn_key_dir }}/{{ openvpn_server_name }}.tgz"
+#     dest: "{{ openvpn_fetch_config_dir }}"
+#     flat: no
+#   when: openvpn_fetch_config_dir is defined
+#   tags:
+#     - fetch
+
+## Fetch openvpn key directory
+- name: use find to get the files list which you want to copy/fetch
+  find: 
+    paths: "{{ openvpn_key_dir }}"
+  register: fetch_keys
+  when: openvpn_fetch_config_dir is defined
+  tags:
+    - fetch
+
+- name: use find to get the files list which you want to copy/fetch
+  find: 
+    paths: "{{ openvpn_key_dir }}/configs/server"
+  register: fetch_server_conf
+  when: openvpn_fetch_config_dir is defined
+  tags:
+    - fetch
+
+- name: use find to get the files list which you want to copy/fetch
+  find: 
+    paths: "{{ openvpn_key_dir }}/configs/clients"
+  register: fetch_client_conf
+  when: openvpn_fetch_config_dir is defined
+  tags:
+    - fetch
+
+- name: use fetch to get the files
+  fetch:
+    src: "{{ item.path }}"
+    dest: "{{ openvpn_fetch_config_dir }}"
+    flat: yes
+  with_items: 
+      - "{{ fetch_keys.files }}"
+      - "{{ fetch_server_conf.files }}"
+      - "{{ fetch_client_conf.files }}"
+  when: openvpn_fetch_config_dir is defined
+  tags:
+    - fetch
+
+
+
+
+
+
+

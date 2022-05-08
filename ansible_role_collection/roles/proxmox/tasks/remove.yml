@@ -1,0 +1,26 @@
+---
+# tasks file for vm
+- name: Remove VMs
+  ignore_errors: True
+  proxmox_kvm:
+    node: "{{ node }}"
+    api_user: "{{ api_user }}"
+    api_password: "{{ api_password }}"
+    api_host: "{{ api_host }}"
+    vmid: "{{ vmid | default(omit) }}" # The source VM id
+    name: "{{ vmname | default(omit) }}"
+    state: stopped
+    force: yes
+    timeout: 120 # Note: The task can take a while. Adapt
+
+
+- name: Remove VMs
+  ignore_errors: True
+  proxmox_kvm:
+    node: "{{ node }}"
+    api_user: "{{ api_user }}"
+    api_password: "{{ api_password }}"
+    api_host: "{{ api_host }}"
+    vmid: "{{ vmid | default(omit) }}" # The source VM id
+    name: "{{ vmname | default(omit) }}"
+    state: absent

@@ -1,0 +1,56 @@
+---
+# tasks file for wireguard_role
+# This is how we avoid generating new keys every time this is run.
+# To force re-generating everything, before running the
+# playbook go on the server and do
+#     wg-quick down {{ servers }} && rm /etc/wireguard/{{ servers }}.conf 
+# (simply removing {{ servers }}.conf without previously shutting down the service
+# will make it impossible to shut down the service in an orderly fashion!
+# You will have to manually re-create a {{ servers }}.conf file before it will exit.)
+- name: Checking client and server exists
+  include_tasks: setup.yml
+  tags: setup
+
+# ### Needs to be worked after 5.6 is out in distro had to manually install
+- include_tasks: "setup-{{ ansible_distribution|lower }}.yml"
+  when: interface_conf is not defined or interface_conf.stat.exists == false
+
+- name: Generate client and server keys
+  include_tasks: generate_server_keys.yml
+  tags: generate_keys
+
+- name: Generate admin client and server configs
+  include_tasks: generate_configs.yml
+  tags: generate_configs
+
+### you can use qrencode -t ansiutf8 < wg0-client.conf to generate qrcode for admin
+
+- name: Set up nat and firewall rules
+  include_tasks: nat_and_firewall.yml
+  when: wireguard_nat
+  tags: nat_and_firewall
+
+- name: Set up unbound for DNS operations
+  include_tasks: dns.yml
+  when: wireguard_dns
+  tags: dns
+
+
+# #When you need to add new clients in future specify the tag "add_client"
+# #Set the "new_client" variable to the name of your new client config file
+# #Set the "new_client_ip" variable to the IP of the new client
+# #The new client config will be downloaded to the "wireguard_role/profiles/" folder on your local host
+
+
+- name: Add another client - will only run if the add_client tag is specified
+  include: 'additional_client.yml'
+  tags: ['never', 'add_client']
+
+- name: removing a client - will only run if the rm_client tag is specified
+  include: 'remove_client.yml'
+  tags: ['never', 'rm_client']
+
+- name: uninstall vpn server
+  include: 'uninstall.yml'
+  tags: ['never', 'uninstall']
+

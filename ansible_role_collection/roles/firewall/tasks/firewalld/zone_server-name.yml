@@ -1,0 +1,88 @@
+---
+## example ansible iptables config. No all varibles need to be used, SEE https://docs.ansible.com/ansible/latest/modules/iptables_module.html
+## to learn how to use the iptables module
+- name: example
+  firewalld:
+    zone: dmz ## default is public. Possible values include block, dmz, drop, external, home, internal, public, trusted, work.
+    service: https ## Name of a service to add/remove to/from firewalld. The service must be listed in output of firewall-cmd --get-services.
+    port: 8081/tcp ## Name of a port or port range to add/remove to/from firewalld. Must be in the form PORT/PROTOCOL or PORT-PORT/PROTOCOL for port ranges.
+    source: 192.0.2.0/24 ## string. The source/network you would like to add/remove to/from firewalld.
+    interface: eth2 ## string. The interface you would like to add/remove to/from a zone in firewalld.
+    masquerade: yes ## yes or no. The masquerade setting you would like to enable/disable to/from zones within firewalld.
+    icmp_block_inversion: yes ## string. Enable/Disable inversion of ICMP blocks for a zone in firewalld.
+    icmp_block: echo-request ## string. The ICMP block you would like to add/remove to/from a zone in firewalld. SEE /usr/lib/firewalld/icmptypes/ for icmp_types in filesystem.
+    rich_rule: rule service name="ftp" audit limit value="1/m" accept ## string. Rich rule to add/remove to/from firewalld.
+    offline: ## yes or no. Whether to run this module even when firewalld is offline.
+    permanent: yes ## yes or no. Should this configuration be in the running firewalld configuration or persist across reboots.
+    immediate: yes ## Default no. Should this configuration be applied immediately, if set as permanent.
+    state: enabled ## absent, disabled, enabled, present. Enable or disable a setting.
+
+
+## Examples from ansible site on how to use the module
+- firewalld:
+    service: https
+    permanent: yes
+    state: enabled
+
+- firewalld:
+    port: 8081/tcp
+    permanent: yes
+    state: disabled
+
+- firewalld:
+    port: 161-162/udp
+    permanent: yes
+    state: enabled
+
+- firewalld:
+    zone: dmz
+    service: http
+    permanent: yes
+    state: enabled
+
+- firewalld:
+    rich_rule: rule service name="ftp" audit limit value="1/m" accept
+    permanent: yes
+    state: enabled
+
+- firewalld:
+    source: 192.0.2.0/24
+    zone: internal
+    state: enabled
+
+- firewalld:
+    zone: trusted
+    interface: eth2
+    permanent: yes
+    state: enabled
+
+- firewalld:
+    masquerade: yes
+    state: enabled
+    permanent: yes
+    zone: dmz
+
+- firewalld:
+    zone: custom
+    state: present
+    permanent: yes
+
+- firewalld:
+    zone: drop
+    state: present
+    permanent: yes
+    icmp_block_inversion: yes
+
+- firewalld:
+    zone: drop
+    state: present
+    permanent: yes
+    icmp_block: echo-request
+
+- name: Redirect port 443 to 8443 with Rich Rule
+  firewalld:
+    rich_rule: rule family=ipv4 forward-port port=443 protocol=tcp to-port=8443
+    zone: public
+    permanent: yes
+    immediate: yes
+    state: enabled

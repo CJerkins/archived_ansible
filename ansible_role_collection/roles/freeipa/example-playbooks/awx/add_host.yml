@@ -1,0 +1,49 @@
+---
+## -- Add host and DNS record A -- ##
+- hosts: ipaserver
+  gather_facts: yes
+  vars:
+    action: add
+    hostname: webserver
+    zone_name: local.drokdev.pro
+    ip_address: 172.16.1.105
+    ns_host_location: drok's chez
+    record_type: 'A'
+  roles:
+    - ansible_role_freeipa
+
+# - hosts: ipaserver
+#   gather_facts: yes
+#   vars:
+#     action: add
+#     hostname: tak
+#     zone_name: local.drokdev.pro
+#     ip_address: 172.16.1.111
+#     ns_host_location: drok's chez
+#     record_type: 'A'
+#   roles:
+#     - ansible_role_freeipa
+
+# - hosts: ipaserver
+#   gather_facts: yes
+#   vars:
+#     action: add
+#     hostname: syncthing
+#     zone_name: local.drokdev.pro
+#     ip_address: 172.16.1.107
+#     ns_host_location: drok's chez
+#     record_type: 'A'
+#   roles:
+#     - ansible_role_freeipa
+
+# - hosts: ipaserver
+#   gather_facts: yes
+#   vars:
+#     action: add
+#     hostname: hassio
+#     zone_name: local.drokdev.pro
+#     ip_address: 172.16.1.110
+#     ns_host_location: drok's chez
+#     record_type: 'A'
+#   roles:
+#     - ansible_role_freeipa

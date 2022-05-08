@@ -1,0 +1,64 @@
+---
+- name: Setting facts
+  import_tasks: set-facts.yml
+  tags:
+    - vm
+## -- vm tasks -- ##
+- name: Provision Virtual Machine
+  import_tasks: provision.yml
+  when: 
+    - build_type | default(omit) == 'provision'
+  tags:
+    - vm
+
+- name: Clone Virtual Machine
+  import_tasks: clone.yml
+  when: 
+    - build_type | default(omit) == 'clone'
+  tags:
+    - vm
+
+- name: Cloud Init Virtual Machine
+  import_tasks: cloudinit.yml
+  when: 
+    - build_type | default(omit) == 'clone'
+  tags:
+    - vm
+
+- name: Cloud Img Virtual Machine
+  import_tasks: cloudimg.yml
+  when: 
+    - build_type | default(omit) == 'cloud'
+  tags:
+    - vm
+
+- name: Start Virtual Machine
+  import_tasks: start.yml
+  when: 
+    - action == 'start'
+  tags:
+    - vm
+
+- name: Remove Virtual Machine
+  import_tasks: remove.yml
+  when: 
+    - action == 'remove'
+  tags:
+    - vm
+
+## -- Container tasks -- ##
+- name: Provision Container
+  import_tasks: container-provision.yml
+  when: 
+    - build_type | default(omit) == 'container'
+    - action == 'start'
+  tags:
+    - container
+
+- name: Remove container
+  import_tasks: container-remove.yml
+  when: 
+    - build_type | default(omit) == 'container'
+    - action == 'remove'
+  tags:
+    - container

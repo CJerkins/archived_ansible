@@ -1,0 +1,36 @@
+---
+container_state: running
+setenforce: false
+
+### Example varibles ###
+container_name: postgres
+container_image: docker.io/postgres:"{{ podman_postgres_version | default(latest) }}"
+container_dir_owner: root
+container_dir_group: root
+container_dir_data: data
+# container_add_cmd_0: ## if you need to run additional cmds proir to running the container. You have to place these in the podman_container_systemd task/main.yml. Any subseqental additional cmd use the first one as a template and label by number.
+# container_add_cmd_1: ## if you need to run additional cmds proir to running the container. You have to place these in the podman_container_systemd task/main.yml. Any subseqental additional cmd use the first one as a template and label by number.
+# container_dir_config: config
+container_run_args: "{{ database_run_args }}"
+# container_firewall_ports:
+#   - 8123/tcp 
+
+## goes to group_vars ##
+# podman_exported_container_volumes_basedir: /var/lib/containers/exported_volumes
+# domain: localdomain
+# timezone: "Europe/Helsinki"
+
+#   -v "{{podman_exported_container_volumes_basedir}}/{{ container_dir_config }}:/config:Z"
+
+
+# podman run -d \
+# --name postgres \
+# -p 5432 \
+# -e POSTGRES_USER=drok \
+# -e POSTGRES_PASSWORD=mysecretpassword \
+# -e POSTGRES_DB=db0 \
+# -v /var/lib/container/postgresql/data:/var/lib/postgresql/data \
+# --net=host \
+# postgres
+
+# -v /var/lib/container/postgresql/config/postgres.conf:/etc/postgresql/postgresql.conf \

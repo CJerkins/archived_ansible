@@ -1,0 +1,20 @@
+---
+- name: Add WireGuard repository
+  get_url:
+    url: https://copr.fedorainfracloud.org/coprs/jdoss/wireguard/repo/epel-7/jdoss-wireguard-epel-7.repo
+    dest: /etc/yum.repos.d/wireguard.repo
+
+- name: Install EPEL repository
+  yum:
+    name: epel-release
+    update_cache: yes
+
+- name: Update all packages to the latest version
+  yum:
+    upgrade: dist
+  register: upgrade
+
+- name: Reboot a slow machine that might have lots of updates to apply
+  reboot:
+    reboot_timeout: 60
+  when: upgrade.changed

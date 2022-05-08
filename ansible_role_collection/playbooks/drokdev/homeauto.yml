@@ -1,0 +1,34 @@
+---
+- hosts: homeauto.local.drokdev.pro
+  become: yes
+  gather_facts: yes
+  tasks:
+    - name: Update server and config hostname.
+      include_role:
+        name: init_setups
+      tags: update
+
+    - name: Update firewall rules.
+      include_role:
+        name: firewall/basis
+
+  tasks:
+    - import_role: 
+        name: podman_containers/homeassistant
+      # when: (homeassistant_enabled | default(False))
+      tags: homeassistant
+
+    - import_role: 
+        name: podman_containers/node_red
+      # when: (nodered_enabled | default(False))
+      tags: nodered
+
+    - import_role: 
+        name: podman_containers/grafana
+      # when: (grafana_enabled | default(False))
+      tags: grafana
+
+    - import_role: 
+        name: podman_containers/mosquitto
+      # when: (mosquitto_enabled | default(False))
+      tags: mosquitto

@@ -1,0 +1,58 @@
+---
+container_state: running
+setenforce: false
+
+### Example varibles ###
+container_name: traccar
+container_image: docker.io/traccar/traccar:latest
+container_dir_owner: root
+container_dir_group: root
+container_dir_config: config
+container_dir_logs: logs
+# container_add_cmd_0: "podman run --rm --entrypoint cat traccar/traccar:latest /opt/traccar/conf/traccar.xml > {{podman_exported_container_volumes_basedir}}/{{ container_dir_config }}/traccar.xml"
+# container_add_cmd_1: ## if you need to run additional cmds proir to running the container. You have to place these in the podman_container_systemd task/main.yml. Any subseqental additional cmd use the first one as a template and label by number.
+container_run_args: >-
+  -dt
+  --restart always
+  -v "{{podman_exported_container_volumes_basedir}}/{{ container_dir_config }}/traccar.xml:/opt/traccar/conf/traccar.xml:Z"
+  -v "{{podman_exported_container_volumes_basedir}}/{{ container_dir_logs }}:/opt/traccar/logs:Z"
+  --net=host
+  -p 8082:8082
+  -p 5055:5055
+# database_run_args: >-
+#   -d
+#   -p 8086:8086
+#   -v "{{podman_exported_container_volumes_basedir}}/{{ container_dir_config }}:/etc/influxdb:Z"
+#   -v "{{podman_exported_container_volumes_basedir}}/{{ container_dir_db }}:/var/lib/influxdb:Z"
+#   --net=host
+# database_initialize_args: >-
+#   -e INFLUXDB_DB="{{ influx_database_name }}" 
+#   -e INFLUXDB_ADMIN_ENABLED=true
+#   -e INFLUXDB_ADMIN_USER=admin 
+#   -e INFLUXDB_ADMIN_PASSWORD="{{ influx_database_admin_pass }}"
+#   -e INFLUXDB_USER="{{ influx_database_user }}"
+#   -e INFLUXDB_USER_PASSWORD="{{ influx_database_user_pass }}"
+#   -v "{{ podman_exported_container_volumes_basedir }}/{{ container_dir_db }}:/var/lib/influxdb:Z"
+container_firewall_ports:
+  - 5055/tcp 
+  - 443/tcp
+
+## goes to group_vars ##
+# podman_exported_container_volumes_basedir: /var/lib/containers/exported_volumes
+# domain: localdomain
+# timezone: "Europe/Helsinki"
+
+# podman run \
+# --rm \
+# --entrypoint cat \
+# traccar/traccar:latest \
+# /opt/traccar/conf/traccar.xml > /var/lib/containers/traccar/config/traccar.xml
+
+# podman run \
+# -dt --restart always \
+# --name traccar \
+# --hostname traccar \
+# -p 80:8082 \
+# traccar/traccar:latest
+# -v "/var/lib/containers/traccar/config/traccar.xml:/opt/traccar/conf/traccar.xml:Z" \
+# -v "/var/lib/containers/traccar/logs:/opt/traccar/logs:Z" \

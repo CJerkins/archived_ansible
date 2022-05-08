@@ -1,0 +1,25 @@
+---
+## -- create-certs.yml vars -- ##
+dir_takserver_key: /opt/tak/certs/files
+# dir_local: /Users/drok/Desktop/tak_certs/
+
+## -- cert config.cfg vars -- ##
+dir_cert_creation: /tmp/takcerts
+# name_country: US
+# name_state: NC
+# name_city: Southern Pines
+# name_company: ASC
+# name_unit: 4BN
+# name_common: CN=takserver
+subject_base: "/C={{ name_country }}/ST={{ name_state }}/L={{ name_city }}/O={{ name_company }}/OU={{ name_unit }}/"
+
+## -- CA vars -- ##
+# name_ca: takTT # "Please give a name for your CA (no spaces).  It should be unique.  If you don't enter anything, or try something under 5 characters
+# password_ca: atakatak
+
+## -- server and client certs vars -- ##
+# name_takserver: takserver
+# name_xmppserver: xmpp
+name_takclients: []
+# admincert: []
+

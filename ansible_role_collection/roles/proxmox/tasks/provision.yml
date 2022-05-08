@@ -1,0 +1,17 @@
+---
+# tasks file for vm
+- name: Create VMs
+  proxmox_kvm:
+    vmid: "{{ vmnewid | default(random_id) }}"
+    node: "{{ node }}"
+    api_user: "{{ api_user }}"
+    api_password: "{{ api_password }}"
+    api_host: "{{ api_host }}"
+    name: "{{ vmname | default('vanguard.local') }}"
+    net: '{"net0":"virtio,bridge={{ vmbridge | default(omit) }},tag={{ vmvlan | default(omit) }}"}'
+    virtio: '{"virtio0":"{{ vmstorage | default(omit) }}:{{ vmdisk | default(omit) }}"}'
+    cores: "{{ vmcores | default(omit) }}"
+    sockets: "{{ vmsockets | default(omit) }}"
+    vcpus: "{{ vmvcpus | default(omit) }}"
+    memory: "{{ vmmemory | default(omit) }}"
+    onboot: "{{ vmonboot | default(omit) }}"

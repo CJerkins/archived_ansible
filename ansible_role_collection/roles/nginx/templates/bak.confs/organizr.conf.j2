@@ -1,0 +1,54 @@
+## provisioned by ansible
+
+server {
+	listen 443 ssl http2;
+	listen [::]:443 ssl http2;
+
+	server_name organizr.local.drokdev.pro;
+    root /usr/share/nginx/html;
+	{# #root /var/www/organizr.local.drokdev.pro/public; #}
+
+	# SSL
+	ssl_certificate {{dir_ssl_key}}/organizr/cert.pem;
+	ssl_certificate_key {{dir_ssl_key}}/organizr/key.pem;
+
+	# security
+	include security.conf;
+
+	# reverse proxy
+	location / {
+		proxy_pass http://homeos.local.drokdev.pro;
+		include proxy.conf;
+	}
+
+	client_max_body_size 1024M;
+	keepalive_timeout 180;
+
+	# additional config
+	include general.conf;
+}
+
+# subdomains redirect
+server {
+	listen 443 ssl http2;
+	listen [::]:443 ssl http2;
+
+	server_name *.organizr.local.drokdev.pro;
+
+	# SSL
+	ssl_certificate {{dir_ssl_key}}/organizr/cert.pem;
+	ssl_certificate_key {{dir_ssl_key}}/organizr/key.pem;
+
+	return 301 https://organizr.local.drokdev.pro$request_uri;
+}
+
+# HTTP redirect
+server {
+	listen 80;
+	listen [::]:80;
+
+	server_name organizr.local.drokdev.pro;
+
+	return 301 https://organizr.local.drokdev.pro$request_uri;
+}
+

@@ -1,0 +1,41 @@
+---
+- name: Insert cert-metadata in script
+  blockinfile:
+    path: "{{ dir_cert_creation }}/makeCert.sh"
+    insertafter: "^#. cert-metadata.sh"
+    block: |
+      COUNTRY={{ name_country }}
+      STATE={{ name_state }}
+      CITY={{ name_city }}
+      ORGANIZATION={{ name_company }}
+      ORGANIZATIONAL_UNIT={{ name_unit }}
+      CAPASS=${CAPASS:-{{ password_ca }}}
+      PASS=${PASS:-$CAPASS}
+      DIR={{ dir_cert_creation }}/files
+      SUBJBASE="/C=${COUNTRY}/"
+      if [ -n "$STATE" ]; then
+       SUBJBASE+="ST=${STATE}/"
+      fi
+      if [ -n "$CITY" ]; then
+       SUBJBASE+="L=${CITY}/"
+      fi
+      if [ -n "$ORGANIZATION" ]; then
+       SUBJBASE+="O=${ORGANIZATION}/"
+      fi
+      if [ -n "$ORGANIZATIONAL_UNIT" ]; then
+       SUBJBASE+="OU=${ORGANIZATIONAL_UNIT}/"
+      fi
+
+## -- Certificate client requests -- ##
+- name: Generate takserver certs
+  command:   
+    argv:
+      - "{{ dir_cert_creation }}/makeCert.sh"
+      - client
+      - "{{ item }}"
+  args:
+    creates: "{{ dir_cert_creation }}/files/{{ item }}.pem"
+  become_user: tak
+  become: yes
+  with_items:
+    - "{{ name_takclients }}"

@@ -1,0 +1,65 @@
+- name: Generate an additional client config
+  shell: umask 077; wg genkey | tee "/tmp/client.private" | wg pubkey > "/tmp/client.public"
+
+- name: Register private key file contents
+  shell: cat /tmp/client.private
+  register: new_private_key_file
+
+- name: Register public key file contents
+  shell: cat /tmp/client.public
+  register: new_public_key_file
+
+- name: Register server public key file contents
+  shell: cat "/root/{{ server }}.public"
+  register: server_public_key_file
+
+- name: Generate the new client config
+  template:
+    src: "templates/add_client.conf"
+    dest: "/tmp/client.conf"
+    owner: root
+    group: root
+    mode: 0600
+
+- name: Register the new client on the vpn server
+  shell: wg set "{{ server }}" peer "{{ new_public_key_file.stdout }}" allowed-ips "{{ client_ip }}/32"
+
+- name: create qr code for config
+  command: qrencode -o /tmp/client.png < /tmp/client.conf
+
+- pause:
+    prompt: "You have 5 minutes till your config erases"
+    minutes: 5
+
+- name: clean up client keys and configs
+  command: shred -f -n 10 -z -u "{{ item }}"
+  with_items:
+    - /tmp/client.conf
+    - /tmp/client.private
+    - /tmp/client.public
+    - /tmp/client.png
+
+# - name: use find to get the files list which you want to copy/fetch
+#   find: 
+#     paths: /tmp/client.png
+#   register: fetch_qrcode
+#   when: qrcode_fetch_dir is defined
+#   tags:
+#     - fetch
+
+# - name: use fetch to get the files
+#   fetch:
+#     src: "{{ item.path }}"
+#     dest: "{{ qrcode_fetch_dir }}"
+#     flat: yes
+#   with_items: 
+#       - "{{ fetch_qrcode.files }}"
+#   when: qrcode_fetch_dir is defined
+#   tags:
+#     - fetch
+
+# - name:  Download the new client config
+#   fetch: 
+#     src: "~/{{ client }}.conf"
+#     dest: "wireguard_role/profiles/"
+#     flat: yes

@@ -1,0 +1,11 @@
+---
+fqdn: "{{ inventory_hostname }}"
+# ipaddress: #"{{ hostvars[inventory_hostname]['ansible_default_ipv4']['address'] }}"
+description: Managed by ansible
+# ns_host_location: Lab
+# ns_os_version: system
+# ns_hardware_platform: Hardware
+zone_name: "{{ domain }}"
+# hostname: #"{{ inventory_hostname_short }}"
+freeipa_action: "{{ action }}"
+freeipa_task: "{{ task }}"

@@ -1,0 +1,4 @@
+    - hosts: tor0
+      become: yes
+      roles:
+         - onion0

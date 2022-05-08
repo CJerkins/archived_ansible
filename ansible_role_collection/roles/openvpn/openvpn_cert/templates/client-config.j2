@@ -1,0 +1,7 @@
+# {{ ansible_managed }}
+{% if openvpn_client_address is defined %}
+ifconfig-push {{openvpn_client_address}} {{openvpn_server_address}}
+{% endif %}
+{% for option in openvpn_client_config_options %}
+{{ option }}
+{% endfor %}

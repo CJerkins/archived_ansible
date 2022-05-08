@@ -1,0 +1,14 @@
+---
+## Unique rules template, uncomment and modify as needed ##
+
+# - name: "Specific server-name" zone rules
+#   include_tasks: tasks/iptables/public/public_server-name.yml
+#   when: (firewall_server-name_enable | default(False))
+
+- name: "Specific openvpn_NAT" zone rules
+  include_tasks: tasks/iptables/public/public_openvpn_NAT.yml
+  when: (firewall_openvpn_NAT_enable | default(False))
+
+- name: "Specific NAT" zone rules
+  include_tasks: tasks/iptables/public/public_NAT.yml
+  when: (firewall_NAT_enable | default(False))

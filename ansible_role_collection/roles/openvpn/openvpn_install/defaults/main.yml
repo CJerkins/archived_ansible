@@ -1,0 +1,16 @@
+---
+# defaults file for openvpn
+openvpn_uninstall: false
+openvpn_base_dir: /etc/openvpn ## used in ldap config generater
+openvpn_fetch_config_dir: /User/drok/Desktop/vpn_certs
+openvpn_server_name: openvpn
+## vars used in tasks
+openvpn_key_dir: "/tmp/openvpn/{{openvpn_server_name}}"
+openvpn_server_config_file: "{{openvpn_server_name}}-server"
+openvpn_client_config_file: "{{openvpn_server_name}}"
+openvpn_log_dir: /var/log/openvpn
+openvpn_jails: false
+openvpn_use_ldap: false
+openvpn_use_crl: false      ## if true generates a crl cert and inputs crl-verify option server config
+openvpn_install: server ## Options server or client.
+clients: []                     

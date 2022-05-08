@@ -1,0 +1,31 @@
+#! /bin/bash
+
+# usage run command with ./mkrole <project name>
+# mkrole will then create role directorys in the project directory
+# and setup git for your new role
+
+# mkpy requires python 3.4+, git, and ansible to be installed
+
+read -p "username or groupname" user
+read -p "gitlab server eg: gitlab.example.com" git_server
+
+# create project directory
+mkdir $1
+cd $1
+echo " " > .gitignore
+mkdir defaults handlers tasks examples_playbook templates vars
+touch defaults/main.yml
+touch handlers/main.yml
+touch tasks/main.yml
+touch examples_playbook/$1.yml
+touch vars/main.yml
+
+curl https://gitlab.cirrus-ss.com/razrdog/boilerplate/raw/master/git_helpers/commit_push.sh > README.md
+curl https://gitlab.cirrus-ss.com/razrdog/boilerplate/raw/master/templates/ansible_README.md > README.md
+
+git init
+git add .
+git remote add origin git@$git_server:$user/$1.git
+
+git commit -m "initial commit"
+git push -u origin master

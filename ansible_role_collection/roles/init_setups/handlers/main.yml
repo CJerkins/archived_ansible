@@ -1,0 +1,38 @@
+---
+- name: restart ssh
+  service:
+    name: sshd
+    state: restarted
+
+- name: Restart firewalld
+  systemd:
+    state: restarted
+    name: firewalld
+  when: ansible_facts['os_family'] == "RedHat"
+
+- name: Restart ufw
+  systemd:
+    state: restarted
+    name: ufw
+  when: ansible_facts['os_family'] == "Debian"
+
+# - name: reload NetworkManager
+#   service:
+#     name: NetworkManager
+#     state: reloaded
+
+# - name: restart systemd-networkd
+#   systemd:
+#     name: systemd-networkd
+#     state: restarted
+#   async: 120
+#   poll: 0
+#   register: net_restarting
+
+# - name: check restart systemd-networkd status
+#   async_status:
+#     jid: "{{ net_restarting.ansible_job_id }}"
+#   register: async_poll_results
+#   until: async_poll_results.finished
+#   retries: 30
+#   listen: restart systemd-networkd

@@ -1,0 +1,28 @@
+---
+- hosts: all
+  gather_facts: yes
+  become: yes
+  # remote_user: root
+  vars:
+    ## -- Hostname -- ##
+    inventory_hostname: # pulls from inventory but can manually define
+    ## -- Packages -- ##
+    additional_packages:
+      - nano
+    ## -- sshd_config -- ##
+    no_pass_auth: true
+    disable_root: true
+    ## -- DNS setup -- ##
+    init_dns_setup: true
+    resolv_nameservers:
+      - "8.8.8.8"
+      - "8.8.4.4"
+    resolv_domain: "foo.org"
+    resolv_search:
+      - "foo.bar"
+      - "foobar.com"
+    resolv_options:
+      - "timeout:2"
+      - "rotate"
+  roles:
+    - ansible_role_init_setups

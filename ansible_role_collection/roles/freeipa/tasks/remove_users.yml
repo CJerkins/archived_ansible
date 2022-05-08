@@ -1,0 +1,25 @@
+---
+- name: Ensure host host is absent
+  # ignore_errors: True
+  ipa_host:
+    name: "{{ hostname }}.{{ zone_name }}"
+    ipa_host: "{{ freeipa_host }}"
+    ipa_user: "{{ freeipa_user }}"
+    ipa_pass: "{{ freeipa_pass }}"
+    state: absent
+
+
+- name: Remove record
+  ipa_dnsrecord:
+    name: "{{ hostname }}"
+    zone_name: "{{ zone_name }}"
+    record_type: "{{ record_type }}"
+    record_value: "{{ record_value }}"
+    ipa_host: "{{ freeipa_host }}"
+    ipa_user: "{{ freeipa_user }}"
+    ipa_pass: "{{ freeipa_pass }}"
+    state: absent
+
+# https://unix.stackexchange.com/questions/426968/ansible-result-failed-v-s-failed-when-result-changed-v-s-changed-when-etc
+  #   register: command_result
+  # failed_when: "'FAILED' in command_result.stderr"

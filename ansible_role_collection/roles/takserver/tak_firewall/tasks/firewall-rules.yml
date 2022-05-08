@@ -1,0 +1,32 @@
+---
+- name: start firewalld and enabled
+  systemd:
+    state: started
+    name: firewalld
+    enabled: yes
+
+- name: Waiting for services to start
+  wait_for:
+    timeout: 30
+
+# - name: Validating if the AdminServer state is RUNNING
+#   tags: validatestart
+#   wait_for:
+#     path: "{{serverlogfile}}"
+#     search_regex: "The server started in RUNNING mode"
+#     delay: 10
+#     timeout: 60
+#     msg: "Not able to find the String RUNNING in the Logfile"
+#   when: ansible_hostname == "{{groups['app'][0]}}" and serverlogfile is defined
+#   register: validatestart
+
+- name: open firewall port for takserver
+  firewalld:
+    port: "{{ item }}"
+    zone: public
+    immediate: yes # this is the firewall-cmd --reload
+    permanent: true
+    state: enabled
+  notify: Restart firewalld
+  with_items:
+    - '{{ firewall_ports }}'

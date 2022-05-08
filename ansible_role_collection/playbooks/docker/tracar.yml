@@ -1,0 +1,5 @@
+---
+- hosts: traccar
+  become: yes 
+  roles:
+     - docker/docker_containers/traccar

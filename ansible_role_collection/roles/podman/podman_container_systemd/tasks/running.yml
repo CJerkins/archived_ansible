@@ -1,0 +1,163 @@
+---
+- name: Install depedencies for Ubuntu
+  package:
+    name: software-properties-common
+    state: present
+  when: 
+    - ansible_distribution == "Ubuntu"
+
+- name: Install repo
+  apt_repository:
+    repo: ppa:projectatomic/ppa
+  when: 
+    - ansible_distribution == "Ubuntu"
+
+- name: ensure podman is installed
+  package:
+    name: podman
+    state: installed
+  when: not skip_podman_install
+
+- name: running single container, get image Id if it exists
+  # command: podman inspect -f {{.Id}} "{{ container_image }}"
+  command: "podman image inspect -f '{{ '{{' }}.Id{{ '}}' }}' {{ container_image }}"
+  register: pre_pull_id
+  ignore_errors: yes
+  when: container_image is defined
+
+- name: running single container, ensure we have up to date container image
+  command: "podman pull {{ container_image }}"
+  when: container_image is defined
+
+- name: running single container, get image Id if it exists
+  command: "podman image inspect -f '{{ '{{' }}.Id{{ '}}' }}'  {{ container_image }}"
+  register: post_pull_id
+  when: container_image is defined
+
+- name: force restart after image change
+  debug: 
+    msg: "image has changed"
+  changed_when: True
+  # notify: restart service
+  when:
+    - container_image is defined
+    - pre_pull_id.stdout != post_pull_id.stdout
+    - pre_pull_id is succeeded
+
+# XXX remove above comparison if future podman tells image changed.
+
+- name: seems we use several container images, ensure all are up to date
+  command: "podman pull {{ item }}"
+  when: container_image_list is defined
+  with_items: "{{ container_image_list }}"
+
+- name: if running pod, ensure configuration file exists
+  stat:
+    path: "{{ container_pod_yaml }}"
+  register: pod_file
+  when: container_pod_yaml is defined
+- name: fail if pod configuration file is missing
+  fail:
+    msg: "Error: Asking to run pod, but pod definition yaml file is missing: {{ container_pod_yaml }}"
+  when:
+    - container_pod_yaml is defined
+    - not pod_file.stat.exists
+
+## Place additional cmd here for prior to running the container
+- name: Running additional cmd proir to container running
+  command: "{{container_add_cmd_0}}"
+  when: container_add_cmd_0 is defined
+
+### Creating and starting a single container ###
+- name: stoping single container if it exists
+  command: "podman stop {{ container_name }}"
+  ignore_errors: yes
+  when: container_image is defined
+
+- name: removing single container if it exists
+  command: "podman rm {{ container_name }}"
+  ignore_errors: yes
+  when: container_image is defined
+
+- name: creating single container
+  command: "podman run --name {{ container_name }} {{ container_run_args }} {{ container_image }}"
+  when: container_image is defined
+
+## Place additional cmd here for prior to running the container
+# - name: stoping single container if it exists
+#   command: "podman stop {{ container_name }}"
+#   when: container_add_cmd_0
+
+# - name: Running additional cmd proir to container running
+#   command: "{{container_add_cmd_0}}"
+#   when: container_add_cmd_0
+
+- name: finial check if container is running
+  command: "podman inspect -f '{{ '{{' }}.State.Status{{ '}}' }}'  {{ container_name }}"
+  register: pull_status
+
+- name: starting single container if it exists
+  command: "podman start {{ container_name }}"
+  when:
+    - container_image is defined
+    - pull_status != "running"
+
+### Creating and starting a pod ###
+# - name: stoping pod if it exists
+#   command: "podman pod stop {{ container_name }}"
+#   ignore_errors: yes
+#   when: container_pod_yaml is defined
+# - name: removing pod if it exists
+#   command: "podman pod rm {{ container_name }}"
+#   ignore_errors: yes
+#   when: container_pod_yaml is defined
+# - name: creating pod
+#   command: "podman play kube {{ container_pod_yaml }}"
+#   when: container_pod_yaml is defined
+
+
+- name: "create systemd service file for container: {{ container_name }}"
+  template:
+    src: systemd-service-single.j2
+    dest: "{{ service_files_dir }}/{{ service_name }}"
+    owner: root
+    group: root
+    mode: 0644
+  # notify: reload systemctl
+  register: service_file
+  when: container_image is defined
+
+- name: "create systemd service file for pod: {{ container_name }}"
+  template:
+    src: systemd-service-pod.j2
+    dest: "{{ service_files_dir }}/{{ service_name }}"
+    owner: root
+    group: root
+    mode: 0644
+  # notify:
+    # - reload systemctl
+    # - start service
+  register: service_file
+  when: container_image_list is defined
+
+### systemd is not really working well, will continue to create. Probably a SElinux issue.
+
+# - name: ensure "{{ service_name }}" is enabled at boot, and systemd reloaded
+#   systemd:
+#     name: "{{ service_name }}"
+#     enabled: yes
+#     daemon_reload: yes
+
+# - name: ensure "{{ service_name }}" is running
+#   service:
+#     name: "{{ service_name }}"
+#     state: started
+#   when: not service_file_before_template.stat.exists
+
+# - name: "ensure {{ service_name }} is restarted due config change"
+#   debug: msg="config has changed:"
+#   changed_when: True
+#   notify: restart service
+#   when:
+#     - service_file_before_template.stat.exists
+#     - service_file.changed

@@ -1,0 +1,23 @@
+---
+- name: waiting the host terminate the clone
+  wait_for:
+    timeout: 20
+
+- name: Test in access host
+  ping:
+
+# - name: Applying resizing in the disk
+#   command: qm resize "{{ vmnewid }}" scsi0 "{{ vmdisk |default(omit) }}"
+# sshkey only works if you use a file. You must use it
+- name: Settinging the user and nameserver in Cloud Init
+  command: qm set "{{ vmnewid | default(random_id) }}" --searchdomain "{{ vmsearchdomain | default(omit) }}" --nameserver "{{ vmnameserver | default(omit) }}" --ciuser "{{ ciuser | default(omit) }}" --cipassword "{{ cipassword | default(omit) }}" --sshkey "{{ sshkey | default(omit) }}"
+
+# - name: Settinging the newtork in host
+#   command: qm set "{{ vmnewid | default(random_id) }}" --net0 model=virtio,bridge="{{ vmbridge | default(omit) }}"
+  # ,macaddr="{{ vmmacaddr | default(omit) }}"
+
+- name: Settinging the newtork in Cloud Init
+  command: qm set "{{ vmnewid | default(random_id) }}" --ipconfig0 ip="{{ vmip | default('dhcp') }}",gw="{{ vmgw | default(omit) }}"
+  when: 
+  - vmip is defined
+

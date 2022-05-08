@@ -1,0 +1,35 @@
+---
+- name: Shutdown vpn server
+  systemd:
+    name: "wg-quick@{{ server }}"
+    enabled: no
+    state: stopped
+
+- name: shred server
+  command: shred -f -n 10 -z -u /etc/wireguard/"{{ server }}".conf
+  ignore_errors: yes
+
+- name: remove the wireguard package
+  package:
+    name: 
+      - wireguard
+      - qrencode
+      - wireguard-dkms
+      - wireguard-tools
+    state: absent
+
+- name: clean up client keys and configs
+  command: shred -f -n 10 -z -u "{{ item }}"
+  with_items: 
+    - /root/{{ server }}.public
+    - /root/{{ admin_client }}.public
+    - /root/client_{{ admin_client }}/{{ server }}-client.conf
+  ignore_errors: yes
+
+- name: remove directorys
+  file:
+    path: "/root/client_{{ admin_client }}"
+    state: absent
+
+
+

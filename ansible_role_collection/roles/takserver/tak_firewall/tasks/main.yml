@@ -1,0 +1,4 @@
+---
+- name: Set firewall rules
+  import_tasks: firewall-rules.yml    
+  tags: firewall

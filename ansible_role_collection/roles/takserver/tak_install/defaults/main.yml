@@ -1,0 +1,76 @@
+---
+## -- takserver install vars -- ##
+additional_packages: []
+# user_webadmin: admin
+# password_webadmin: atakatak
+# password_takadmin: atakatak
+# postgres_package: pgdg-redhat-repo-latest
+# tak_version: 1.3.12-RELEASE6 ## you get tak version from the rpm file
+takserver_address: "{{ ansible_host }}" # "{{ hostvars[inventory_hostname].ansible_default_ipv4.address }}"
+## -- CoreConfig.xml -- ##
+# Inputs
+# input_tcp_port: 8087
+# input_udp_port: 8087
+# input_stcp_port: 8088
+# input_tls_port: 8089
+# input_ldap_port: 8090  ## for ldapssl
+# input_ad_port: 8091  ## for adssl
+# input_https_port: 8443
+# input_federation_port: 8444
+# input_clientauth_port: 8446
+# input_http_port: 8080
+# input_custom:
+#   # - {auth: ldap, name: stdssl, protocol: tls, port: 8092}
+  # - {name: stdssl, protocol: tls, port: 8092}
+
+# LDAP Config
+# ldap_server_url: ldap://ipaserver.vanguard.local/
+# ldap_userstring: uid={username},cn=users,cn=accounts,dc=vanguard,dc=local
+# ldap_update_interval: 60
+# ldap_group_prefix: cn=tak_
+# ldap_security_type: simple
+# ldap_account_domain: uid=server_tak,cn=users,cn=accounts,dc=vanguard,dc=local
+# ldap_account_password: atakatak
+# ldap_group_class: groups
+# ldap_group_basedn: cn=takclients
+# Active Directory Config
+# ad_server_url: ldap://dc1.vanguard.local/dc=vanguard,dc=local
+# ad_userstring: VANGUARD\{username} 
+# ad_update_interval: 60
+# ad_group_prefix: cn=tak_
+# ad_security_type: simple
+# ad_account_domain: cn=server_tak,cn=Users,dc=vanguard,dc=local
+# ad_account_password: atakatak
+# ad_group_class: group
+# ad_group_basedn: cn=takclients
+
+# Database config
+# database_url: jdbc:postgresql://127.0.0.1:5432/cot
+# database_user: martiuser
+# database_password: pass4marti
+
+# ## -- create-certs.yml vars -- ##
+# dir_takserver_key: /opt/tak/certs/files
+# # dir_local: /Users/drok/Desktop/tak_certs/
+
+# ## -- cert config.cfg vars -- ##
+# dir_cert_creation: /tmp/takcerts
+# # name_country: US
+# # name_state: NC
+# # name_city: Southern Pines
+# # name_company: ASC
+# # name_unit: 4BN
+# # name_common: CN=takserver
+# subject_base: "/C={{ name_country }}/ST={{ name_state }}/L={{ name_city }}/O={{ name_company }}/OU={{ name_unit }}/"
+
+# ## -- CA vars -- ##
+# # name_ca: takTT # "Please give a name for your CA (no spaces).  It should be unique.  If you don't enter anything, or try something under 5 characters
+# # password_ca: atakatak
+
+# ## -- server and client certs vars -- ##
+# # name_takserver: takserver
+# name_takclients: []
+# # admincert: []
+
+## -- Firewall rule vars -- ##
+firewall_ports: []

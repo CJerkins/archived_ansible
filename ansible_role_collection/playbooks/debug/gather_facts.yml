@@ -1,0 +1,16 @@
+---
+- hosts: localhost 
+  gather_facts: yes
+  vars:
+    ipaddress: "{{ hostvars[inventory_hostname]['ansible_default_ipv4']['gateway'] }}"
+  tasks:
+    #- debug:
+    #    msg: "{{ inventory_hostname }}"
+    #- debug:
+    #    msg: "{{ hostvars[item]['ansible_default_ipv4']['address'] }} {{ inventory_hostname }} {{ inventory_hostname_short }} "
+    #  when: hostvars[item].ansible_default_ipv4.address is defined
+    #  with_items: "{{ inventory_hostname }}"
+    #
+    - name: "DEBUG HOSTVARS"
+      debug:
+        msg: "{{ ipaddress }}"

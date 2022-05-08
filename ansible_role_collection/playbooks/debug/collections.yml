@@ -1,0 +1,5 @@
+---
+- hosts: all
+  tasks:
+    - pfsensible.core.pfsense_vlan:
+        vlan_id: 100

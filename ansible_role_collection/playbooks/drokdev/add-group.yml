@@ -1,0 +1,30 @@
+---
+- hosts: ipaserver0
+  gather_facts: yes
+  tasks:
+  - ipa_group:
+      name: home_users
+      description: Group for normal home users.
+      # gidnumber: 54321
+      state: present
+      ipa_host: ipaserver0.local.drokdev.pro
+      ipa_user: admin
+      ipa_pass: DroKcoff33QUEENusa6z!pROPE5FRUIT9park@
+
+  - ipa_group:
+      name: tak_users
+      description: Group for normal tak users.
+      # gidnumber: 54321
+      state: present
+      ipa_host: ipaserver0.local.drokdev.pro
+      ipa_user: admin
+      ipa_pass: DroKcoff33QUEENusa6z!pROPE5FRUIT9park@
+
+  - ipa_group:
+      name: IoT_devices
+      description: Group for normal IoT devices to authenticate.
+      # gidnumber: 54321
+      state: present
+      ipa_host: ipaserver0.local.drokdev.pro
+      ipa_user: admin
+      ipa_pass: DroKcoff33QUEENusa6z!pROPE5FRUIT9park@

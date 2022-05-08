@@ -1,0 +1,42 @@
+---
+- name: Install Takserver
+  import_tasks: install-tak12.yml
+  tags: Install
+
+- name: Copy scripts that generate certs
+  copy: 
+    src: "files/{{ item.src }}"
+    dest: "{{ dir_cert_creation }}/{{ item.dest }}"
+    owner: tak
+    group: tak
+    mode: '0777'
+  with_items:
+    - { src: 'revokeCert.sh', dest: 'revokeCert.sh' }
+
+
+- name: Insert cert-metadata in script
+  blockinfile:
+    path: "{{ dir_cert_creation }}/makeRootCa.sh"
+    insertafter: "^#. cert-metadata.sh"
+    block: |
+      COUNTRY={{ name_country }}
+      STATE={{ name_state }}
+      CITY={{ name_city }}
+      ORGANIZATION={{ name_company }}
+      ORGANIZATIONAL_UNIT={{ name_unit }}
+      CAPASS=${CAPASS:-{{ password_ca }}}
+      PASS=${PASS:-$CAPASS}
+      DIR={{ dir_cert_creation }}/files
+      SUBJBASE="/C=${COUNTRY}/"
+      if [ -n "$STATE" ]; then
+       SUBJBASE+="ST=${STATE}/"
+      fi
+      if [ -n "$CITY" ]; then
+       SUBJBASE+="L=${CITY}/"
+      fi
+      if [ -n "$ORGANIZATION" ]; then
+       SUBJBASE+="O=${ORGANIZATION}/"
+      fi
+      if [ -n "$ORGANIZATIONAL_UNIT" ]; then
+       SUBJBASE+="OU=${ORGANIZATIONAL_UNIT}/"
+      fi

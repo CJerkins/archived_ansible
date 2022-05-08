@@ -1,0 +1,5 @@
+---
+- hosts: traccar
+  become: yes 
+  roles:
+     - podman/podman_containers/traccar

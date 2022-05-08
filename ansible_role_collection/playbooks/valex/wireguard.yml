@@ -1,0 +1,78 @@
+---
+# - name: Setup Wireguard VPN
+#   hosts: takpf
+#   gather_facts: true
+#   become: yes
+#   vars:
+#     wireguard_nat: true
+#     wireguard_dns: false
+#     clients: 2
+#   roles:
+#     - wireguard/wireguard_harden
+
+# - name: Setup DNS
+#   hosts: tak
+#   gather_facts: true
+#   tasks:
+
+#   - name: Install wget
+#     become: yes
+#     package:
+#       name: wget
+#       state: present
+
+#   - name: install docker
+#     command: wget -qO- https://get.docker.com/ | sh
+
+#   - name: create pihole container
+#     docker_container:
+#       name: pihole
+#       image: pihole/pihole
+#       state: present
+#       exposed_ports:
+#         - "53:53/tcp"
+#         - "53:53/udp"
+#         # - 80:80
+#       env:
+#           TZ: "America/New York"
+#       volumes:
+#         - "$(pwd)/etc-pihole/:/etc/pihole/"
+#         - "$(pwd)/etc-dnsmasq.d/:/etc/dnsmasq.d/"
+#       dns_servers: 127.0.0.1
+#       dns_servers: 8.8.8.8
+#       dns_servers: 8.8.4.4
+#       restart_policy: unless-stopped
+
+# - name: Setup Wireguard VPN
+#   hosts: tak
+#   gather_facts: true
+#   become: yes
+#   vars:
+#     clients: 10
+#     vpn_interface: wg0
+#   tasks:
+
+#   # - name: Install qrencode
+#   #   package:
+#   #     name: qrencode
+#   #     state: present
+
+#   - name: create qr code for config
+#     command: qrencode -o /root/wg_clients/client_{{ item }}/{{ vpn_interface }}-client.png < /root/wg_clients/client_{{ item }}/{{ vpn_interface }}-client.conf
+#     with_sequence: start=1 end={{ clients }}
+
+- name: Add Wireguard VPN Client
+  hosts: tak
+  gather_facts: true
+  become: yes
+  vars:
+    new_client: pf0
+    new_client_ip: 10.202.0.100
+  roles:
+    - wireguard/wireguard_harden
+
+
+
+
+
+

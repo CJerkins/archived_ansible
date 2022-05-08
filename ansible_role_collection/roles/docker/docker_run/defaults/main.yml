@@ -1,0 +1,20 @@
+---
+container_state: running
+service_name: "{{ container_name }}-container.service"
+service_files_dir: /etc/systemd/system
+
+# Service options.
+docker_service_state: started
+docker_service_enabled: true
+docker_restart_handler_state: restarted
+
+# Docker Compose options.
+docker_install_compose: true
+docker_compose_version: "1.22.0"
+docker_compose_path: /usr/local/bin/docker-compose
+
+docker_user: "{{ ansible_user }}"
+docker_admin: true
+
+portainer_available_externally: "false"
+portainer_data_directory: "{{ docker_home }}/portainer/config"

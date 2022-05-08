@@ -1,0 +1,21 @@
+---
+- name: iptables - Perform NAT readdressing
+  iptables:
+    table: nat
+    chain: POSTROUTING
+    source: "{{ openvpn_server_network }}/24"
+    to_source: "{{ansible_default_ipv4.address}}"
+    jump: SNAT
+    action: insert
+    comment: "Perform NAT readdressing"
+  when: not firewall_masquerade_not_snat
+
+- name: iptables - Perform NAT readdressing with MASQUERADE
+  iptables:
+    table: nat
+    chain: POSTROUTING
+    source: "{{ openvpn_server_network }}/24"
+    jump: MASQUERADE
+    action: insert
+    comment: "Perform NAT readdressing"
+  when: firewall_masquerade_not_snat

@@ -1,0 +1,72 @@
+---
+- hosts: vpnserver
+  gather_facts: yes
+  become: yes
+  # connection: local
+  vars:
+    openvpn_server_name: vpn_valex
+    firewall_firewall_ip_forward: true
+    openvpn_port: 1194
+    openvpn_server_network: 10.8.0.0          ## format 192.168.1.0 ONLY define for subnet configurations.
+    openvpn_server_netmask: 255.255.255.0     ## format 255.255.255.0 ONLY define for subnet configurations.
+    # openvpn_addl_server_options: 
+    #   - route 172.16.1.0 255.255.255.0 10.8.0.1
+    openvpn_push: 
+      - block-outside-dns
+    openvpn_redirect_gateway: true ## if true inputs, push "redirect-gateway def1", in server config
+    openvpn_set_dns: true      ## enables dns push settings
+    openvpn_verbose: 3          ## Default is 3. Options: 1 - 11. SEE https://openvpn.net/community-resources/reference-manual-for-openvpn-2-4/ for mor inforamation
+    clients: 
+      - client0
+      - client1
+    server_public_ipaddress: 54.90.27.101 ## vpn server publiaddress. 
+    # openvpn_addl_client_options: 
+    #   - log vpn-test0-client.log 
+    openvpn_install: server ## Options server or client
+    # openvpn_fetch_config_dir: /tmp/vpn-test/
+
+  tasks:
+
+  # - name: Generate certs and configs
+  #   import_role: 
+  #     name: openvpn/openvpn_cert
+  #     vars_from: vars/mwr.yml
+  #     # openvpn_server_name: vpn-test0
+  #     # openvpn_port: 1194
+  #     # openvpn_server_network: 10.8.0.0          ## format 192.168.1.0 ONLY define for subnet configurations.
+  #     # openvpn_server_netmask: 255.255.255.0     ## format 255.255.255.0 ONLY define for subnet configurations.
+  #     # openvpn_addl_server_options: 
+  #     #   - route 172.16.1.0 255.255.255.0 10.8.0.1
+  #     # openvpn_push: 
+  #     #   - block-outside-dns
+  #     # openvpn_redirect_gateway: true ## if true inputs, push "redirect-gateway def1", in server config
+  #     # openvpn_set_dns: true      ## enables dns push settings
+  #     # openvpn_verbose: 7          ## Default is 3. Options: 1 - 11. SEE https://openvpn.net/community-resources/reference-manual-for-openvpn-2-4/ for mor inforamation
+  #     # clients: 
+  #     #   - client0
+  #     #   - client1
+  #     # server_public_ipaddress: 54.174.30.38 ## vpn server publiaddress. 
+  #     # openvpn_addl_client_options: 
+  #     #   - log vpn-test0-client.log 
+  #     # openvpn_install: server ## Options server or client
+  #     # openvpn_hostvars: inventory/host_vars/vpntest.local.drokdev.pro/vars.yml
+  #     # openvpn_host: vpntest.local.drokdev.pro
+  #   delegate_to: "{{ openvpn_gen_machine }}"
+
+
+  - name: Install and start vpn server
+    # become: yes
+  
+    import_role: 
+      name: openvpn/openvpn_install
+      # vars_from: host_vars/vpn.vanguard.cloud/mwr.yml
+
+    delegate_to: vpn.vanguard.cloud
+
+  - name: Setup firewall rules on vpn server
+    import_role:
+      name: firewall      
+    vars:
+      firewall_type: ufw
+      firewall_openvpn_NAT_enable: true 
+    delegate_to: vpn.vanguard.cloud

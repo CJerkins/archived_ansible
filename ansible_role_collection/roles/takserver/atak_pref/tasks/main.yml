@@ -1,0 +1,16 @@
+---
+
+- name: Generate device preference
+  import_tasks: gen_pref.yml
+  tags:
+    - gen_pref
+    delegate_to: "{{ https_fileshare_host }}"
+
+# - name: Generate qr_code
+#   import_tasks: gen_qr_code.yml
+#   when: 
+#     - qr_code
+#     - https_fileshare_host != 'localhost'
+#   tags:
+#     - qr_code
+#     delegate_to: "{{ https_fileshare_host }}"

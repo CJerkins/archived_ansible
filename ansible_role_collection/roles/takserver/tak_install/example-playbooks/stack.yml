@@ -1,0 +1,34 @@
+---
+- name: Installing tak stack
+  hosts: tak-services
+  remote_user: root
+  become: yes
+  become_method: sudo
+  vars:
+    LOCAL_HOSTNAME: '{{ inventory_hostname }}'
+    LOCAL_FQDN_NAME: 'dmz.drokdev.pro'
+  roles:
+    - common
+
+- name: Installing takserver
+  hosts: tak
+  become: yes
+  roles:
+    - takserver
+
+- name: Installing wowza
+  hosts: stream
+  user: root
+  roles:
+    - ansible-wowza
+  tasks:
+    - debug: msg={{ansible_default_ipv4}}
+
+- name: Installing xmppChat
+  hosts: xmpp
+  remote_user: root
+  become: yes
+  vars:
+    prosody_dhparam_length: 4096
+  roles:
+   - prosody

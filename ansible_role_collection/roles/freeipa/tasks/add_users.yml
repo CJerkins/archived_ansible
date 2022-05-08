@@ -1,0 +1,15 @@
+---
+- name: Ensure host is present
+  ipa_host:
+    name: "{{ hostname }}.{{ zone_name }}"
+    description: "{{ description }}"
+    ip_address: "{{ ip_address }}"
+    ns_host_location: "{{ ns_host_location }}"
+    ns_os_version: "{{ ns_os_version }}"
+    ns_hardware_platform: "{{ ns_hardware_platform }}"
+    # mac_address:
+    # - "08:00:27:E3:B1:2D"
+    ipa_host: "{{ freeipa_host }}"
+    ipa_user: "{{ freeipa_user }}"
+    ipa_pass: "{{ freeipa_pass }}"
+    state: present

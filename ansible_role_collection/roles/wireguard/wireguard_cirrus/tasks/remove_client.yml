@@ -1,0 +1,13 @@
+---
+# - name: Simple select query to acme db
+#   postgresql_query:
+#     db: acme
+#     query: SELECT version()
+
+- name: Register public key file contents
+  shell: cat "{{ rm_client }}.public"
+  register: rm_public_key_file
+
+- name: Register the new client on the vpn server
+  shell: wg set "{{ server }}" peer "{{ rm_public_key_file.stdout }}" remove
+

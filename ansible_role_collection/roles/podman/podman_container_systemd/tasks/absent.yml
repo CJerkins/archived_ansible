@@ -1,0 +1,27 @@
+---
+- name: ensure "{{ service_name }}" is disabled at boot
+  service:
+    name: "{{ service_name }}"
+    enabled: false
+  when:
+    - service_file_before_template.stat.exists
+
+- name: ensure "{{ service_name }}" is stopped
+  service:
+    name: "{{ service_name }}"
+    state: stopped
+    enabled: no
+  when:
+    - service_file_before_template.stat.exists
+
+- name: clean up systemd service file
+  file:
+    path: "{{ service_files_dir }}/{{ service_name }}"
+    state: absent
+  notify: reload systemctl
+
+- name: clean up pod configuration file
+  file:
+    path: "{{ container_pod_yaml }}"
+    state: absent
+  when: container_pod_yaml is defined

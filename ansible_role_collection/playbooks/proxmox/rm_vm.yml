@@ -1,0 +1,18 @@
+---
+# - hosts: 127.0.0.1
+#   connection: local
+#   vars_prompt:
+#     - name: ansible_become_password
+#       prompt: "What is the password the above user needs for sudo access? (Press return if none.)"
+
+- hosts: pve2.vanguard.intra
+  gather_facts: no
+  become: yes
+
+  vars:
+    ## -- VM vars -- ##
+    action: remove
+    # vmid: 2128 # source VM name or the VM ID in provisioning
+    # vmname      : vanguard.local # The target VM Name
+  roles:
+  - role: proxmox

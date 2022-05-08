@@ -1,0 +1,100 @@
+---
+- name: Create a user
+  user:
+    name: tak
+    password: "{{ password_takadmin | password_hash('sha512') }}"
+    groups: wheel   # Empty by default.
+    # shell: /bin/bash       # Defaults to /bin/bash
+    # system: no             # Defaults to no
+    # createhome: yes        # Defaults to yes
+    home: /home/tak  # Defaults to /home/<username>
+    state: present
+  # when: user_exists == "0"
+
+- name: Create takserver/client key directory
+  file:
+    path: "{{ dir_takserver_key }}" # default /tmp/takcerts
+    owner: tak
+    group: tak
+    mode: 0775
+    state: directory
+
+- name: Create temporary directory
+  file:
+    path: "{{ dir_cert_creation }}" # default /tmp/takcerts
+    owner: tak
+    group: tak
+    mode: 0775
+    state: directory
+
+- name: Ensure openssl installed
+  package:
+    name: 
+      - openssl
+      - java-1.8.0-openjdk-devel
+    state: present
+
+- name: Generate CA
+  import_tasks: gen_ca.yml
+  tags: gen_ca
+
+
+- name: Generate server certs
+  import_tasks: server_certs.yml
+  tags: server_certs
+
+
+- name: Generate client certs
+  import_tasks: user_certs.yml
+  tags: user_certs
+
+
+### Uncomment if you want to export to a location ###
+# - name: Copy CA, truststore keys, crl, and server to takserver directory
+#   copy:
+#     src: '{{ dir_cert_creation }}/{{ item.src }}'
+#     dest: '{{ dir_takserver_key }}/{{ item.dest }}'
+#     owner: tak
+#     group: tak
+#     remote_src: yes
+#   with_items:
+#     - { src: 'truststore-root.jks', dest: 'truststore-root.jks', }
+#     - { src: 'fed-truststore.jks', dest: 'fed-truststore.jks', }
+#     # - { src: 'ca.pem', dest: 'ca.pem', }
+#     # - { src: 'root-ca.pem', dest: 'root-ca.pem', }
+#     # - { src: 'ca-trusted.pem', dest: 'ca-trusted.pem', }
+#     # - { src: 'root-ca-trusted.pem', dest: 'root-ca-trusted.pem', }
+#     # - { src: 'ca-do-not-share.key', dest: 'ca-do-not-share.key', }
+#     # - { src: 'root-ca-do-not-share.pem', dest: 'root-ca-do-not-share.pem', }
+#     - { src: 'ca.crl', dest: 'ca.crl', }
+#     - { src: 'crl_index.txt', dest: 'crl_index.txt', }
+#     - { src: 'crl_index.txt.attr', dest: 'crl_index.txt.attr', }
+#     - { src: "{{ name_takserver }}.jks", dest: "{{ name_takserver }}.jks", }
+#     - { src: '{{ admincert }}.pem', dest: '{{ admincert }}.pem', }
+
+# - name: Copy webadmin certs
+#   copy:
+#     src: '{{ dir_cert_creation }}/{{ item.src }}'
+#     dest: '{{ dir_takserver_key }}/{{ item.dest }}'
+#     owner: tak
+#     group: tak
+#     remote_src: yes
+#   with_items:
+#     - { src: '{{ admincert }}.pem', dest: '{{ admincert }}.pem', }
+
+# - name: use find to get the files list which you want to copy/fetch
+#   find: 
+#     paths: "{{ dir_cert_creation }}" 
+#   register: file_2_fetch
+
+# - name: use fetch to get the files
+#   fetch:
+#     src: "{{ item.path }}"
+#     dest: "{{ dir_local }}"
+#     flat: yes
+#   with_items: "{{ file_2_fetch.files }}"
+
+# - name: Delete temporary certificate directory
+#   file:
+#     path: "{{ dir_cert_creation }}"
+#     state: absent

@@ -1,0 +1,78 @@
+---
+- name: Install qrencode
+  package:
+    name: qrencode
+    state: present
+
+- name: Generate client configs
+  template:
+    src: "templates/admin_client.conf"
+    dest: "/root/client_{{ admin_client }}/{{ server }}-client.conf"
+    owner: root
+    group: root
+    mode: 0600
+  when: admin_client_keys is not defined or admin_client_keys.stat.exists == false
+
+- name: create qr code for config
+  command: qrencode -o /root/client_{{ admin_client }}/{{ server }}-client.png < /root/client_{{ admin_client }}/{{ server }}-client.conf
+  when: admin_client_keys is not defined or admin_client_keys.stat.exists == false
+
+# Else an already-running service will overwrite the local
+# config we are about to create when it quits
+- name: Stop any running Wireguard service
+  systemd:
+    name: wg-quick@{{ server }}.service
+    state: stopped
+
+# Sometimes systemd doesn't do the job
+- name: Stop any running Wireguard service directly
+  shell: "wg-quick down {{ server }} || true"  # ignore failures
+  register: wg_quick_down_out  # For debugging
+
+# Should happen last among the config file creations, so if the process 
+# is interrupted we will re-generate everything (the existence of the 
+# server config is used to determine whether to generate the server and 
+# client config files)
+- name: Generate server config
+  template:
+    src: "templates/server.conf"
+    dest: "/etc/wireguard/{{ server }}.conf"
+    owner: root
+    group: root
+    mode: 0600
+  when: interface_conf is not defined or interface_conf.stat.exists == false
+
+- name: Print server public key
+  debug:
+    var: server_public_key_files.stdout
+
+
+- name: Enable wireguard interface
+  systemd:
+    name: "wg-quick@{{ server }}"
+    enabled: yes
+    state: started
+# when is omitted since state should be `started` regardless
+
+- name: Register the admin_client on the vpn server
+  shell: wg set {{ server }} peer {{ client_public_key_files.stdout }} allowed-ips {{ vpn_admin_client_network }}.2/32
+  when: admin_client_keys is not defined or admin_client_keys.stat.exists == false
+
+- name: Restart the VPN service to save changes
+  systemd:
+    name: wg-quick@{{ server }}.service
+    state: restarted
+
+- name: clean up client keys and configs
+  command: shred -f -n 10 -z -u "{{ item }}"
+  with_items:
+    - /root/{{ server }}.private
+    - /root/{{ admin_client }}.private
+    # - /root/client_{{ admin_client }}/{{ server }}-client.png
+    # - /root/client_{{ admin_client }}/{{ server }}-client.conf
+  ignore_errors: yes
+    
+
+
+
+

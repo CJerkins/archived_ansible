@@ -1,0 +1,86 @@
+---
+- name: Template a file to config.cgf
+  template:
+    src: templates/cert/config.cfg.j2
+    dest: "{{ dir_cert_creation }}/config.cfg"
+    owner: tak
+    group: wheel
+    mode: '0644'
+
+## -- Create CA and truststore -- ##
+
+- name: Generate CA key 
+  command: openssl req -new -sha256 -x509 -days 3652 -extensions v3_ca -keyout ca-do-not-share.key -out ca.pem -passout pass:"{{ password_ca }}" -config config.cfg -subj "{{ subject_base }}CN={{ name_ca }}"
+  become_user: tak
+  become: yes
+  args:
+    chdir: "{{ dir_cert_creation }}"
+    creates: ca.pem
+  # when: tak_ca_key is not defined
+
+- name: Generate CA crt
+  command: openssl x509 -in ca.pem  -addtrust clientAuth -addtrust serverAuth -setalias "{{ name_ca }}" -out ca-trusted.pem
+  become_user: tak
+  become: yes
+  args:
+    chdir: "{{ dir_cert_creation }}"
+    creates: ca-trusted.pem
+  # when: tak_ca_key is not defined
+
+- name: pkcs12 export
+  command: openssl pkcs12 -export -in ca-trusted.pem -out truststore-root.p12 -nokeys -caname "{{ name_ca }}" -passout pass:"{{ password_ca }}"
+  become_user: tak
+  become: yes
+  args:
+    chdir: "{{ dir_cert_creation }}"
+    creates: truststore-root.p12
+  # when: tak_ca_key is not defined
+
+- name: jks export
+  command: keytool -import -trustcacerts -file ca.pem -keystore truststore-root.jks -alias "{{ name_ca }}" -storepass "{{ password_ca }}" -noprompt
+  become_user: tak
+  become: yes
+  args:
+    chdir: "{{ dir_cert_creation }}"
+    creates: truststore-root.jks
+  # when: tak_ca_key is not defined
+
+- name: Generate fed-truststore.jks
+  copy:
+    src: "{{ dir_cert_creation }}/truststore-root.jks"
+    dest: "{{ dir_cert_creation }}/fed-truststore.jks"
+    owner: tak
+    group: tak
+    remote_src: yes
+
+- name: Make copies for safety
+  copy:
+    src: '{{ dir_cert_creation }}/{{ item.src }}'
+    dest: '{{ dir_cert_creation }}/{{ item.dest }}'
+    owner: tak
+    group: tak
+    remote_src: yes
+  with_items:
+    - { src: 'ca.pem', dest: 'root-ca.pem', }
+    - { src: 'ca-trusted.pem', dest: 'root-ca-trusted.pem' }
+    - { src: 'ca-do-not-share.key', dest: 'root-ca-do-not-share.pem' }
+
+- name: Create empty crl_index
+  file:
+    path: '{{ dir_cert_creation }}/{{ item }}'
+    owner: tak
+    group: tak
+    state: touch
+    mode: '0640'
+  with_items:
+    - crl_index.txt
+    - crl_index.txt.attr
+
+- name: Generate ca.crl
+  command: openssl ca -config config.cfg -gencrl -keyfile ca-do-not-share.key -key "{{ password_ca }}" -cert ca.pem -out ca.crl
+  become_user: tak
+  become: yes
+  args:
+    chdir: "{{ dir_cert_creation }}"
+    creates: ca.crl
+  # when: tak_ca_key is not defined

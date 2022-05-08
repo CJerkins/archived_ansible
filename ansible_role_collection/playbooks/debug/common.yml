@@ -1,0 +1,11 @@
+---
+- name: Installing 
+  hosts: all
+  remote_user: root
+  become: yes
+  become_method: sudo
+  vars:
+    LOCAL_HOSTNAME: '{{ inventory_hostname }}'
+    LOCAL_FQDN_NAME: 'dmz.drokdev.pro'
+  roles:
+    - common

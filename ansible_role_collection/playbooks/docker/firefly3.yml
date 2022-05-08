@@ -1,0 +1,7 @@
+---
+- hosts: docker0
+  become: yes 
+  roles:
+     - docker/docker_containers/firefly
+
+

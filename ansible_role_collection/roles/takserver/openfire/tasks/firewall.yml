@@ -1,0 +1,22 @@
+---
+- name: start firewalld and enabled
+  systemd:
+    state: started
+    name: firewalld
+    enabled: yes
+
+- name: Waiting for services to start
+  wait_for:
+    timeout: 30
+
+- name: open firewall port for takserver
+  firewalld:
+    port: "{{item}}"
+    zone: public
+    immediate: yes # this is the firewall-cmd --reload
+    permanent: true
+    state: enabled
+  with_items:
+    - '9090/tcp'
+    - '9091/tcp'
+    - '5222/tcp'

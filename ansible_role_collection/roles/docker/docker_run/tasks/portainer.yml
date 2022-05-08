@@ -1,0 +1,27 @@
+---
+- name: Create Portainer Directories
+  file:
+    path: "{{docker_exported_container_volumes_basedir}}/portainer/{{ item }}"
+    state: directory
+  with_items:
+    - data
+
+- name: Portainer Docker Container
+  docker_container:
+    name: portainer
+    image: portainer/portainer
+    pull: true
+    volumes:
+      - "{{docker_exported_container_volumes_basedir}}/portainer/data:/data:rw"
+      - "/var/run/docker.sock:/var/run/docker.sock:ro"
+      - "/etc/timezone:/etc/timezone:ro"
+    ports:
+      - "9000:9000"
+    restart_policy: unless-stopped
+    # memory: 1g
+    # labels:
+    #   traefik.backend: "portainer"
+    #   traefik.frontend.rule: "Host:portainer.{{ domain }}"
+    #   traefik.enable: "{{ portainer_available_externally }}"
+    #   traefik.port: "9000"
+

@@ -1,0 +1,68 @@
+---
+container_state: running
+setenforce: false
+
+container_name: grafana
+container_image: grafana/grafana
+container_dir_lib: data
+container_dir_dashboards: dashboards
+container_dir_datasources: datasources
+# container_dir_owner: 472
+# container_dir_group: root
+container_memory: 128M
+container_fqdn: "grafana.{{ domain }}"
+container_run_args: >-
+  -d
+  -p 3000:3000/tcp
+  -v "{{podman_exported_container_volumes_basedir}}/{{ container_dir_lib }}:/var/lib/grafana/:Z"
+  -e GF_INSTALL_PLUGINS=grafana-clock-panel,natel-discrete-panel,petrslavotinek-carpetplot-panel,vonage-status-panel,raintank-worldping-app
+  -e GF_SECURITY_ADMIN_USER="{{ grafana_admin_user }}"
+  -e GF_SECURITY_ADMIN_PASSWORD=d"{{ grafana_admin_password }}"
+  --hostname="{{ container_fqdn }}"
+  --memory="{{ container_memory }}"
+  --net=host
+database_run_args: >-
+  -d
+  -p 8086:8086
+  -v "{{podman_exported_container_volumes_basedir}}/{{ container_dir_config }}:/etc/influxdb:Z"
+  -v "{{podman_exported_container_volumes_basedir}}/{{ container_dir_db }}:/var/lib/influxdb:Z"
+  --net=host
+database_initialize_args: >-
+  -e INFLUXDB_DB="{{ influx_database_name }}" 
+  -e INFLUXDB_ADMIN_ENABLED=true
+  -e INFLUXDB_ADMIN_USER=admin 
+  -e INFLUXDB_ADMIN_PASSWORD="{{ influx_database_admin_pass }}"
+  -e INFLUXDB_USER="{{ influx_database_user }}"
+  -e INFLUXDB_USER_PASSWORD="{{ influx_database_user_pass }}"
+  -v "{{ podman_exported_container_volumes_basedir }}/{{ container_dir_db }}:/var/lib/influxdb:Z"
+container_firewall_ports:
+  - 3000/tcp
+
+  # --security-opt label=disable
+  # -v "{{podman_exported_container_volumes_basedir}}/{{ container_dir_dashboards }}:/etc/grafana/provisioning/dashboards/:Z"  ### Having permissions issues with directory
+  # -v "{{podman_exported_container_volumes_basedir}}/{{ container_dir_datasources }}:/etc/grafana/provisioning/datasources/:Z"  ### Having permissions issues with directory
+
+
+
+## goes to host_vars ##
+# podman_exported_container_volumes_basedir: /var/lib/containers/exported_volumes
+# domain: localdomain
+# timezone: "Europe/Helsinki"
+
+
+
+
+# podman run -d \
+# -p 3000:3000/tcp \
+# -v /var/lib/containers/grafana/grafana-lib:/var/lib/grafana:Z \
+# --hostname=grafana.local.drokdev.pro \
+# --memory=128M \
+# --net=host \
+# -e GF_INSTALL_PLUGINS=grafana-clock-panel,natel-discrete-panel,petrslavotinek-carpetplot-panel,vonage-status-panel,raintank-worldping-app \
+# -e GF_SECURITY_ADMIN_USER=admin \
+# -e GF_SECURITY_ADMIN_PASSWORD=drokDROK63 \
+# grafana/grafana
+
+
+
+

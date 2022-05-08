@@ -1,0 +1,30 @@
+---
+- hosts: 
+  # - webserver0
+  - webserver1
+  gather_facts: yes
+  become: yes
+  vars:
+    firewall_ports:
+      - 80
+      - 443
+      - 22
+    dir_ssl_key: /etc/nginx/ssl
+    servers:
+      # - bitwarden
+      # - bitwardenD2
+      # - organizr
+      # - hass
+      # - nodered
+      # - cloud
+      # - cloudD2
+      # - firefly
+      # - pbx
+      # # - traccar
+      # - xoa0
+      # - xoa1
+      # - sync
+      # - motioneye
+      - inventory
+  roles:
+    - nginx

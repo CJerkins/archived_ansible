@@ -1,0 +1,7 @@
+---
+- hosts: 
+  - repo-yum.local.drokdev.pro
+  - repo-apt.local.drokdev.pro
+  become: yes
+  roles:
+    - apache

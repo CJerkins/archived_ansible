@@ -1,0 +1,64 @@
+---
+- set_fact:
+    fw_state: enabled
+  when: container_state == "running"
+
+- name: set firewall ports state to disabled when container state is not running
+  set_fact:
+    fw_state: disabled
+  when: container_state != "running"
+
+- name: set firewall ports state to enabled when container state is running
+  block:
+
+  - name: ensure firewalld is installed
+    tags: firewall
+    package: 
+      name: firewalld 
+      state: installed
+
+  - name: ensure firewall service is running
+    tags: firewall
+    service: 
+      name: firewalld 
+      state: started
+
+  - name: ensure container's exposed ports firewall state
+    tags: firewall
+    firewalld:
+      port: "{{ item }}"
+      permanent: yes
+      immediate: yes
+      state: "{{ fw_state }}"
+    with_items: "{{ container_firewall_ports }}"
+
+  when: 
+    - ansible_distribution == "CentOS" or ansible_distribution=="RedHat"
+
+- name: set firewall ports state to enabled when container state is running
+  block:
+
+  - name: ensure firewalld is installed
+    tags: firewall
+    package: 
+      name: ufw 
+      state: installed
+
+  - name: ensure firewall service is running
+    tags: firewall
+    service: 
+      name: ufw 
+      state: started
+
+  - name: ensure container's exposed ports firewall state
+    tags: firewall
+    ufw:
+      port: "{{ item }}"
+      permanent: yes
+      immediate: yes
+      state: "{{ fw_state }}"
+    with_items: "{{ container_firewall_ports }}"
+
+  when: 
+    - ansible_distribution == "Ubuntu"
+    

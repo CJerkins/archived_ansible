@@ -1,0 +1,56 @@
+---
+- name: Ensure EPEL is enabled and firewalld
+  package:
+    name: 
+      - epel-release
+      - firewalld
+    state: present
+  when: ansible_facts['os_family'] == "RedHat"
+
+- name: Install ufw
+  package:
+    name: 
+      - ufw
+    state: present
+  when: ansible_facts['distribution'] == 'Debian'
+  
+- name: start firewalld and enabled
+  systemd:
+    state: started
+    name: firewalld
+    enabled: yes
+  when: ansible_facts['os_family'] == "RedHat"
+
+- name: start ufw and enabled
+  systemd:
+    state: started
+    name: ufw
+    enabled: yes
+  when: ansible_facts['distribution'] == 'Debian'
+  
+
+- name: Waiting for services to start
+  wait_for:
+    timeout: 30
+
+- name: open firewall ports
+  firewalld:
+    port: "{{ item }}"
+    zone: public
+    immediate: yes # this is the firewall-cmd --reload
+    permanent: true
+    state: enabled
+  notify: restart firewalld
+  with_items:
+    - '{{ firewall_ports }}'
+  when: ansible_facts['os_family'] == "RedHat"
+
+- name: Allow all access to tcp port 80
+  ufw:
+    rule: allow
+    port: "{{ item }}"
+    proto: tcp
+  notify: restart ufw
+  with_items:
+    - '{{ firewall_ports }}'
+  when: ansible_facts['distribution'] == 'Debian'

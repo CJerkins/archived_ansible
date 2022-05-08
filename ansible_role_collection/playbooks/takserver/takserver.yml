@@ -1,0 +1,21 @@
+---
+- name: Installing takserver
+  hosts: takserver
+  become: yes
+  vars:
+    password_takadmin: atakatak
+    user_webadmin: admin
+    password_webadmin: atakatak
+    admincert: webAdmin0
+    name_takclients:
+      - admin0
+      - webAdmin0
+      # - webAdmin1
+      # - jed0
+      # - jed1
+      # - jed2
+      # - jed3
+      # - jed4
+      # - jed5
+  roles:
+    - takserver

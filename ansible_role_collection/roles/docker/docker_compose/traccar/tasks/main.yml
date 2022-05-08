@@ -1,0 +1,32 @@
+---
+- name: Make traccar directorys.
+  file:
+    path: "{{docker_exported_container_volumes_basedir}}/traccar/{{ item }}"
+    state: directory
+  with_items:
+    - conf
+    - logs
+    - data
+
+### Install ###
+- name: Docker configurations
+  tags: container
+  import_role:
+    name: docker_run
+
+- name: Copy traccar docker-compose.yml file into place.
+  template:
+    src: docker-compose.traccar.yml.j2
+    dest: /var/homelabos/traccar/docker-compose.traccar.yml
+
+- name: Configure traccar systemd service.
+  template:
+    src: service.j2
+    dest: /etc/systemd/system/traccar.service
+
+- name: Start traccar
+  systemd:
+    name: traccar
+    enabled: "yes"
+    daemon-reload: "yes"
+    state: started

@@ -1,0 +1,87 @@
+---
+## example ansible iptables config. No all varibles need to be used, SEE https://docs.ansible.com/ansible/latest/modules/iptables_module.html
+## to learn how to use the iptables module
+- name: example
+  iptables:
+    table: nat ## string. Options: nat, mangle, raw, security
+    chain: INPUT ## Options: INPUT, FORWARD, OUTPUT, PREROUTING, POSTROUTING, SECMARK or CONNSECMARK
+    ctstate: ESTABLISHED,RELATED ## Options: INVALID, NEW, ESTABLISHED, RELATED, UNTRACKED, SNAT, DNAT
+    in_interface: eth0 ## string. If this option is omitted, any interface name will match.
+    out_interface: eth0 ## string. If this option is omitted, any interface name will match.
+    protocol: tcp ## all is default. string. Options: tcp, udp, udplite, icmp, esp, ah, sctp or the special keyword all, or it can be a numeric value, representing one of these protocols or a different one. A protocol name from /etc/protocols is also allowed.
+    match: tcp ## list. man iptables-extensions for use.
+    reject_with: ## string. Specifies the error packet type to return while rejecting. It implies "jump: REJECT"
+    destination_port: 80 ## string
+    jump: ACCEPT ## This specifies the target of the rule; i.e., what to do if the packet matches it.
+    action: append ## append is default. Options: insert
+    destination: ## string. Address can be either a network name, a hostname, a network IP address (with /mask), or a plain IP address.
+    destination_port: ## string. This can either be a service name or a port number. 
+    source:  ## string. Address can be either a network name, a hostname, a network IP address (with /mask), or a plain IP address.
+    source_port: ## string. This can either be a service name or a port number. 
+    src_range: ## string. Specifies the source IP range to match in the iprange module.
+    to_ports: 8600 ## This specifies a destination port or range of ports to use, without this, the destination port is never altered.
+    to_destination: ## string. This specifies a destination address to use with DNAT.
+    to_source: ## string. This specifies a source address to use with SNAT.
+    icmp_type: ## string. This allows specification of the ICMP type, which can be a numeric ICMP type, type/code pair, or one of the ICMP type names shown by the command 'iptables -p icmp -h'
+    comment: example ## sring. This specifies a comment that will be added to the rule.
+    rule_num: 5 ## Insert the rule as the given rule number. This works only with action=insert.
+    state: present ## defaults present. Options: present, absent. Whether the rule should be absent or present.
+  notify: "save iptables" ## Use to save you your settings
+
+
+## Examples from ansible site on how to use the module
+- name: Block specific IP
+  iptables:
+    chain: INPUT
+    source: 8.8.8.8
+    jump: DROP
+  become: yes
+
+- name: Forward port 80 to 8600
+  iptables:
+    table: nat
+    chain: PREROUTING
+    in_interface: eth0
+    protocol: tcp
+    match: tcp
+    destination_port: 80
+    jump: REDIRECT
+    to_ports: 8600
+    comment: Redirect web traffic to port 8600
+  become: yes
+
+- name: iptables flush filter
+  iptables:
+    chain: "{{ item }}"
+    flush: yes
+  with_items:  [ 'INPUT', 'FORWARD', 'OUTPUT' ]
+
+- name: iptables flush nat
+  iptables:
+    table: nat
+    chain: '{{ item }}'
+    flush: yes
+  with_items: [ 'INPUT', 'OUTPUT', 'PREROUTING', 'POSTROUTING' ]
+
+- name: Set the policy for the INPUT chain to DROP
+  iptables:
+    chain: INPUT
+    policy: DROP
+
+- name: Log packets arriving into an user-defined chain
+  iptables:
+    chain: LOGGING
+    action: append
+    state: present
+    limit: 2/second
+    limit_burst: 20
+    log_prefix: "IPTABLES:INFO: "
+    log_level: info
+
+- name: Accept icmp
+  iptables:
+    chain: OUTPUT
+    protocol: icmp
+    jump: ACCEPT
+
+

@@ -1,0 +1,11 @@
+---
+- name: Setup CoreConfig.xml
+  import_tasks: config.yml
+  tags: config
+
+### need to check db is runing before play
+# - name: Setup admin access
+#   import_tasks: setup-admin.yml
+#   tags: admin
+
+

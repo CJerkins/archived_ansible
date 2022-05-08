@@ -1,0 +1,11 @@
+---
+# handlers file
+- name: Restart takserver
+  systemd:
+    state: restarted
+    name: takserver
+
+- name: Restart firewalld
+  systemd:
+    state: restarted
+    name: firewalld

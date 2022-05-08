@@ -1,0 +1,18 @@
+---
+# defaults file for wireguard_role
+
+#Declare the VPN subnet
+# vpn_client_network: '10.201'
+vpn_server_network_ipv6: 'fd42:42:42:'
+vpn_server_network: '10.202.0'
+#Declare the VPN server port
+vpn_port: '51821'
+vpn_interface: 'wg0'
+
+#Declare the number of clients
+# clients: 2
+
+client_config_path: '~/Desktop/wireguard_role/profiles'
+
+wireguard_nat: false
+wireguard_dns: false

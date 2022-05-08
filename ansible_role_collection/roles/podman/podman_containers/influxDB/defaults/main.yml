@@ -1,0 +1,69 @@
+---
+container_state: running
+setenforce: false
+
+### Example varibles ###
+container_name: influxdb
+container_image: influxdb
+container_dir_owner: root
+container_dir_group: root
+container_dir_config: config
+# container_add_cmd_0: "podman run --rm influxdb influxd config > {{podman_exported_container_volumes_basedir}}/{{ container_dir_config }}/influxdb.conf" ## if you need to run additional cmds proir to running the container. You have to place these in the podman_container_systemd task/main.yml. Any subseqental additional cmd use the first one as a template and label by number.
+container_dir_db: db
+container_run_args: "{{ database_run_args }}"
+container_db_args: "{{ database_initialize_args }}"
+# container_run_args: >-
+#   -d
+#   -p 8086:8086
+#   -v "{{podman_exported_container_volumes_basedir}}/{{ container_dir_config }}:/etc/influxdb:Z"
+#   -v "{{podman_exported_container_volumes_basedir}}/{{ container_dir_db }}:/var/lib/influxdb:Z"
+#   --net=host
+# container_db_args: >-
+#   -e INFLUXDB_DB="{{database_name}}" 
+#   -e INFLUXDB_ADMIN_ENABLED=true
+#   -e INFLUXDB_ADMIN_USER=admin 
+#   -e INFLUXDB_ADMIN_PASSWORD="{{database_admin_pass}}"
+#   -e INFLUXDB_USER="{{database_user}}"
+#   -e INFLUXDB_USER_PASSWORD="{{database_user_pass}}"
+#   -v "{{podman_exported_container_volumes_basedir}}/{{ container_dir_db }}:/var/lib/influxdb:Z"
+# container_firewall_ports:
+#   - 8086/tcp 
+
+## goes to group_vars ##
+# podman_exported_container_volumes_basedir: /var/lib/containers/exported_volumes
+# domain: localdomain
+# timezone: "Europe/Helsinki"
+
+  # -v "{{podman_exported_container_volumes_basedir}}/{{ container_dir_config }}:/etc/influxdb/influxdb.conf:Z"
+
+# podman run --rm influxdb influxd config > /var/lib/containers/influxdb/config/influxdb.conf
+# podman run -d -p 8086:8086 \
+# --name influxdb \
+# --security-opt label=disable \
+# -v /var/lib/containers/influxdb/db:/var/lib/influxdb:Z \
+# -v /var/lib/containers/influxdb/config:/etc/influxdb:Z \
+# influxdb
+
+# -v /var/lib/containers/influxdb/config:/etc/influxdb/influxdb.conf:Z \
+
+# -v "{{podman_exported_container_volumes_basedir}}/{{ container_dir_db }}:/var/lib/influxdb:Z"
+# -v /var/lib/containers/influxdb/config:/etc/influxdb/influxdb.conf:Z \
+
+### example to intialize a database
+# $ docker run --rm \
+#       -e INFLUXDB_DB=db0 -e INFLUXDB_ADMIN_ENABLED=true \
+#       -e INFLUXDB_ADMIN_USER=admin -e INFLUXDB_ADMIN_PASSWORD=supersecretpassword \
+#       -e INFLUXDB_USER=telegraf -e INFLUXDB_USER_PASSWORD=secretpassword \
+#       -v $PWD:/var/lib/influxdb \
+#       influxdb /init-influxdb.sh
+
+### example to generate a config
+# $ docker run -p 8086:8086 \
+#       -v $PWD/influxdb.conf:/etc/influxdb/influxdb.conf:ro \
+#       influxdb -config /etc/influxdb/influxdb.conf
+
+# docker run --rm influxdb influxd config > influxdb.conf ## generate a default config
+
+###  run the influx client in a separate container:
+# podman exec -it influxdb influx
+# podman run --rm --link=influxdb -it influxdb influx -host influxdb

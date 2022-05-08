@@ -1,0 +1,39 @@
+## provisioned by ansible
+
+server {
+    listen 443 ssl http2;
+    listen [::]:443 ssl http2;
+
+    server_name  nodered.local.drokdev.pro;
+
+    ssl_certificate {{dir_ssl_key}}/nodered/cert.pem; 
+    ssl_certificate_key {{dir_ssl_key}}/nodered/key.pem;
+    ssl_prefer_server_ciphers on;
+    ssl_protocols TLSv1 TLSv1.1 TLSv1.2; #TLSv1.3
+    ssl_ciphers TLS-CHACHA20-POLY1305-SHA256:TLS-AES-256-GCM-SHA384:TLS-AES-128-GCM-SHA256:HIGH:!aNULL:!MD5;
+    ssl_verify_depth 3;
+
+ 
+    location / {
+        proxy_pass http://172.16.100.42:1880;
+
+        proxy_set_header X-Real-IP $remote_addr;
+        proxy_set_header Upgrade $http_upgrade;
+        proxy_set_header Connection "upgrade";
+        proxy_http_version 1.1;
+    }
+}
+
+{# server {
+if ($host = nodered.local.drokdev.pro) {
+    return 301 https://$host$request_uri;
+} 
+
+
+    listen       80 ;
+    listen       [::]:80 ;
+    server_name nodered.drokdev.pro;
+    return 404; 
+
+
+} #}

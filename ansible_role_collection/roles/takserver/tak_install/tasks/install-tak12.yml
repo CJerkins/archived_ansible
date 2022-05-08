@@ -1,0 +1,92 @@
+---
+- name: Ensure EPEL is enabled and nessasary packages installed
+  package:
+    name: 
+      - epel-release
+      - firewalld
+    state: present
+
+- name: Install additional_packages
+  yum:
+    name: 
+      - "{{ item }}"
+    state: present
+  with_items:
+    - "{{ additional_packages }}"
+
+- name: Update and upgrade packages
+  package:
+    name: '*'
+    state: latest
+
+- name: Create a user
+  user:
+    name: tak
+    password: "{{ password_takadmin | password_hash('sha512') }}"
+    groups: wheel   # Empty by default.
+    # shell: /bin/bash       # Defaults to /bin/bash
+    # system: no             # Defaults to no
+    # createhome: yes        # Defaults to yes
+    home: /home/tak  # Defaults to /home/<username>
+    state: present
+  # when: user_exists == "0"
+    
+- name: Copy takserver rpm
+  copy:
+    src: files/takserver-{{ tak_version }}.noarch.rpm  ## you get tak version from the rpm file
+    dest: /home/tak
+    mode: 777
+
+- name: Increase system limit for number of concurrent TCP connections (do once)
+  shell: echo -e "* soft nofile 32768\n* hard nofile 32768" | tee --append /etc/security/limits.conf > /dev/null
+  when: tak_version == '1.3.12-RELEASE6'
+
+- name: Install postgres10 yum repository 
+  get_url:
+    url: https://download.postgresql.org/pub/repos/yum/reporpms/EL-7-x86_64/{{ postgres_package }}.noarch.rpm
+    dest: /root
+  when: tak_version == '1.3.12-RELEASE6'
+
+- name: Install postgresql10 rpm from a local file
+  yum:
+    name: /root/{{ postgres_package }}.noarch.rpm
+    state: present
+  when: tak_version == '1.3.12-RELEASE6'
+
+# - name: Install postgres10 repository 
+#   command: rpm -Uvh https://yum.postgresql.org/10/redhat/rhel-7-x86_64/pgdg-centos10-10-2.noarch.rpm -y
+
+# - name: Install postgresql10
+#   yum:
+#     name: 
+#       - postgresql10-server
+#       - postgresql10
+
+- name: Update and upgrade packages
+  yum:
+    name: '*'
+    state: latest
+
+- name: Install takserver rpm from a local file
+  yum:
+    name: /home/tak/takserver-{{ tak_version }}.noarch.rpm
+    state: present
+
+- name: Check that the database exists
+  stat:
+    path: /var/lib/pgsql/10/data
+  register: database
+
+- name: run db-utility script
+  command: /opt/tak/db-utils/takserver-setup-db.sh
+  when: database.stat.exists == False
+
+- name: remove takserver rpm
+  file:
+    path: /home/tak/takserver-{{ tak_version }}.noarch.rpm  ## you get tak version from the rpm file
+    state: absent
+
+- name: remove postgres rpm
+  file:
+    path: /root/{{ postgres_package }}.noarch.rpm
+    state: absent

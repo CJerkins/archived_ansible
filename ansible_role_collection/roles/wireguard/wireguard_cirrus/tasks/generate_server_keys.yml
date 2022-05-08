@@ -1,0 +1,45 @@
+---
+### Generate server keys
+- name: Generate private and public keys for the server
+  shell: umask 077; wg genkey | tee /root/{{ server }}.private | wg pubkey > /root/{{ server }}.public
+  register: server_key_files
+  when: interface_conf is not defined or interface_conf.stat.exists == false
+
+- name: Register private key file contents
+  shell: cat /root/{{ server }}.private
+  register: server_private_key_files
+  when: interface_conf is not defined or interface_conf.stat.exists == false
+  
+- name: Register public key file contents
+  shell: cat /root/{{ server }}.public
+  register: server_public_key_files
+  when: interface_conf is not defined or interface_conf.stat.exists == false
+
+  
+### generate client keys
+- name: Generate private and public keys for the client and server
+  shell: umask 077; wg genkey | tee /root/{{ admin_client }}.private | wg pubkey > /root/{{ admin_client }}.public
+  register: client_key_files
+  when: admin_client_keys is not defined or admin_client_keys.stat.exists == false
+
+- name: Register private key file contents
+  shell: cat /root/{{ admin_client }}.private
+  register: client_private_key_files
+  when: admin_client_keys is not defined or admin_client_keys.stat.exists == false
+
+- name: Register public key file contents
+  shell: cat /root/{{ admin_client }}.public
+  register: client_public_key_files
+  when: admin_client_keys is not defined or admin_client_keys.stat.exists == false
+  
+
+# Client configs are traditionally named {{ servers }}-client.conf, this lets
+# us keep that scheme.
+- name: Generate directories for client configs
+  file:
+    path: "/root/client_{{ admin_client }}"
+    state: directory
+    owner: root
+    group: root
+    mode: 0600
+   

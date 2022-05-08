@@ -1,0 +1,22 @@
+---
+container_state: running
+available_externally: "false"
+setenforce: false
+
+
+### Example varibles ###
+container_name: traccar
+container_dir_owner: root
+container_dir_group: root
+container_dir_config: conf
+container_dir_logs: logs
+
+docker_firewall_ports:
+  - 8082/tcp 
+  - 5055/tcp 
+
+
+## goes to group_vars ##
+# docker_exported_container_volumes_basedir: /var/lib/containers/exported_volumes
+# domain: localdomain
+# timezone: "Europe/Helsinki"

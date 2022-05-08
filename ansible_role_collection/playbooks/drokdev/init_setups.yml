@@ -1,0 +1,41 @@
+---
+- hosts: 
+    # - pihole1
+    # - xoa1
+    # - webservers
+    # - appserver0
+    # - adminhost
+    # - ipaserver0
+    # - ipaserver1
+    # - takserver0
+    - nextcloud
+    # - nfsserver
+  gather_facts: yes
+  become: yes
+  vars:
+    init_setup_use_pam: false
+    init_setup_use_ldap: true
+    init_setup_use_log: true
+    init_setup_use_motd: true
+  roles:
+    # - bitwarden_vault
+    - init_setups
+
+# To actually run the playbook, we need to be authenticated to Bitwarden first. That means:
+
+# Run bw login (or bw unlock) to log in and get a session key.
+# Set the BW_SESSION environment variable to this value.
+# Run the playbook.
+# The above tasks would look something like this:
+
+# bash$ bw login
+# ? Email address: lars@redhat.com
+# ? Master password: [hidden]
+# You are logged in!
+
+# To unlock your vault, set your session key to the `BW_SESSION`
+# environment variable. ex:
+# $ export BW_SESSION="..."
+# [...]
+# bash$ export BW_SESSION="..."
+# bash$ ansible-playbook inject-passwords.yml

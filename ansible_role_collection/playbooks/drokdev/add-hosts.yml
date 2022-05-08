@@ -1,0 +1,324 @@
+---
+- hosts: ipaserver0
+  gather_facts: yes
+  vars:
+    action: add
+    task: hosts
+    hostname: cloud
+    zone_name: local.drokdev.pro
+    description: This entry was provisioned by ansible
+    ip_address: 172.16.20.5
+    ns_host_location: drok_place
+    ns_os_version: system
+    ns_hardware_platform: Dell R610
+
+    freeipa_host: ipaserver0.local.drokdev.pro  ## set an ip address if unable to resolve to it
+    freeipa_user: admin
+    freeipa_pass: DroKcoff33QUEENusa6z!pROPE5FRUIT9park@
+  roles:
+    - freeipa
+
+- hosts: ipaserver0
+  gather_facts: yes
+  vars:
+    action: add
+    task: hosts
+    hostname: vault
+    zone_name: local.drokdev.pro
+    description: This entry was provisioned by ansible
+    ip_address: 172.16.20.5
+    ns_host_location: drok_place
+    ns_os_version: system
+    ns_hardware_platform: Dell R610
+
+    freeipa_host: ipaserver0.local.drokdev.pro  ## set an ip address if unable to resolve to it
+    freeipa_user: admin
+    freeipa_pass: DroKcoff33QUEENusa6z!pROPE5FRUIT9park@
+  roles:
+    - freeipa
+
+- hosts: ipaserver0
+  gather_facts: yes
+  vars:
+    action: add
+    task: hosts
+    hostname: hass
+    zone_name: local.drokdev.pro
+    description: This entry was provisioned by ansible
+    ip_address: 172.16.20.5
+    ns_host_location: drok_place
+    ns_os_version: system
+    ns_hardware_platform: Dell R610
+
+    freeipa_host: ipaserver0.local.drokdev.pro  ## set an ip address if unable to resolve to it
+    freeipa_user: admin
+    freeipa_pass: DroKcoff33QUEENusa6z!pROPE5FRUIT9park@
+  roles:
+    - freeipa
+
+- hosts: ipaserver0
+  gather_facts: yes
+  vars:
+    action: add
+    task: hosts
+    hostname: red
+    zone_name: local.drokdev.pro
+    description: This entry was provisioned by ansible
+    ip_address: 172.16.20.5
+    ns_host_location: drok_place
+    ns_os_version: system
+    ns_hardware_platform: Dell R610
+
+    freeipa_host: ipaserver0.local.drokdev.pro  ## set an ip address if unable to resolve to it
+    freeipa_user: admin
+    freeipa_pass: DroKcoff33QUEENusa6z!pROPE5FRUIT9park@
+  roles:
+    - freeipa
+
+# - hosts: ipaserver0
+#   gather_facts: yes
+#   vars:
+#     action: add
+#     task: hosts
+#     hostname: tas
+#     zone_name: local.drokdev.pro
+#     description: This entry was provisioned by ansible
+#     ip_address: 172.16.20.5
+#     ns_host_location: drok_place
+#     ns_os_version: system
+#     ns_hardware_platform: Dell R610
+
+#     freeipa_host: ipaserver0.local.drokdev.pro  ## set an ip address if unable to resolve to it
+#     freeipa_user: admin
+#     freeipa_pass: DroKcoff33QUEENusa6z!pROPE5FRUIT9park@
+#   roles:
+#     - freeipa
+
+- hosts: ipaserver0
+  gather_facts: yes
+  vars:
+    action: add
+    task: hosts
+    hostname: firefly
+    zone_name: local.drokdev.pro
+    description: This entry was provisioned by ansible
+    ip_address: 172.16.20.5
+    ns_host_location: drok_place
+    ns_os_version: system
+    ns_hardware_platform: Dell R610
+
+    freeipa_host: ipaserver0.local.drokdev.pro  ## set an ip address if unable to resolve to it
+    freeipa_user: admin
+    freeipa_pass: DroKcoff33QUEENusa6z!pROPE5FRUIT9park@
+  roles:
+    - freeipa
+
+# - hosts: ipaserver0
+#   gather_facts: yes
+#   vars:
+#     action: add
+#     task: hosts
+#     hostname: esp
+#     zone_name: local.drokdev.pro
+#     description: This entry was provisioned by ansible
+#     ip_address: 172.16.20.5
+#     ns_host_location: drok_place
+#     ns_os_version: system
+#     ns_hardware_platform: Dell R610
+
+#     freeipa_host: ipaserver0.local.drokdev.pro  ## set an ip address if unable to resolve to it
+#     freeipa_user: admin
+#     freeipa_pass: DroKcoff33QUEENusa6z!pROPE5FRUIT9park@
+#   roles:
+#     - freeipa
+
+- hosts: ipaserver0
+  gather_facts: yes
+  vars:
+    action: add
+    task: hosts
+    hostname: xoa0
+    zone_name: local.drokdev.pro
+    description: This entry was provisioned by ansible
+    ip_address: 172.16.20.5
+    ns_host_location: drok_place
+    ns_os_version: system
+    ns_hardware_platform: Dell R610
+
+    freeipa_host: ipaserver0.local.drokdev.pro  ## set an ip address if unable to resolve to it
+    freeipa_user: admin
+    freeipa_pass: DroKcoff33QUEENusa6z!pROPE5FRUIT9park@
+  roles:
+    - freeipa
+
+- hosts: ipaserver0
+  gather_facts: yes
+  vars:
+    action: add
+    task: hosts
+    hostname: xoa1
+    zone_name: local.drokdev.pro
+    description: This entry was provisioned by ansible
+    ip_address: 172.16.20.5
+    ns_host_location: drok_place
+    ns_os_version: system
+    ns_hardware_platform: Dell R610
+
+    freeipa_host: ipaserver0.local.drokdev.pro  ## set an ip address if unable to resolve to it
+    freeipa_user: admin
+    freeipa_pass: DroKcoff33QUEENusa6z!pROPE5FRUIT9park@
+  roles:
+    - freeipa
+
+
+
+
+
+
+
+
+- hosts: ipaserver0
+  gather_facts: yes
+  vars:
+    action: add
+    task: hosts
+    hostname: gw
+    zone_name: local.drokdev.pro
+    description: This entry was provisioned by ansible
+    ip_address: 172.16.10.1
+    ns_host_location: drok_place
+    ns_os_version: system
+    ns_hardware_platform: Dell R610
+
+    freeipa_host: ipaserver0.local.drokdev.pro  ## set an ip address if unable to resolve to it
+    freeipa_user: admin
+    freeipa_pass: DroKcoff33QUEENusa6z!pROPE5FRUIT9park@
+  roles:
+    - freeipa
+
+- hosts: ipaserver0
+  gather_facts: yes
+  vars:
+    action: add
+    task: hosts
+    hostname: xcp
+    zone_name: local.drokdev.pro
+    description: This entry was provisioned by ansible
+    ip_address: 172.16.10.2
+    ns_host_location: drok_place
+    ns_os_version: system
+    ns_hardware_platform: Dell R610
+
+    freeipa_host: ipaserver0.local.drokdev.pro  ## set an ip address if unable to resolve to it
+    freeipa_user: admin
+    freeipa_pass: DroKcoff33QUEENusa6z!pROPE5FRUIT9park@
+  roles:
+    - freeipa
+
+- hosts: ipaserver0
+  gather_facts: yes
+  vars:
+    action: add
+    task: hosts
+    hostname: freenas
+    zone_name: local.drokdev.pro
+    description: This entry was provisioned by ansible
+    ip_address: 172.16.10.5
+    ns_host_location: drok_place
+    ns_os_version: system
+    ns_hardware_platform: Dell R610
+
+    freeipa_host: ipaserver0.local.drokdev.pro  ## set an ip address if unable to resolve to it
+    freeipa_user: admin
+    freeipa_pass: DroKcoff33QUEENusa6z!pROPE5FRUIT9park@
+  roles:
+    - freeipa
+
+
+
+
+
+
+
+
+- hosts: ipaserver0
+  gather_facts: yes
+  vars:
+    action: add
+    task: hosts
+    hostname: pihole0
+    zone_name: local.drokdev.pro
+    description: This entry was provisioned by ansible
+    ip_address: 172.16.200.2
+    ns_host_location: drok_place
+    ns_os_version: system
+    ns_hardware_platform: Dell R610
+
+    freeipa_host: ipaserver0.local.drokdev.pro  ## set an ip address if unable to resolve to it
+    freeipa_user: admin
+    freeipa_pass: DroKcoff33QUEENusa6z!pROPE5FRUIT9park@
+  roles:
+    - freeipa
+
+- hosts: ipaserver0
+  gather_facts: yes
+  vars:
+    action: add
+    task: hosts
+    hostname: pihole1
+    zone_name: local.drokdev.pro
+    description: This entry was provisioned by ansible
+    ip_address: 172.16.200.3
+    ns_host_location: drok_place
+    ns_os_version: system
+    ns_hardware_platform: Dell R610
+
+    freeipa_host: ipaserver0.local.drokdev.pro  ## set an ip address if unable to resolve to it
+    freeipa_user: admin
+    freeipa_pass: DroKcoff33QUEENusa6z!pROPE5FRUIT9park@
+  roles:
+    - freeipa
+
+- hosts: ipaserver0
+  gather_facts: yes
+  vars:
+    action: add
+    task: hosts
+    hostname: ipaserver0
+    zone_name: local.drokdev.pro
+    description: This entry was provisioned by ansible
+    ip_address: 172.16.200.4
+    ns_host_location: drok_place
+    ns_os_version: system
+    ns_hardware_platform: Dell R610
+
+    freeipa_host: ipaserver0.local.drokdev.pro  ## set an ip address if unable to resolve to it
+    freeipa_user: admin
+    freeipa_pass: DroKcoff33QUEENusa6z!pROPE5FRUIT9park@
+  roles:
+    - freeipa
+
+- hosts: ipaserver0
+  gather_facts: yes
+  vars:
+    action: add
+    task: hosts
+    hostname: ipaserver1
+    zone_name: local.drokdev.pro
+    description: This entry was provisioned by ansible
+    ip_address: 172.16.200.5
+    ns_host_location: drok_place
+    ns_os_version: system
+    ns_hardware_platform: Dell R610
+
+    freeipa_host: ipaserver0.local.drokdev.pro  ## set an ip address if unable to resolve to it
+    freeipa_user: admin
+    freeipa_pass: DroKcoff33QUEENusa6z!pROPE5FRUIT9park@
+  roles:
+    - freeipa
+
+
+
+
+# cn=users,cn=accounts,dc=local,dc=drokdev,dc=pro
+# dc=vanguard,dc=intra

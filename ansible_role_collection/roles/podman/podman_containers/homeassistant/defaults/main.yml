@@ -1,0 +1,26 @@
+---
+container_state: running
+setenforce: false
+
+container_name: hassio
+container_image: docker.io/homeassistant/home-assistant:latest
+container_dir_owner: root
+container_dir_group: root
+container_dir_config: config
+container_dir_ssl: ssl
+container_run_args: >-
+  -d
+  -v "{{podman_exported_container_volumes_basedir}}/{{ container_dir_config }}:/config:Z"
+  -v "{{podman_exported_container_volumes_basedir}}/{{ container_dir_ssl }}:/ssl:Z"
+  -v /etc/localtime:/etc/localtime:z
+  -e "TZ={{ timezone }}"
+  --net=host
+container_firewall_ports:
+  - 8123/tcp 
+## goes to groupd_vars ##
+
+# podman_exported_container_volumes_basedir: /var/lib/containers/exported_volumes
+# domain: localdomain
+# timezone: "Europe/Helsinki"
+
+# podman run --name hassio -d --net=host docker.io/homeassistant/home-assistant:latest

@@ -1,0 +1,23 @@
+---
+- name: sftp install
+  hosts: sftp
+  become: yes
+  become_user: root
+  # vars:
+  #   - sftp_allow_passwords: true
+  #   - sftp_users:
+  #     - name: victor24-0
+  #       password: "$1$salty$pxC1ruuhlxB3s0PDhPUG7/"
+  #     - name: victor24-1
+  #       password: "$1$salty$D8wQXAPf/h2NuacwROU6U/" 
+  #     - name: victor24-2
+  #       password: "$1$salty$xbz.ckVxljxSJkwucf5Z1/" 
+  #     - name: rtf
+  #       password: "$1$salty$pDRkTL3rYjvGjNrfGM2RH." 
+  #   - sftp_directories:
+  #     - imports
+  #     - exports
+  #     - { name: public, mode: 755 }
+  #     - other
+  roles:
+    - sftp

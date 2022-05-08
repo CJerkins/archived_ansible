@@ -1,0 +1,26 @@
+---
+- name: add admin login
+  command:   
+    argv:
+      - java -jar /opt/tak/utils/UserManager.jar
+      - usermod -A -p
+      - "{{ password_webadmin }}"
+      - "{{ user_webadmin }}"
+  when: password_webadmin is defined
+  become_user: tak
+  become: yes
+
+- name: add admin cert
+  command:   
+    argv:
+      - java -jar /opt/tak/utils/UserManager.jar
+      - certmod -A
+      - /opt/tak/certs/files/{{ item }}
+  with_items: "{{ user_webadmin }}.pem"
+  when: user_webadmin is defined 
+  become_user: tak
+  become: yes
+
+
+  # java -jar /opt/tak/utils/UserManager.jar usermod -A -p Paddle#Tibia1#Thirsty admin
+  # java -jar /opt/tak/utils/UserManager.jar certmod -A /opt/tak/certs/files/webAdmin0.pem

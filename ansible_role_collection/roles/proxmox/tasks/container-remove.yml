@@ -1,0 +1,22 @@
+---
+# tasks file for cantainer
+- name: Stop containers
+  ignore_errors: True
+  proxmox:
+    vmid: "{{ ctid }}"
+    node: "{{ node }}"
+    api_user: "{{ api_user }}"
+    api_password: "{{ api_password }}"
+    api_host: "{{ api_host }}"
+    state       : stopped
+    force       : yes
+
+- name: Remove containers
+  ignore_errors: True
+  proxmox:
+    vmid: "{{ ctid }}"
+    node: "{{ node }}"
+    api_user: "{{ api_user }}"
+    api_password: "{{ api_password }}"
+    api_host: "{{ api_host }}"
+    state: absent

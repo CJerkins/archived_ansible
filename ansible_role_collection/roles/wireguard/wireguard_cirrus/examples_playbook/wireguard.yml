@@ -1,0 +1,32 @@
+---
+- name: Setup Wireguard VPN
+  hosts: vpn0.cirruss.com
+  gather_facts: true
+  become: yes
+  vars:
+    wireguard_nat: true
+    wireguard_dns: true
+    admin_client: admin0
+    server: wg0
+  roles:
+    - wireguard/wireguard_cirrus
+
+
+# - name: add a client
+#   hosts: vpn0.cirruss.com
+#   gather_facts: true
+#   become: yes
+#   vars:
+#     client: newclient
+#     client_ip: 10.200.200.12
+#   roles:
+#     - wireguard/wireguard_cirrus
+
+# - name: remove a client
+#   hosts: vpn1.cirruss.com
+#   gather_facts: true
+#   become: yes
+#   vars:
+#     rm_client: newclient
+#   roles:
+#     - wireguard/wireguard_cirrus

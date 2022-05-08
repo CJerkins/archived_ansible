@@ -1,0 +1,49 @@
+---
+- hosts: vpn_test
+  gather_facts: yes
+  become: yes
+  # connection: local
+  vars:
+    openvpn_server_name: vpn_valex
+    openvpn_port: 1194
+    openvpn_server_network: 10.8.0.0          ## format 192.168.1.0 ONLY define for subnet configurations.
+    openvpn_server_netmask: 255.255.255.0     ## format 255.255.255.0 ONLY define for subnet configurations.
+    # openvpn_addl_server_options: 
+    #   - route 172.16.1.0 255.255.255.0 10.8.0.1
+    openvpn_push: 
+      - block-outside-dns
+    openvpn_redirect_gateway: true ## if true inputs, push "redirect-gateway def1", in server config
+    openvpn_set_dns: true      ## enables dns push settings
+    openvpn_verbose: 3          ## Default is 3. Options: 1 - 11. SEE https://openvpn.net/community-resources/reference-manual-for-openvpn-2-4/ for mor inforamation
+    clients: 
+      - client0
+      - client1
+    server_public_ipaddress: 54.90.27.101 ## vpn server publiaddress. 
+    # openvpn_addl_client_options: 
+    #   - log vpn-test0-client.log 
+    openvpn_install: server ## Options server or client
+    firewall_ip_forward: true
+    firewall_openvpn_NAT_enable: true
+    firewall_masquerade_not_snat: true
+
+  tasks:
+
+  - name: Generate certs and configs
+    import_role: 
+      name: openvpn/openvpn_cert
+      vars_from: vars/mwr.yml
+    delegate_to: "{{ openvpn_gen_machine }}"
+
+
+  - name: Install and start vpn server
+    import_role: 
+      name: openvpn/openvpn_install
+    delegate_to: vpntest.local.drokdev.pro
+
+  - name: Setup firewall rules on vpn server
+    import_role:
+      name: firewall
+    vars:
+      firewall_type: iptables
+      firewall_openvpn_NAT_enable: true
+    delegate_to: vpntest.local.drokdev.pro

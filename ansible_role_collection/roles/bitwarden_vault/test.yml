@@ -1,0 +1,48 @@
+---
+- hosts: localhost
+  gather_facts: no
+  roles:
+    - bitwarden_vault
+  vars:
+    bitwarden_lookup_ubuntu: "{{ lookup('bitwarden', 'ubuntu_user', field='username') }}"
+  tasks:
+
+  - debug:
+      msg: "{{ bitwarden_lookup_ubuntu }}"  
+  # - debug:
+  #     msg: "{{ lookup('bitwarden', '{{ item }}', field='username') }}"
+  #   register: bitwarden_username
+  #   with_items: "{{ bitwarden_lookup }}"
+
+  # - debug:
+  #     msg: "{{ lookup('bitwarden', '{{ bitwarden_lookup }}') }}"
+  #   register: bitwarden_password
+
+  # - debug:
+  #     msg: "{{ bitwarden_username.msg['login']['username'] }}"
+
+  # - debug:
+  #     msg: "{{ bitwarden_password.msg }}"
+
+  # - set_fact:
+  #     bitwarden_password: bitwarden_username.msg
+
+  # - set_fact:
+  #     bitwarden_password: bitwarden_password.msg
+
+  # - set_fact:
+  #     bitwarden_username: "{{ lookup('bitwarden', '{{ item }}', field='username') }}"
+  #     bitwarden_password: "{{ lookup('bitwarden', '{{ item }}') }}"
+  #   with_items: "{{ bitwarden_lookup }}"
+
+  # - debug:
+  #     msg: "{{ item.msg }}"
+  #   with_items: "{{ bitwarden_username.results }}"
+
+
+  # - debug:
+  #     msg: "{{ bitwarden_password }}"
+
+
+
+

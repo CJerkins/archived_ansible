@@ -1,0 +1,17 @@
+---
+- name: iptables - Allow incoming VPN connection
+  iptables:
+    chain: INPUT
+    protocol: "{{ openvpn_proto | default('udp') }}"
+    destination_port: "{{openvpn_port | default(1194) }}"
+    jump: ACCEPT
+    action: insert
+    comment: "Allow incoming VPN connection"
+
+- name: iptables - Accept packets from VPN tunnel adaptor
+  iptables:
+    chain: INPUT
+    in_interface: "{{ openvpn_ifname_server | default('tun') }}"
+    jump: ACCEPT
+    action: insert
+    comment: "Accept packets from VPN tunnel adaptor"

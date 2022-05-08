@@ -1,0 +1,84 @@
+---
+- name: Add vlan interface and rules
+  hosts: router
+  # become: yes
+  # vars:
+
+  #   pfsense_interface_description: test
+  #   pfsense_interface_network_port: vtnet1
+  #   pfsense_interface_ipv4_type: static
+  #   pfsense_interface_ipv4_address: 192.168.1.1/24
+  #   pfsense_interface_create_gateway: true
+
+  #   pfsense_vlan_id: 100
+  #   pfsense_vlan_priority: 0
+  #   pfsense_vlan_network_port: vtnet1.100
+
+  #   pfsense_rule_action: pass
+  #   pfsense_rule_ipproto: inet
+  #   pfsense_rule_protocol: any
+  #   pfsense_rule_source: any
+  #   pfsense_rule_source_port: any
+  #   pfsense_rule_destination: any
+  #   pfsense_rule_destination_port: any
+  #   pfsense_rule_before: 
+  #   pfsense_rule_after:
+  #   pfsense_rule_logging: true
+
+  tasks:
+    - debug: var=hostvars[inventory_hostname]['ansible_default_ipv4']['address']
+
+    - name: Add "{{ pfsense_interface_description | default(omit) }}" vlan
+      vlan:
+        interface: "{{ pfsense_interface_network_port }}"
+        vlan_id: "{{ pfsense_vlan_id }}"
+        descr: "{{ pfsense_interface_description | default(omit) }}"
+        priority: "{{ pfsense_vlan_priority }}"
+        state: present
+
+  # - name: "Add interface {{ pfsense_interface_description | default(omit) }}"
+  #   pfsense_interface:
+  #     descr: "{{ pfsense_interface_description | default(omit) }}"
+  #     interface: "{{ pfsense_vlan_network_port }}"
+  #     ipv4_type: "{{ pfsense_interface_ipv4_type | default(omit) }}"
+  #     ipv4_address: "{{ pfsense_interface_ipv4_address | default(omit) }}"
+  #     create_ipv4_gateway: "{{ pfsense_interface_create_gateway | default(omit)}}"
+  #     enable: True
+
+
+  # - name: "Add rules for {{ pfsense_interface_description | default(omit) }}"
+  #   pfsense_rule:
+  #     name: 'Allow Internal traffic out'
+  #     action: "{{ pfsense_rule_action }}"
+  #     interface: "{{ pfsense_vlan_network_port }}"
+  #     ipprotocol: "{{ pfsense_rule_ipproto | default(omit) }}"
+  #     protocol: "{{ pfsense_rule_protocol | default(omit) }}"
+  #     source: "{{ pfsense_rule_source | default(omit) }}"
+  #     source_port: "{{ pfsense_rule_source_port | default(omit) }}"
+  #     destination: "{{ pfsense_rule_destination | default(omit) }}"
+  #     destination_port: "{{ pfsense_rule_destination_port | default(omit) }}"
+  #     before: "{{ pfsense_rule_before | default(omit) }}"
+  #     after: "{{ pfsense_rule_after | default(omit) }}"
+  #     log: "{{ pfsense_rule_logging | default(omit) }}"
+  #     state: present
+
+  # - name: "Add rules for {{ pfsense_interface_description | default(omit) }}"
+  #   pfsense_rule:
+  #     name: 'Block traffic '
+  #     action: "{{ pfsense_rule_action }}"
+  #     interface: "{{ pfsense_vlan_network_port }}"
+  #     ipprotocol: "{{ pfsense_rule_ipproto | default(omit) }}"
+  #     protocol: "{{ pfsense_rule_protocol | default(omit) }}"
+  #     source: "{{ pfsense_rule_source | default(omit) }}"
+  #     source_port: "{{ pfsense_rule_source_port | default(omit) }}"
+  #     destination: "{{ pfsense_rule_destination | default(omit) }}"
+  #     destination_port: "{{ pfsense_rule_destination_port | default(omit) }}"
+  #     before: "{{ pfsense_rule_before | default(omit) }}"
+  #     after: "{{ pfsense_rule_after | default(omit) }}"
+  #     log: "{{ pfsense_rule_logging | default(omit) }}"
+  #     state: present
+
+
+
+
+

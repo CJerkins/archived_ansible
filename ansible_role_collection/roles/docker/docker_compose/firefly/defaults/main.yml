@@ -1,0 +1,4 @@
+---
+container_state: running
+default_username: "{{ admin_username }}"
+default_password: "{{ admin_password }}"

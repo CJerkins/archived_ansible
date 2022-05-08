@@ -1,0 +1,57 @@
+### --- Setting Container --- ###
+---
+# --- Setting Virtual Machine --- #
+# vmid        : 357 # Should set this at playbook
+# vmname      : vanguard.local # Should set this at playbook
+vmcores     : 4
+vmsockets   : 1
+vmvcpus     : 1
+vmmemory    : 4096
+vmdisk      : 16
+# vmbridge    : vmbr0
+# vmvlan      : 1
+vmstorage   : local-lvm
+vmonboot    : no
+vmformat    : qcow2
+
+## -- Cloud Init -- ##
+# vmnewid: 480
+# vmdisk: 20G
+# vmsearchdomain: vanguard.local
+# vmnameserver: '8.8.8.8'
+ciuser: "{{ proxmox_vm_user }}"
+cipassword: "{{ proxmox_vm_password }}"
+sshkey: "{{ proxmox_ssh_key }}"
+# vmmacaddr: 02:00:00:02:80:de
+# vmip: 30.20.200.12/24
+# vmgw: 30.20.200.1
+
+##S --- Setting Container --- ###
+# OS_Template : centos-7-default_20171212_amd64.tar.xz
+# ubuntu-18.04-standard_18.04-1_amd64.tar.gz 
+# ubuntu-16.04-standard_16.04-1_amd64.tar.gz 
+# centos-7-default_20171212_amd64.tar.xz
+
+# ctid        : 187 # Should set this at playbook
+# ctpassword  : drokDROK63 # Should set this at playbook
+# cthostname  : server.vanguard.local
+# searchdomain: vanguard.local
+# ctnameserver: 8.8.8.8
+ctcores     : 2
+ctmemory    : 1024
+ctswap      : 512
+ctdisk      : 8
+ctstorage   : local-lvm
+# ctnetif     : 
+#   net0: "name=eth0,ip=dhcp,bridge=vmbr0"
+# ctip        : 172.16.1.1/24
+# ctgw        : 172.16.1.1
+# ctbridge    : vmbr0
+
+  # net0: "name=eth0,ip=8.8.8.8,gw=9.9.9.9,bridge=vmbr0"
+# ctmounts    : 
+#   mp0: "/mnt/pve/cephfs_data/downloads/,mp=/downloads"
+#   mp1: "/mnt/pve/cephfs_data/media,mp=/media"
+# ctunprivileged: yes
+# ctpubkey    : "ssh-rsa myPublicKey engonzal@hostname"
+# ctonboot    : no

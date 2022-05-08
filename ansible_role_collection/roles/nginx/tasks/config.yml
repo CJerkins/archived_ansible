@@ -1,0 +1,29 @@
+---
+- name: Template a file to nginx.conf
+  template:
+    src: templates/nginx.conf.j2
+    dest: /etc/nginx/nginx.conf
+    mode: 0654
+  notify: restart nginx
+
+- name: Servers configs
+  template:
+    src: templates/confs/{{ item }}.conf.j2
+    dest: /etc/nginx/conf.d/{{ item }}.conf
+    mode: 0654
+  with_items: '{{ servers }}'
+
+- name: copy server configs
+  copy:
+    src: files/{{ item.src }}
+    dest: /etc/nginx/{{ item.dest }}
+  with_items: 
+    - { src: general.conf, dest: general.conf, }
+    - { src: proxy.conf, dest: proxy.conf, }
+    - { src: security.conf, dest: security.conf, }
+
+- name: start nginx and enabled
+  systemd:
+    state: started
+    name: nginx
+    enabled: yes

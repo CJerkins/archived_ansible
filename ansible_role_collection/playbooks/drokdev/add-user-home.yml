@@ -1,0 +1,45 @@
+---
+- hosts: ipaserver0
+  gather_facts: yes
+  tasks:
+  - ipa_user:
+      name: Leann
+      givenname: Lean
+      sn: Haines
+      krbpasswordexpiration: 20210101235959
+      # mail:
+      # - john.simmons@socom.mil
+      telephonenumber:
+      - '+910'
+      # sshpubkey:
+      # - ssh-rsa AAAAB3NzaC1yc2EAAAADAQABAAACAQDn1XGdzaWYRQSNX5i3y5Mrmt8LvKfa+MomMRWMYtleUI0nIQ8s0WiY57F2Lwf3VmRaJaxsXTMiYdXXVYlO+YbTYyZsfE521MFPZZ/z7O5Yb0vmYTmgtnnho5jb1ymOZKQTqhtLRFwUzcwCuHzaTnXgLqXhPTzMVU8qsE/MOcgBuZNxKyLvmGgWqrwpMFeY6tVBHbAuEAHBnfHWxPkhiQVCymDy4lqrqbwucqqU7+Mw5+MGMR3lvJc/SYER+eHcdd6C+ifK4PNmQojXk1mmvgTKtClZeZloZhwFKiwcXDqTVSFxpbT+g1cQrbBohpDOOHMB4a6uklHHuo3efqrxS9npypc7rCG85TnNIhQwuT2xaJnVbtj1OqFA6X4nU1RP0DG5ZNdmmFGX12mWlf8QYK9LaGLbUO/I9XpkQKdGZGXBVIrU0uBN8LwI+eywp7ABH/vjh8lNDozDEnawHf4bzHGzI8x1qXrKHIS5N1zxb6X43pxhTZhCOMDt8WO3oovBSxlMb9D4x+KTkNjQzjmR20v02MNcUddxBWeLukJK1OUPx5RZVIzsyuqa+5RSbZz4IUeGGF8AZ+yPWBQlf2fXICci9VZ3dxLVFEhyeFoFAVm/I1PL2AncSO2YJAdIN3zqpCMVlRYM1lFbVLTKMLeuLbI3ZNXJQOY/a1GCBGzBd0WNWw== fortified.tech.advisor@gmail.com
+      loginshell: /bin/bash
+      # uidnumber: 1001
+      # gidnumber: 100
+      state: present
+
+      ipa_host: ipaserver0.local.drokdev.pro
+      ipa_user: admin
+      ipa_pass: DroKcoff33QUEENusa6z!pROPE5FRUIT9park@
+
+  - ipa_user:
+      name: drok
+      givenname: Darrell
+      sn: Haines
+      krbpasswordexpiration: 20210101235959
+      mail:
+      - fortified.tech.advisor@gmail.com
+      telephonenumber:
+      - '+910-308-7261'
+      # sshpubkey:
+      # - ssh-rsa AAAAB3NzaC1yc2EAAAADAQABAAACAQDn1XGdzaWYRQSNX5i3y5Mrmt8LvKfa+MomMRWMYtleUI0nIQ8s0WiY57F2Lwf3VmRaJaxsXTMiYdXXVYlO+YbTYyZsfE521MFPZZ/z7O5Yb0vmYTmgtnnho5jb1ymOZKQTqhtLRFwUzcwCuHzaTnXgLqXhPTzMVU8qsE/MOcgBuZNxKyLvmGgWqrwpMFeY6tVBHbAuEAHBnfHWxPkhiQVCymDy4lqrqbwucqqU7+Mw5+MGMR3lvJc/SYER+eHcdd6C+ifK4PNmQojXk1mmvgTKtClZeZloZhwFKiwcXDqTVSFxpbT+g1cQrbBohpDOOHMB4a6uklHHuo3efqrxS9npypc7rCG85TnNIhQwuT2xaJnVbtj1OqFA6X4nU1RP0DG5ZNdmmFGX12mWlf8QYK9LaGLbUO/I9XpkQKdGZGXBVIrU0uBN8LwI+eywp7ABH/vjh8lNDozDEnawHf4bzHGzI8x1qXrKHIS5N1zxb6X43pxhTZhCOMDt8WO3oovBSxlMb9D4x+KTkNjQzjmR20v02MNcUddxBWeLukJK1OUPx5RZVIzsyuqa+5RSbZz4IUeGGF8AZ+yPWBQlf2fXICci9VZ3dxLVFEhyeFoFAVm/I1PL2AncSO2YJAdIN3zqpCMVlRYM1lFbVLTKMLeuLbI3ZNXJQOY/a1GCBGzBd0WNWw== fortified.tech.advisor@gmail.com
+      loginshell: /bin/bash
+      # uidnumber: 1001
+      # gidnumber: 100
+      state: present
+
+      ipa_host: ipaserver0.local.drokdev.pro
+      ipa_user: admin
+      ipa_pass: DroKcoff33QUEENusa6z!pROPE5FRUIT9park@
+
+  

@@ -1,0 +1,53 @@
+---
+#### Create Directorys ####
+- name: ensure "{{ container_name }}" container files mount point on host
+  tags: mount
+  file:
+    path: "{{docker_exported_container_volumes_basedir}}/{{ item }}"
+    owner: "{{ container_dir_owner }}" ## Make changes according to your needs
+    group: "{{ container_dir_group }}" ## Make changes according to your needs
+    state: directory
+    recurse: yes
+  with_items:
+    - "{{ container_dir_example }}" ## Make changes according to your needs
+    - "{{ container_dir_example }}" ## Make changes according to your needs
+
+### Install ###
+- name: Docker configurations
+  tags: container
+  import_role:
+    name: docker_run
+
+
+###### Create
+- name: Get docker group id
+  group:
+    name: docker
+  register: docker_group
+
+- name: Netdata Docker Container
+  docker_container:
+    name: netdata
+    hostname: "{{ container_name }}.{{ domain }}"
+    image: netdata/netdata
+    state: started
+    pull: true
+    ports:
+      - "19999:19999"
+    volumes:
+      - "{{docker_exported_container_volumes_basedir}}/proc:/host/proc:ro"
+      - "{{docker_exported_container_volumes_basedir}}/sys:/host/sys:ro"
+      - "/var/run/docker.sock:/var/run/docker.sock:ro"
+    env:
+      PGID: "{{ docker_group.gid }}"
+    capabilities:
+      - SYS_PTRACE
+    security_opts:
+      - apparmor:unconfined
+    restart_policy: unless-stopped
+    memory: 1g
+    labels:
+      traefik.backend: "netdata"
+      traefik.frontend.rule: "Host:netdata.{{ domain }}"
+      traefik.enable: "{{ available_externally }}"
+      traefik.port: "19999"
