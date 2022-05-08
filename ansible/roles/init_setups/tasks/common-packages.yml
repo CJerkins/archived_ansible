@@ -1,0 +1,43 @@
+---
+###Installing common packages###
+- name: Install common packages
+  package:
+    name: "{{ init_setup_common_packages }}"
+    state: present
+
+- name: Install additional packages
+  package:
+    name: "{{ item }}"
+    state: present
+  with_items:
+    - "{{ init_setup_additional_packages }}"
+
+
+
+
+
+
+# - name: Install common CENTOS packages
+#   yum:
+#     name: "{{ centos_common_packages }}"
+#   when: ansible_facts['os_family'] == "RedHat"
+
+# - name: Install additional packages
+#   yum:
+#     name: "{{ item }}"
+#   with_items:
+#     - "{{ init_setup_additional_packages }}"
+#   when: ansible_facts['os_family'] == "RedHat"
+
+  
+# - name: Install common UBUNTU packages
+#   apt:
+#     name: "{{ ubuntu_common_packages }}"
+#   when: ansible_facts['os_family'] == "Debian"
+
+# - name: Install additional packages
+#   yum:
+#     name: "{{ item }}"
+#   with_items:
+#     - "{{ init_setup_additional_packages }}"
+#   when: ansible_facts['os_family'] == "Debian"

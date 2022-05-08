@@ -1,0 +1,13 @@
+- hosts: all
+  gather_facts: yes
+  become: yes
+  vars:
+    harden_linux_root_password: your_encrypted_password_here
+    harden_linux_deploy_user: deploy
+    harden_linux_deploy_user_password: your_encrypted_password_here
+    harden_linux_deploy_user_home: /home/deploy
+    harden_linux_deploy_user_public_keys:
+      - /home/your_user/.ssh/id_rsa.pub
+    harden_firewall: false
+  roles:
+    - harden_linux_server

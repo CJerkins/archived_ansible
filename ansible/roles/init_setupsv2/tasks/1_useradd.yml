@@ -1,0 +1,73 @@
+---
+## FOR CENTOS ##
+- name: Add a new user
+  user:
+    name: "{{ item.username }}"
+    groups: "{{ item.groups | default('') }}"
+    password: "{{ init_setup_password | password_hash('sha512') }}"
+    shell: /bin/bash
+    update_password: on_create
+  with_items:
+    - "{{ init_setup_CentOS_users }}"
+  when: ansible_facts['os_family'] == "RedHat"
+
+- name: "Allow admin users to sudo without a password"
+  lineinfile:
+    dest: "/etc/sudoers" # path: in version 2.3
+    state: "present"
+    regexp: "^%wheel"
+    line: "%wheel ALL=(ALL) NOPASSWD: ALL"
+  when: ansible_facts['os_family'] == "RedHat"
+
+
+## FOR DEBIAN ##
+- name: Add a new user
+  user:
+    name: "{{ item.username }}"
+    groups: "{{ item.groups | default('') }}"
+    password: "{{ init_setup_password | password_hash('sha512') }}"
+    shell: /bin/bash
+    update_password: on_create
+  with_items:
+    - '{{ init_setup_Ubuntu_users }}'
+  when: ansible_facts['os_family'] == "Debian"
+
+- name: "Allow admin users to sudo without a password"
+  lineinfile:
+    dest: "/etc/sudoers" # path: in version 2.3
+    state: "present"
+    regexp: "^%sudo"
+    line: "%sudo ALL=(ALL) NOPASSWD: ALL"
+  when: ansible_facts['os_family'] == "Debian"
+
+
+
+## SSH PUB KEY ##
+- name: Create authorized_keys file
+  file:
+    path: home/{{ item.username }}/.ssh/authorized_keys
+    owner: "{{ item.username }}"
+    group: "{{ item.username }}"
+    mode: '0644'
+  with_items:
+    - "{{ init_setup_CentOS_users }} or {{ init_setup_Ubuntu_users }}"
+
+- name: ssh-copy-id
+  lineinfile:
+    path: home/{{ item.username }}/.ssh/authorized_keys
+    line: "{{ init_setup_ssh_public_key }}"
+  with_items:
+    - "{{ init_setup_CentOS_users }} or {{ init_setup_Ubuntu_users }}"
+
+
+## CREATE SSH KEY PAIR ##
+- name: Create a ed25519 SSH key for user
+  user:
+    name: "{{ item.username }}"
+    generate_ssh_key: yes
+    ssh_key_file: .ssh/id_ed25519
+    ssh_key_type: ed25519
+    ssh_key_comment: Provisioned_by_Ansible
+  with_items:
+    - "{{ init_setup_CentOS_users }} or {{ init_setup_Ubuntu_users }}"
+

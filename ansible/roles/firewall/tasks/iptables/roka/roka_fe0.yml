@@ -1,0 +1,55 @@
+---
+- name: Accept dhcp
+  iptables:
+    chain: INPUT
+    protocol: udp
+    source_port: 67
+    destination_port: 68
+    syn: match
+    jump: ACCEPT
+    comment: Accept dhcp.
+
+- name: Accept outbound car vpn to con0
+  iptables:
+    chain: OUTPUT
+    protocol: udp
+    destination: "{{ con0_pub_ip }}"
+    destination_port: 30001
+    syn: match
+    jump: ACCEPT
+    comment: Accept outbound car vpn to con0.
+
+# - name: Accept incoming fight VPN traffic and forward to gw0
+#   iptables:
+#     chain: FORWARD
+#     in_interface: "{{ fe0_incoming_interface }}"
+#     out_interface: "{{ fe0_outgoing_interface }}"
+#     protocol: udp
+#     match: udp
+#     destination_port: 11194
+#     jump: ACCEPT
+#     comment: Accept incoming fight VPN traffic and forward to gw0
+
+# - name: DNAT incoming fight VPN traffic to gw0 IP
+#   iptables:
+#     table: nat
+#     chain: PREROUTING
+#     in_interface: "{{ fe0_incoming_interface }}"
+#     protocol: udp
+#     match: udp
+#     destination_port: 11194
+#     jump: DNAT
+#     source: "{{ p2p_con0_ip }}"
+#         # --to-source 10.10.1.2
+#     comment: "DNAT incoming fight VPN traffic to gw0 IP"
+
+# - name: SNAT outgoing fight VPN traffic from car tunnel IP
+#   iptables:
+#     table: nat
+#     chain: POSTROUTING
+#     out_interface: "{{ fe0_outgoing_interface }}"
+#     jump: SNAT
+#     source: "{{ p2p_fe0_ip }}"
+#         # --to-source 10.10.1.2
+#     comment: "SNAT outgoing fight VPN traffic from car tunnel IP"
+

@@ -1,0 +1,26 @@
+---
+- name: Update and upgrade packages
+  package:
+    name: '*'
+    state: latest
+
+- name: Install additional_packages
+  package:
+    name: 
+      - nginx
+    state: present
+
+- name: Generate certs
+  import_tasks: certs.yml
+  tags: gen_certs
+
+
+- name: Generate server configs
+  import_tasks: config.yml
+  tags: server_config
+
+
+- name: Config firewall
+  import_tasks: firewall.yml
+  tags: firewall
+

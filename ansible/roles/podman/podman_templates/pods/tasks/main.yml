@@ -1,0 +1,52 @@
+---
+
+- name: ensure pod conf dir exists
+  file:
+    path: "{{ podman_pod_yaml_dir }}"
+    state: directory
+
+- name: do preparations for running pod
+  block:
+
+  - name: "set pod configuration file: {{ pod_yaml_path }}"
+    template:
+      src: pod.yml.j2
+      dest: "{{ pod_yaml_path }}"
+      owner: root
+      group: root
+      mode: "0600"
+
+  - name: ensure container files mount point on host
+    tags: mount
+    file:
+      path: "{{podman_exported_container_volumes_basedir}}/{{ item }}"
+      owner: "{{ container_dir_owner }}"
+      group: "{{ container_dir_group }}"
+      state: directory
+      recurse: yes
+    with_items:
+      - "{{ container_dir_example }}"
+      - "{{ container_dir_example }}"
+
+  when: container_state == "running"
+
+- name: import role podman_container_systemd to handle containers
+  vars:
+    container_name: example
+    container_state: running
+    container_pod_yaml: "{{ pod_yaml_path }}"
+    container_image_list: "{{ pod_container_image_list }}"
+    container_dir_example: example
+    container_dir_example: example
+    container_dir_owner: 0
+    container_dir_group: root
+    container_firewall_ports:
+      - 8052/tcp
+  import_role:
+    name: podman_container_systemd
+
+- name: "remove configuration file: {{ pod_yaml_path }}"
+  file:
+    path: "{{ pod_yaml_path }}"
+    state: absent
+  when: container_state == "absent"

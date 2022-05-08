@@ -1,0 +1,19 @@
+---
+- name: Template a file to CoreConfig.xml
+  template:
+    src: templates/CoreConfig.xml.j2
+    dest: /opt/tak/CoreConfig.xml
+    owner: tak
+    group: tak
+    mode: 0654
+  notify: Restart takserver
+  
+- name: just force systemd to reread configs (2.4 and above)
+  systemd:
+    daemon_reload: yes
+
+- name: start takserver and enabled
+  systemd:
+    state: started
+    name: takserver
+    enabled: yes

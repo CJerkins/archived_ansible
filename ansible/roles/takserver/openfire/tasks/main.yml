@@ -1,0 +1,9 @@
+---
+# - name: Install mariadb-server
+#   import_tasks: database.yml
+
+- name: Install openfire server
+  import_tasks: install.yml
+
+- name: Set firewall rules
+  import_tasks: firewall.yml

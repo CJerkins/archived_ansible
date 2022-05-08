@@ -1,0 +1,53 @@
+---
+- name: Install cockpit on RHEL
+  block:
+
+  - name: Install cockpit
+    package:
+      name: 
+        - cockpit
+        - setroubleshoot-server
+
+  - name: Enable cockpit Port
+    firewalld:
+      service: cockpit
+      permanent: yes
+      state: enabled
+
+  when: ansible_facts['os_family'] == "RedHat"
+
+- name: Install cockpit on Debian
+  block:
+
+  - name: add repo
+    apt_repository:
+      repo: deb http://deb.debian.org/debian stretch-backports main
+      state: present
+      filename: backports.list
+    when: (ansible_facts['distribution'] == 'Debian') and (ansible_facts['distribution_major_version'] == '9')   
+
+  - name: "Update repositories cache debian strech"
+    apt:
+      update_cache: yes
+    when: (ansible_facts['distribution'] == 'Debian') and (ansible_facts['distribution_major_version'] == '9')   
+
+  - name: Install cockpit
+    package:
+      name: 
+        - cockpit
+        - ufw
+
+  - name: Enable cockpit Port
+    ufw:
+      rule: allow
+      port: 9090
+      proto: tcp
+
+  when: ansible_facts['os_family'] == "Debian"
+
+- name: Enable cockpit
+  systemd:
+    name: cockpit
+    masked: no
+    enabled: yes
+    state: started

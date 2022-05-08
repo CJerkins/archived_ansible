@@ -1,0 +1,6 @@
+- ipa_group:
+    name: sysops
+    state: absent
+    ipa_host: ipa.example.com
+    ipa_user: admin
+    ipa_pass: topsecret

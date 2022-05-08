@@ -1,0 +1,77 @@
+---
+## -- Certificate requests -- ##
+- name: Generate server certificate request
+  command: openssl req -new -newkey rsa:2048 -sha256 -keyout "{{ name_takserver }}".key -passout pass:"{{ password_ca }}" -out "{{ name_takserver }}".csr -subj "{{ subject_base }}CN={{ name_ca }}"
+  become_user: tak
+  become: yes
+  args:
+    chdir: "{{ dir_cert_creation }}"
+    creates: "{{ name_takserver }}.csr"
+  # when: tak_ca_key is not defined
+
+- name: Signing server certificate request
+  command: openssl x509 -sha256 -req -days 730 -in "{{ name_takserver }}".csr -CA ca.pem -CAkey ca-do-not-share.key -out "{{ name_takserver }}".pem -set_serial "{{ 1000000 | random }}" -passin pass:{{ password_ca }} -extensions server -extfile config.cfg
+  become_user: tak
+  become: yes
+  args:
+    chdir: "{{ dir_cert_creation }}"
+    creates: "{{ name_takserver }}.pem"
+# when: tak_ca_key is not defined
+
+  ## -- Keys -- ##
+- name: Generate server key pkcs12
+  command: openssl pkcs12 -export -in "{{ name_takserver }}".pem -inkey "{{ name_takserver }}".key -out "{{ name_takserver }}".p12 -name "{{ name_takserver }}" -CAfile ca.pem -passin pass:"{{ password_ca }}" -passout pass:"{{ password_ca }}"
+  become_user: tak
+  become: yes
+  args:
+    chdir: "{{ dir_cert_creation }}"
+    creates: "{{ name_takserver }}.p12"
+  # when: tak_ca_key is not defined
+
+- name: Generate server key jks
+  command: keytool -importkeystore -deststorepass "{{ password_ca }}" -destkeypass "{{ password_ca }}" -destkeystore "{{ name_takserver }}".jks -srckeystore "{{ name_takserver }}".p12 -srcstoretype PKCS12 -srcstorepass "{{ password_ca }}" -alias "{{ name_takserver }}"
+  become_user: tak
+  become: yes
+  args:
+    chdir: "{{ dir_cert_creation }}"
+    creates: "{{ name_takserver }}.jks"
+  # when: tak_ca_key is not defined
+
+
+  ## -- XMPP Certificate requests -- ##
+- name: Generate server certificate request
+  command: openssl req -new -newkey rsa:2048 -sha256 -keyout xmppserver.key -passout pass:"{{ password_ca }}" -out xmppserver.csr -subj "{{ subject_base }}CN={{ name_ca }}"
+  become_user: tak
+  become: yes
+  args:
+    chdir: "{{ dir_cert_creation }}"
+    creates: xmppserver.csr
+  # when: tak_ca_key is not defined
+
+- name: Signing server certificate request
+  command: openssl x509 -sha256 -req -days 730 -in xmppserver.csr -CA ca.pem -CAkey ca-do-not-share.key -out xmppserver.pem -set_serial "{{ 1000000 | random }}" -passin pass:{{ password_ca }} -extensions server -extfile config.cfg
+  become_user: tak
+  become: yes
+  args:
+    chdir: "{{ dir_cert_creation }}"
+    creates: xmppserver.pem
+# when: tak_ca_key is not defined
+
+  ## -- Keys -- ##
+- name: Generate server key pkcs12
+  command: openssl pkcs12 -export -in xmppserver.pem -inkey xmppserver.key -out xmppserver.p12 -name xmppserver -CAfile ca.pem -passin pass:"{{ password_ca }}" -passout pass:"{{ password_ca }}"
+  become_user: tak
+  become: yes
+  args:
+    chdir: "{{ dir_cert_creation }}"
+    creates: xmppserver.p12
+  # when: tak_ca_key is not defined
+
+- name: Generate server key jks
+  command: keytool -importkeystore -deststorepass "{{ password_ca }}" -destkeypass "{{ password_ca }}" -destkeystore xmppserver.jks -srckeystore xmppserver.p12 -srcstoretype PKCS12 -srcstorepass "{{ password_ca }}" -alias xmppserver
+  become_user: tak
+  become: yes
+  args:
+    chdir: "{{ dir_cert_creation }}"
+    creates: xmppserver.jks
+  # when: tak_ca_key is not defined

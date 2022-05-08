@@ -1,0 +1,26 @@
+---
+container_state: running
+setenforce: false
+
+container_name: netdata
+container_image: netdata/netdata
+container_dir_owner: root
+container_dir_group: root
+container_dir_proc: proc
+container_dir_sys: sys
+container_dir_sock: var/run/docker.sock
+container_run_args: >-
+  -d
+  -v "{{podman_exported_container_volumes_basedir}}/{{ container_dir_proc }}:/host/proc:Z"
+  -v "{{podman_exported_container_volumes_basedir}}/{{ container_dir_sys }}:/host/sys:Z"
+  -v "{{podman_exported_container_volumes_basedir}}/{{ container_dir_sock }}:/var/run/docker.sock:Z"
+  --cap-add SYS_PTRACE
+  --security-opt apparmor=unconfined
+  - p 19999:19999
+container_firewall_ports:
+  - 19999/tcp 
+## goes to host_vars ##
+
+# podman_exported_container_volumes_basedir: /var/lib/containers/exported_volumes
+# domain: localdomain
+# timezone: "Europe/Helsinki"

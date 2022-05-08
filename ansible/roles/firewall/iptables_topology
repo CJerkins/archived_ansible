@@ -1,0 +1,170 @@
+--backend services DNS,XMPP,TAK privateIP-172.16.50.2
+
+--fe0-subnet  -fight-subnet-10.10.1.0:11194 entrypoint -Car-client-10.10.1.2:30001
+iptables -A INPUT -m conntrack --ctstate RELATED,ESTABLISHED -j ACCEPT
+iptables -A INPUT -m conntrack --ctstate INVALID -j DROP
+iptables -A INPUT -i lo -j ACCEPT
+iptables -A INPUT -p icmp -j ACCEPT
+iptables -A INPUT -p tcp -m tcp --dport 22 -m conntrack --ctstate NEW -m comment --comment "Accept SSH" -j ACCEPT
+iptables -A INPUT -p udp -m udp --sport 67 --dport 68 -m comment --comment "Accept dhcp" -j ACCEPT
+iptables -A INPUT -j LOG --log-prefix "iptables input dropped: "
+iptables -A OUTPUT -m conntrack --ctstate RELATED,ESTABLISHED -j ACCEPT
+iptables -A OUTPUT -m conntrack --ctstate INVALID -j DROP
+iptables -A OUTPUT -o lo -j ACCEPT
+iptables -A OUTPUT -p icmp -j ACCEPT
+iptables -A OUTPUT -d 3.228.231.62/32 -p udp -m udp --dport 30001 -m comment --comment "Accept outbound car vpn to con0" -j ACCEPT
+iptables -A OUTPUT -p tcp -m multiport --dports 80,443,53 -m conntrack --ctstate NEW -m comment --comment "Accept outbound HTTP, HTTPS, DNS" -j ACCEPT
+iptables -A OUTPUT -p udp -m multiport --dports 53,123 -m comment --comment "Accept DNS and NTP" -j ACCEPT
+iptables -A OUTPUT -j LOG --log-prefix "iptables output dropped: "
+iptables -A FORWARD -m conntrack --ctstate RELATED,ESTABLISHED -j ACCEPT
+iptables -A FORWARD -m conntrack --ctstate INVALID -j DROP
+iptables -A FORWARD -p icmp -j ACCEPT
+iptables -A FORWARD -i eth0 -o con0 -p udp -m udp --dport 11194 -m comment --comment "Accept incoming fight VPN traffic and forward to gw0" -j ACCEPT
+iptables -A FORWARD -j LOG --log-prefix "iptables forward dropped: "
+iptables -t nat -A PREROUTING -i eth0 -p udp -m udp --dport 11194 -m comment --comment "DNAT incoming fight VPN traffic to gw0 IP" -j DNAT --to-destination 10.10.0.2
+iptables -t nat -A POSTROUTING -o con0 -m comment --comment "SNAT outgoing fight VPN traffic from car tunnel IP" -j SNAT --to-source 10.10.1.2
+iptables -P INPUT DROP
+iptables -P FORWARD DROP
+iptables -P OUTPUT DROP
+
+##uncomment net.ipv4.ip_forward=1 line vim /etc/sysctl.conf > sysctl -p
+##iptables -A OUTPUT -d x.x.x.x(publicIPcon0)/32 -p udp -m udp --dport 30001 -m comment --comment "Accept outbound car vpn to con0" -j ACCEPT
+
+
+--fe1 -ligher-subnet-10.10.2.0:11195 entrypoint -football-client-10.10.2.2:30002
+iptables -A INPUT -m conntrack --ctstate RELATED,ESTABLISHED -j ACCEPT
+iptables -A INPUT -m conntrack --ctstate INVALID -j DROP
+iptables -A INPUT -i lo -j ACCEPT
+iptables -A INPUT -p icmp -j ACCEPT
+iptables -A INPUT -p tcp -m tcp --dport 22 -m conntrack --ctstate NEW -m comment --comment "Accept SSH" -j ACCEPT
+iptables -A INPUT -p udp -m udp --sport 67 --dport 68 -m comment --comment "Accept dhcp" -j ACCEPT
+iptables -A INPUT -j LOG --log-prefix "iptables input dropped: "
+iptables -A OUTPUT -m conntrack --ctstate RELATED,ESTABLISHED -j ACCEPT
+iptables -A OUTPUT -m conntrack --ctstate INVALID -j DROP
+iptables -A OUTPUT -o lo -j ACCEPT
+iptables -A OUTPUT -p icmp -j ACCEPT
+iptables -A OUTPUT -d 3.228.231.62/32 -p udp -m udp --dport 30002 -m comment --comment "Accept outbound football vpn to con0" -j ACCEPT
+iptables -A OUTPUT -p tcp -m multiport --dports 80,443,53 -m conntrack --ctstate NEW -m comment --comment "Accept outbound HTTP, HTTPS, DNS" -j ACCEPT
+iptables -A OUTPUT -p udp -m multiport --dports 53,123 -m comment --comment "Accept DNS and NTP" -j ACCEPT
+iptables -A OUTPUT -j LOG --log-prefix "iptables output dropped: "
+iptables -A FORWARD -m conntrack --ctstate RELATED,ESTABLISHED -j ACCEPT
+iptables -A FORWARD -m conntrack --ctstate INVALID -j DROP
+iptables -A FORWARD -p icmp -j ACCEPT
+iptables -A FORWARD -i eth0 -o con0 -p udp -m udp --dport 11195 -m comment --comment "Forward lighter traffic from eth0 down con0" -j ACCEPT
+iptables -A FORWARD -j LOG --log-prefix "iptables forward dropped: "
+iptables -t nat -A PREROUTING -i eth0 -p udp --dport 11195 -m comment --comment "DNAT forward lighter traffic from fe2 to gw0" -j DNAT --to-destination 10.10.0.2
+iptables -t nat -A POSTROUTING -o con0 -m comment --comment "SNAT outgoing lighter traffic from football tunnel IP" -j SNAT --to-source 10.10.2.2
+iptables -P INPUT DROP
+iptables -P FORWARD DROP
+iptables -P OUTPUT DROP
+
+##uncomment net.ipv4.ip_forward=1 line vim /etc/sysctl.conf > sysctl -p
+##iptables -A OUTPUT -d x.x.x.x(publicIPcon0)/32 -p udp -m udp --dport 30002 -m comment --comment "Accept outbound football vpn to con0" -j ACCEPT
+
+
+--fe2 -spoon-server entrypoint -10.10.4.1:30004 -Waffle-client-10.10.3.2:30003
+iptables -A INPUT -m conntrack --ctstate RELATED,ESTABLISHED -j ACCEPT
+iptables -A INPUT -m conntrack --ctstate INVALID -j DROP
+iptables -A INPUT -i lo -j ACCEPT
+iptables -A INPUT -p icmp -j ACCEPT
+iptables -A INPUT -p tcp -m tcp --dport 22 -m conntrack --ctstate NEW -m comment --comment "Accept SSH" -j ACCEPT
+iptables -A INPUT -i con0 -p udp -m udp --dport 30004 -m comment --comment "Accept spoon VPN in through con0" -j ACCEPT
+iptables -A INPUT -j LOG --log-prefix "iptables input dropped: "
+iptables -A OUTPUT -m conntrack --ctstate RELATED,ESTABLISHED -j ACCEPT
+iptables -A OUTPUT -m conntrack --ctstate INVALID -j DROP
+iptables -A OUTPUT -o lo -j ACCEPT
+iptables -A OUTPUT -p icmp -j ACCEPT
+iptables -A OUTPUT -d 3.228.231.62/32 -p udp -m udp --dport 30003 -m comment --comment "Accept outbound waffle vpn to con0" -j ACCEPT
+iptables -A OUTPUT -p tcp -m multiport --dports 80,443,53 -m conntrack --ctstate NEW -m comment --comment "Outbound HTTP, HTTPS, DNS" -j ACCEPT
+iptables -A OUTPUT -p udp -m multiport --dports 53,123 -m comment --comment "Accept DNS and NTP" -j ACCEPT
+iptables -A OUTPUT -j LOG --log-prefix "iptables output dropped: "
+iptables -A FORWARD -m conntrack --ctstate RELATED,ESTABLISHED -j ACCEPT
+iptables -A FORWARD -m conntrack --ctstate INVALID -j DROP
+iptables -A FORWARD -p icmp -j ACCEPT
+iptables -A FORWARD -i gw0 -o eth0 -m comment --comment "Accept incoming fight VPN traffic and forward from fe1 to gw0" -j ACCEPT
+iptables -A FORWARD -j LOG --log-prefix "iptables forward dropped: "
+iptables -t nat -A POSTROUTING -o eth0 -m comment --comment "Allow internet traffic back in" -j MASQUERADE
+
+### CHECK on these Default policies
+iptables -P INPUT DROP
+iptables -P FORWARD DROP
+iptables -P OUTPUT DROP
+
+iptables -A OUTPUT -d x.x.x.x(publicIPcon0)/32 -p udp -m udp --dport 30003 -m comment --comment "Accept outbound waffle vpn to con0" -j ACCEPT
+
+--con0 -tree-server-10.10.0.1:30000 -car-server-10.10.1.1:30001 -football-server-10.10.2.1:30002 -waffle-server-10.10.3.1:30003
+iptables -A INPUT -m conntrack --ctstate RELATED,ESTABLISHED -j ACCEPT
+iptables -A INPUT -m conntrack --ctstate INVALID -j DROP
+iptables -A INPUT -i lo -j ACCEPT
+iptables -A INPUT -p icmp -j ACCEPT
+iptables -A INPUT -p tcp -m tcp --dport 22 -m conntrack --ctstate NEW -m comment --comment "Accept SSH" -j ACCEPT
+iptables -A INPUT -p udp -m udp --sport 67 --dport 68 -m comment --comment "Accept dhcp" -j ACCEPT
+iptables -A INPUT -p udp -m udp --dport 30000 -m comment --comment "Accept tree VPN in form on gw0" -j ACCEPT
+iptables -A INPUT -d 3.230.5.252/32 -p udp -m udp --dport 30001 -m comment --comment "Accept inbound car vpn" -j ACCEPT
+iptables -A INPUT -d 3.228.118.214/32 -p udp -m udp --dport 30002 -m comment --comment "Accept inbound football vpn" -j ACCEPT
+iptables -A INPUT -d 3.230.253.120/32 -p udp -m udp --dport 30003 -m comment --comment "Accept inbound waffle vpn" -j ACCEPT
+iptables -A INPUT -j LOG --log-prefix "iptables input dropped: "
+iptables -A OUTPUT -m conntrack --ctstate RELATED,ESTABLISHED -j ACCEPT
+iptables -A OUTPUT -m conntrack --ctstate INVALID -j DROP
+iptables -A OUTPUT -o lo -j ACCEPT
+iptables -A OUTPUT -p icmp -j ACCEPT
+iptables -A OUTPUT -o eth0 -p tcp -m multiport --dports 80,443,53 -m conntrack --ctstate NEW -m comment --comment "Accept outbound HTTP, HTTPS, DNS" -j ACCEPT
+iptables -A OUTPUT -o eth0-p udp -m multiport --dports 53,123 -m comment --comment "Accept DNS and NTP" -j ACCEPT
+iptables -A OUTPUT -j LOG --log-prefix "iptables output dropped: "
+iptables -A FORWARD -m conntrack --ctstate RELATED,ESTABLISHED -j ACCEPT
+iptables -A FORWARD -m conntrack --ctstate INVALID -j DROP
+iptables -A FORWARD -p icmp -j ACCEPT
+iptables -A FORWARD -i fe0 -o gw0 -p udp -m udp --dport 11194 -m comment --comment "Forward fight traffic from fe1 to gw0" -j ACCEPT
+iptables -A FORWARD -i fe1 -o gw0 -p udp -m udp --dport 11195 -m comment --comment "Forward lighter traffic from fe2 to gw0" -j ACCEPT
+check this //iptables -A FORWARD -i gw0 -o fe2 -p udp -m udp --dport 30004 -m comment --comment "Forward spoon traffic from gw0 to fe2" -j ACCEPT
+iptables -A FORWARD -j LOG --log-prefix "iptables forward dropped: "
+iptables -P INPUT DROP
+//iptables -P FORWARD 1st set to DROP// 2nd set to ACCEPT after first pdf
+iptables -P OUTPUT DROP
+
+##uncomment net.ipv4.ip_forward=1 line vim /etc/sysctl.conf > sysctl -p
+##iptables -A INPUT -d x.x.x.x(fe1PublicIP)/32 -p udp -m udp --dport 30001 -m comment --comment "Accept inbound car vpn" -j ACCEPT
+##iptables -A INPUT -d x.x.x.x(fe2PublicIP)/32 -p udp -m udp --dport 30002 -m comment --comment "Accept inbound football vpn" -j ACCEPT
+##iptables -A INPUT -d x.x.x.x(fe3PublicIP)/32 -p udp -m udp --dport 30003 -m comment --comment "Accept inbound waffle vpn" -j ACCEPT
+
+
+--gw0 Gateway tree-client-10.10.0.2:30000 spoon-client-10.10.4.2:30004 fight-server-10.10.1.0:11194 lighter-server-10.10.2.0:11195
+iptables -A INPUT -m conntrack --ctstate RELATED,ESTABLISHED -j ACCEPT
+iptables -A INPUT -m conntrack --ctstate INVALID -j DROP
+iptables -A INPUT -i lo -j ACCEPT
+iptables -A INPUT -p icmp -j ACCEPT
+iptables -A INPUT -p tcp -m tcp --dport 22 -m conntrack --ctstate NEW -m comment --comment "Accept SSH" -j ACCEPT
+iptables -A INPUT -p udp -m udp --sport 67 --dport 68 -m comment --comment "Accept dhcp" -j ACCEPT
+iptables -A INPUT -i con0 -p udp -m udp --dport 11194 -m comment --comment "Accept fight traffic in on the con0 interface" -j ACCEPT
+iptables -A INPUT -i con0 -p udp -m udp --dport 11195 -m comment --comment "Accept lighter traffic in on the con0 interface" -j ACCEPT
+iptables -A INPUT -j LOG --log-prefix "iptables input dropped: "
+iptables -A OUTPUT -m conntrack --ctstate RELATED,ESTABLISHED -j ACCEPT
+iptables -A OUTPUT -m conntrack --ctstate INVALID -j DROP
+iptables -A OUTPUT -o lo -j ACCEPT
+iptables -A OUTPUT -p icmp -j ACCEPT
+iptables -A OUTPUT -d 3.228.231.62/32 -o eth0 -p udp -m udp --dport 30000 -m comment --comment "Accept tree vpn to go out to con0" -j ACCEPT
+iptables -A OUTPUT -d 10.10.3.2/32 -o con0 -p udp -m udp --dport 30004 -m comment "Allows spoon vpn to built through con0" -j ACCEPT
+iptables -A OUTPUT -j LOG --log-prefix "iptables output dropped: "
+iptables -A FORWARD -m conntrack --ctstate RELATED,ESTABLISHED -j ACCEPT
+iptables -A FORWARD -m conntrack --ctstate INVALID -j DROP
+iptables -A FORWARD -i tm+ -o tm+ -j ACCEPT
+iptables -A FORWARD -i tm+ -o eg0 -j ACCEPT
+iptables -A FORWARD -i tm+ -o eth0 -d 172.31.80.167/32 -j ACCEPT
+iptables -A FORWARD -i eth0 ! -o xxx -m comment --comment "xxx traffic goes anywhere except via xxx" -j ACCEPT
+iptables -A FORWARD -j LOG --log-prefix "iptables forward dropped: "
+
+iptables -t nat -A POSTROUTING -o eg0 -m comment --comment "Allows traffic to appear coming from fe3" -j SNAT --to-source 10.10.4.2
+iptable -t nat -A POSTROUTING -s 172.31.80.167/32 -o con0 -m comment --comment "SNAT traffic coming from intel client out con0 so nodes don\'t need static routes to xxx LAN" -j SNAT --to-source 10.10.0.2
+iptables -P INPUT DROP
+iptables -P FORWARD DROP
+iptables -P OUTPUT DROP
+
+##ADD to gateway to pass traffic back and forth between lighter and fight subnets. all traffic still egresses from fe3
+iptables -A FORWARD -i tm1 -o tm2 -s 10.10.1.0/24 -d 10.10.2.0/24 -j ACCEPT
+iptables -A FORWARD -i tm2 -o tm1 -s 10.10.2.0/24 -d 10.10.1.0/24 -j DROP
+
+##uncomment net.ipv4.ip_forward=1 line vim /etc/sysctl.conf > sysctl -p
+##iptables -A OUTPUT -d x.x.x.x(con0PublicIP)/32 -o xxx(wan interface on gw) -p udp -m udp --dport 30000 -m comment --comment "Accept tree vpn to go out to con0" -j ACCEPT
+##iptables -A FORWARD -i tm+ -o eth0(GWprivatInterf) -d 172.16.x.x(GWprivatIP)/32 -j ACCEPT
+##iptables -A FORWARD -i eth0(GWprivatInterf) ! -o xxx -m comment --comment "xxx traffic goes anywhere except via xxx" -j ACCEPT
+##iptable -t nat -A POSTROUTING -s 172.16.x.x(GWprivateIP)/32 -o con0 -m comment --comment "SNAT traffic coming from intel client out con0 so nodes don\'t need static routes to xxx LAN" -j SNAT --to-source 10.10.0.2

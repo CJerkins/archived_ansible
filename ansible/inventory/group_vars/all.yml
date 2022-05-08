@@ -1,0 +1,96 @@
+---
+### General vars ###
+timezone: "America/New_York"
+domain: local.drokdev.pro
+dns_nameserver: 172.16.1.4 ## this should point to a LDAP or active_dirtory.
+admin_username: admin
+admin_password: password
+### init_setup ###
+## -- Packages -- ##
+init_setup_additional_packages:
+  - htop
+## -- User init -- ##
+init_setup_CentOS_users:
+- username: "{{ lookup('bitwarden', 'default_admin_user', field='username') }}" # "centos"
+  groups: 
+    - "wheel"
+init_setup_Ubuntu_users:
+- username: "{{ lookup('bitwarden', 'default_admin_user', field='username') }}"
+  groups: 
+    - "admin"
+init_setup_password: "{{ lookup('bitwarden', 'default_admin_user') }}" # set as a default for all users. At first login users will change.
+# init_setup_admin_users:
+# - admin_username: drok
+  # user_admin_path: /Users/drok/.ssh/id_rsa.pub # "{{ lookup('file', '{{ user_admin_path }}/'{{ user_admin }}'/.ssh/i{{ ssh_pub_file }}') }}"
+# - admin_username: kat
+  # user_admin_path: /Users/user/.ssh/id_rsa.pub # "{{ lookup('file', '{{ user_admin_path }}/'{{ user_admin }}'/.ssh/i{{ ssh_pub_file }}') }}"
+## -- PAM init -- ##
+init_setup_use_pam: false
+## -- sshd_config -- ##
+init_setup_no_pass_auth: true
+init_setup_disable_root: true
+## -- DNS setup -- ##
+init_setup_dns_setup: true
+init_setup_resolv_nameservers:
+  - "172.16.200.4"
+  - "172.16.200.2"
+init_setup_resolv_domain: "local.drokdev.pro"
+init_setup_resolv_search:
+  - "local.drokdev.pro"
+init_setup_resolv_options:
+  - "timeout:2"
+  - "rotate"
+## -- FreeIPA client init -- ##
+use_ldap: true
+init_setup_freeipa_client_realm: LOCAL.DROKDEV.PRO
+init_setup_freeipa_client_principal: admin #"{{ lookup('bitwarden', 'ipa_user', field='username') }}"
+init_setup_freeipa_client_password: DroKcoff33QUEENusa6z!pROPE5FRUIT9park@ #"{{ lookup('bitwarden', 'ipa_user') }}"
+
+### freeipa defaults ###
+freeipa_host: ipaserver0.local.drokdev.pro  ## set an ip address if unable to resolve to it
+freeipa_user: "{{ lookup('bitwarden', 'ipa_user', field='username') }}"
+freeipa_pass: "{{ lookup('bitwarden', 'ipa_user') }}"
+freeipa_action: add
+
+## firewall ##
+firewall_ip_forward: false
+# firewall_firewall: firewalld # ufw iptables
+
+### podman defaults ###
+podman_exported_container_volumes_basedir: "/var/lib/containers/{{ container_name }}"
+podman_pod_yaml_dir: "/etc/containers/pods/{{ pod_name }}"
+
+
+### docker defaults ###
+docker_exported_container_volumes_basedir: "/var/containers/{{ container_name }}"
+# docker_compose_dir: "/etc/containers/{{ docker_compose_name }}"
+# Where you want Docker to store images
+docker_image_directory: "{{ docker_home }}/data"
+# Where you want Docker to store its container data.
+docker_home: /mnt/Volume2/docker
+# Docker storage driver, see https://docs.docker.com/storage/storagedriver/select-storage-driver/#supported-backing-filesystems
+# You might want to change this to ZFS, depending on your underlying filesystem.
+docker_storage_driver: overlay2
+docker_users:
+  - "{{ ansible_user }}"
+
+
+### proxmox defaults ###
+proxmox_vm_user: drok 
+proxmox_vm_password: 'password'
+proxmox_ssh_key: '~/.ssh/drokMAC.pub'
+# promox_default_hostname: example  ## default hostname for all cloned created vms
+proxmox_bridge: vmbr0
+
+
+
+### openvpn defaults ###
+openvpn_gen_machine: cert
+openvpn_fetch_config_dir: /tmp/vpn-test/
+
+
+### https fileshare ###
+httpd_fileshare_location: "/var/www/html/share"
+httpd_domain_name: http.drokdev.pro/wev
+
+

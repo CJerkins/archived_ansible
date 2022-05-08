@@ -1,0 +1,18 @@
+---
+- name: add admin cert
+  command:   
+    argv:
+      - java -jar /opt/tak/utils/UserManager.jar
+      - certmod -g
+      - "{{ item.groups }}"
+      - /opt/tak/certs/files/{{ item.alpha }}
+  with_items: 
+    - takclients
+    - { usr: '{{ alpha }}.pem', grps: 'alpha' }
+  when: alpha is defined 
+  become_user: tak
+  become: yes
+
+
+  # java -jar /opt/tak/utils/UserManager.jar usermod -A -p Paddle#Tibia1#Thirsty admin
+  # java -jar /opt/tak/utils/UserManager.jar certmod -A /opt/tak/certs/files/webAdmin0.pem

@@ -1,0 +1,17 @@
+---
+#- name: "Setup tak admin role"
+# - name: use admin bash
+#   shell: ./opt/tak/enable_admin.sh # cert name must be admin.pem
+  # when: admincert is defined 
+  
+- name: add admin user
+  shell: java -jar /opt/tak/utils/UserManager.jar usermod -A -p {{ password_webadmin }} {{ user_webadmin }}
+  when: password_webadmin is defined
+
+- name: add admin cert
+  shell: java -jar /opt/tak/utils/UserManager.jar certmod -A /opt/tak/certs/files/{{ item }} # webADMIN.pem
+  with_items: "{{ admincert }}.pem"
+  when: admincert is defined 
+
+  # java -jar /opt/tak/utils/UserManager.jar usermod -A -p Paddle#Tibia1#Thirsty admin
+  # java -jar /opt/tak/utils/UserManager.jar certmod -A /opt/tak/certs/files/webAdmin0.pem

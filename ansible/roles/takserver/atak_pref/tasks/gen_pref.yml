@@ -1,0 +1,44 @@
+---
+- name: Send to "{{ https_fileshare_host }}"
+  block:
+
+  - name: Create device_pref directory
+    file:
+      path: "{{ tak_device_pref_location }}/{{ item.0 }}" # default /tmp/takcerts
+      mode: 0775
+      state: directory
+    with_together: "{{ device_name }}"
+
+  - name: Template a file to device.pref
+    template:
+      src: templates/device.pref.j2
+      dest: "{{ tak_device_pref_location }}/{{ item.0 }}/{{ item.0 }}.pref"
+      mode: 0775
+    with_together: 
+      - "{{ device_name }}"
+
+  when: 
+    - https_fileshare_host != 'localhost' 
+
+
+
+### Prefence files save to localhost ###
+- name: Send to "{{ https_fileshare_host }}"
+  block:
+
+  - name: Create device_pref directory
+    file:
+      path: /tmp/atak_pref # default /tmp/takcerts
+      mode: 0775
+      state: directory
+
+  - name: Template a file to device.pref
+    template:
+      src: templates/device.pref.j2
+      dest: tmp/atak_pref/{{ item.0 }}.pref"
+      mode: 0775
+    with_together: 
+      - "{{ device_name }}"    
+
+  when: 
+    - https_fileshare_host == 'localhost'   

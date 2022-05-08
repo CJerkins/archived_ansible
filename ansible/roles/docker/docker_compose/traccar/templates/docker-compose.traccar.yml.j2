@@ -1,0 +1,40 @@
+---
+version: '3.6'
+
+# This networks section required for the pacakge to be visible to Traefik. 
+# DO NOT Remove
+networks:
+  traefik_network:
+    external:
+      name: traefik
+
+services:
+  traccar:
+    container_name: traccar
+    image: traccar/traccar:latest
+    restart: always
+    ports:
+        - "8082:8082/tcp"
+        - "5000-5150:5000-5150/tcp"
+        - "5000-5150:5000-5150/udp"
+    volumes:
+        - /etc/timezone:/etc/timezone:ro
+        - /etc/localtime:/etc/localtime:ro
+        - {{docker_exported_container_volumes_basedir}}/traccar/conf:/opt/traccar/conf:rw
+        - {{docker_exported_container_volumes_basedir}}/traccar/data:/opt/traccar/data:rw
+        - {{docker_exported_container_volumes_basedir}}/traccar/logs:/opt/traccar/logs:rw
+    networks:
+      - traefik_network
+    labels:
+      - "traefik.enable=true"
+      - "traefik.docker.network=traefik"
+      - "traefik.http.frontend.rule=Host:PackageFileName.{{ domain }}"
+      - "traefik.http.protocol=http"
+      - "traefik.http.port=80"
+      - "traefik.http.frontend.headers.customFrameOptionsValue=ALLOW-FROM http://{{ domain }}"
+      - "traefik.http.frontend.headers.customFrameOptionsValue=ALLOW-FROM https://{{ domain }}"
+{% if enable_tor %}
+      - "traefik.tor.frontend.rule=Host:PackageFileName.{{ tor_domain }}"
+      - "traefik.tor.protocol=http"
+      - "traefik.tor.port=80"
+{% endif %}

@@ -1,0 +1,10 @@
+---
+- name: Setup Wireguard VPN
+  hosts: wireguard0.local.drokdev.pro
+  gather_facts: true
+  become: yes
+  vars:
+    wireguard_nat: true
+    # wireguard_dns: true
+  roles:
+    - wireguard/wireguard_harden

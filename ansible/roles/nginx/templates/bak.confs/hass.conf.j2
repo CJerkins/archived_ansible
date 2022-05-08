@@ -1,0 +1,44 @@
+server {
+    listen       443 ssl;
+    server_name  homeauto.local.drokdev.pro;
+
+    ssl on;
+    ssl_certificate {{dir_ssl_key}}/hass/cert.pem; 
+    ssl_certificate_key {{dir_ssl_key}}/hass/key.pem;
+    ssl_prefer_server_ciphers on;
+    ssl_protocols       TLSv1 TLSv1.1 TLSv1.2; #TLSv1.3
+    ssl_ciphers    TLS-CHACHA20-POLY1305-SHA256:TLS-AES-256-GCM-SHA384:TLS-AES-128-GCM-SHA256:HIGH:!aNULL:!MD5;
+
+    location / {
+        proxy_pass http://172.16.100.46:8123;
+        proxy_set_header Host $host;
+
+        proxy_http_version 1.1;
+        proxy_set_header Upgrade $http_upgrade;
+        proxy_set_header Connection "upgrade";
+    }
+
+    location /api/websocket {
+        proxy_pass http://172.16.100.46:8123/api/websocket;
+        proxy_set_header Host $host;
+
+        proxy_http_version 1.1;
+        proxy_set_header Upgrade $http_upgrade;
+        proxy_set_header Connection "upgrade";
+
+    }
+}
+
+server {
+if ($host = homeauto.local.drokdev.pro) {
+    return 301 https://$host$request_uri;
+} 
+
+
+    listen       80 ;
+    listen       [::]:80 ;
+    server_name homeauto.drokdev.pro;
+    return 404; 
+
+
+}

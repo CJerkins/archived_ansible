@@ -1,0 +1,18 @@
+---
+# defaults file for wireguard_role
+
+#Declare the VPN subnet
+vpn_admin_client_network: '10.201.0'
+vpn_server_network: '10.201.0'
+#Declare the VPN server port
+vpn_port: '51821'
+
+#Declare the number of clients
+admin_client: admin0
+server: wg0
+
+client_config_path: '~/Desktop/wireguard_role/profiles'
+qrcode_fetch_dir:
+
+wireguard_nat: false
+wireguard_dns: false

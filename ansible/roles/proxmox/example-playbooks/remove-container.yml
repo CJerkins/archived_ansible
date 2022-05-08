@@ -1,0 +1,19 @@
+---
+- hosts: proxmox
+  gather_facts: yes
+  vars:
+    ## -- Container vars -- ##
+    action   : remove
+    ctid        : 247 # Varible has to be set in playbook
+  roles:
+  - role: ansible_role_proxmox
+
+## -- Run multiple times to remove more than one -- ##
+# - hosts: proxmox
+#   gather_facts: yes
+#   vars:
+#     ## -- Container vars -- ##
+    # action      : remove
+#     ctid        : 243 # Varible has to be set in playbook
+#   roles:
+#   - role: container

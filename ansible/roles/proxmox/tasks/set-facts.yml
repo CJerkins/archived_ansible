@@ -1,0 +1,8 @@
+---
+- name: Set a random vmid when vmnewid is not defined
+  set_fact:
+    random_id: "{{ 3000 | random(start=2000) }}"
+
+- name: Set a random vmid when vmnewid is not defined
+  set_fact:
+    random_name: "devops.{{ random_id }}.{{ domain }}"

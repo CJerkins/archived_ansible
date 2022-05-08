@@ -1,0 +1,53 @@
+## provisioned by ansible
+
+server {
+    listen 443 ssl http2;
+    listen [::]:443 ssl http2;
+
+    server_name xoa1.local.drokdev.pro;
+    {# root /var/www/xoa1.local.drokdev.pro/public; #}
+
+    # SSL
+    ssl_certificate {{dir_ssl_key}}/xoa1/cert.pem;
+    ssl_certificate_key {{dir_ssl_key}}/xoa1/key.pem;
+
+    # security
+    include security.conf;
+
+    # reverse proxy
+    location / {
+        proxy_pass http://172.16.10.4:80;
+        include proxy.conf;
+
+{#         proxy_ssl_trusted_certificate /etc/nginx/trusted_ca_cert.crt;
+        proxy_ssl_verify       on;
+        proxy_ssl_verify_depth 2; #}
+    }
+
+    # additional config
+    include general.conf;
+}
+
+# subdomains redirect
+server {
+    listen 443 ssl http2;
+    listen [::]:443 ssl http2;
+
+    server_name *.xoa1.local.drokdev.pro;
+
+    # SSL
+    ssl_certificate {{dir_ssl_key}}/xoa1/cert.pem;
+    ssl_certificate_key {{dir_ssl_key}}/xoa1/key.pem;
+
+    return 301 https://xoa1.local.drokdev.pro$request_uri;
+}
+
+# HTTP redirect
+server {
+    listen 80;
+    listen [::]:80;
+
+    server_name .xoa1.local.drokdev.pro;
+
+    return 301 https://xoa1.local.drokdev.pro$request_uri;
+}

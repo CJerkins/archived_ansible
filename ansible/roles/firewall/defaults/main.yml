@@ -1,0 +1,13 @@
+---
+firewall_ip_forward: false
+firewall_setenforce: false ## when true it is set to 0
+firewall_service: iptables ## choose firewalld or ufw
+
+## Unique rules to enable ##
+# firewall_server-name_enable: true
+
+iptables_allow_ping: true
+
+firewalld_block_ping: false
+
+ufw_block_ping: false

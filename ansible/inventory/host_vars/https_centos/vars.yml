@@ -1,0 +1,56 @@
+---
+apache_vhosts:
+  - servername: "https.drokdev.pro"
+    serveralias: "drokdev.pro"
+    options: Indexes MultiViews FollowSymLinks Includes ExecCGI
+    allow_override: 'None'
+    documentroot: "/var/www/html/share"
+    extra_parameters: |
+      Alias /share /var/www/html/share
+        <Directory /var/www/html/share>
+            Options Indexes MultiViews FollowSymLinks Includes ExecCGI
+            AllowOverride None
+            Allow from all
+            Require all granted
+        </Directory>
+
+        <Location /share>
+           Dav On
+           <LimitExcept GET HEAD OPTIONS PUT>
+              Order Allow,Deny
+              Allow from all
+           </LimitExcept>
+        </Location>
+
+
+apache_vhosts_ssl:
+  - servername: "https.drokdev.pro"
+    documentroot: "/var/www/html"
+    certificate_file: /etc/pki/tls/certs/localhost.crt
+    certificate_key_file: /etc/pki/tls/private/localhost.key
+
+
+# <VirtualHost *:443>
+#         DocumentRoot "/var/www/html"
+#         ServerName "{{ httpd_domain_name }}:443"
+#         SSLCertificateFile {{ httpd_cert_dir }}/{{ httpd_ssl_certificate_file }}
+#         SSLCertificateKeyFile   {{ httpd_key_dir }}/{{ httpd_ssl_certificate_key_file }}
+# </VirtualHost>
+
+
+
+# Alias /repo /var/www/html/repo
+#   <Directory /var/www/html/repo>
+#       Options Indexes MultiViews FollowSymLinks Includes ExecCGI
+#       AllowOverride None
+#       Allow from all
+#       Require all granted
+#   </Directory>
+
+#   <Location /repo>
+#      Dav On
+#      <LimitExcept GET HEAD OPTIONS PUT>
+#         Order Allow,Deny
+#         Allow from all
+#      </LimitExcept>
+#   </Location>

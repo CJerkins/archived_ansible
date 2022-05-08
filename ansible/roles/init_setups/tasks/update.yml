@@ -1,0 +1,28 @@
+---
+- name: "Update repositories cache Centos"
+  yum:
+    update_cache: yes
+    state: present
+  when: ansible_facts['os_family'] == "RedHat"
+
+- name: "Update repositories cache Ubuntu"
+  apt:
+    update_cache: yes
+  when: ansible_facts['os_family'] == "Debian"
+
+###Running Updates###
+- name: "Update repositories cache Centos"
+  yum:
+    name: '*'
+    state: latest
+  when: 
+    - ansible_facts['os_family'] == "RedHat"
+    - keep_packages_updated
+  
+- name: "Update repositories cache Ubuntu"
+  apt:
+    upgrade: true
+    state: latest
+  when: 
+    - ansible_facts['os_family'] == "Debian"
+    - keep_packages_updated

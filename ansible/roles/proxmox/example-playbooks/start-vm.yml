@@ -1,0 +1,22 @@
+---
+- hosts: proxmox
+  gather_facts: yes
+  vars:
+    ## -- VM vars -- ##
+    vmid        : 357 # source VM name or the VM ID in provisioning
+    # vmname      : vanguard.local # The target VM Name
+    build_type  : provision
+  roles:
+  - role: ansible_role_proxmox
+
+## -- To start more than one VM run multiple times -- ##
+# - hosts: proxmox
+#   gather_facts: yes
+#   vars:
+#     ## -- VM vars -- ##
+#     vmid        : 357 
+#     # vmname      : vanguard.local
+#     build_type  : provision
+#   roles:
+#   - role: vm
+#     state: started

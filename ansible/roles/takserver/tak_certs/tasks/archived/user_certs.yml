@@ -1,0 +1,106 @@
+---
+## -- Certificate requests -- ##
+- name: Generate client certificate requests
+  command: openssl req -new -newkey rsa:2048 -sha256 -keyout {{ item }}.key -passout pass:"{{ password_ca }}" -out {{ item }}.csr -subj "{{ subject_base }}CN={{ name_ca }}"
+  become_user: tak
+  become: yes
+  args:
+    chdir: "{{ dir_cert_creation }}"
+    creates: "{{ item }}.csr"
+  with_items:
+    - "{{ name_takclients }}"
+  # when: tak_ca_key is not defined
+
+- name: Signing client certificate request
+  command: openssl x509 -sha256 -req -days 730 -in {{ item }}.csr -CA ca.pem -CAkey ca-do-not-share.key -out {{ item }}.pem -set_serial {{ 1000000 | random }} -passin pass:"{{ password_ca }}" -extensions server -extfile config.cfg
+  become_user: tak
+  become: yes
+  args:
+    chdir: "{{ dir_cert_creation }}"
+    creates: "{{ item }}.pem"
+  with_items:
+  - "{{ name_takclients }}"
+  # when: tak_ca_key is not defined
+
+
+# Not sure if this is nessessary or what this even does. Its in the original script.
+# - name: Generate  ??? CA
+#   command: openssl x509 -in "{{ name_ca }}".pem  -addtrust clientAuth -addtrust serverAuth -setalias "{{ name_ca }}" -out "{{ name_ca }}"-trusted.pem
+#   args:
+#     chdir: "{{ dir_cert_creation }}"
+#     creates: 
+#   when: ???_ca_key is defined
+
+# - name: Adding the chain
+#   command: cat ca.pem >> "{{ name_ca }}".pem
+
+# - name: Adding the chain
+#   command: cat ca-trusted.pem >> "{{ name_ca }}"-trusted.pem
+
+
+
+ ## -- Keys -- ##
+- name: Generate client key pkcs12
+  command: openssl pkcs12 -export -in "{{ item }}".pem -inkey "{{ item }}".key -out "{{ item }}".p12 -name "{{ item }}" -CAfile ca.pem -passin pass:"{{ password_ca }}" -passout pass:"{{ password_ca }}"
+  become_user: tak
+  become: yes
+  args:
+    chdir: "{{ dir_cert_creation }}"
+    creates: "{{ item }}.p12"
+  with_items:
+  - "{{ name_takclients }}"
+  # when: tak_ca_key is not defined
+
+- name: Generate client key jks
+  command: keytool -importkeystore -deststorepass "{{ password_ca }}" -destkeypass "{{ password_ca }}" -destkeystore "{{ item }}".jks -srckeystore "{{ item }}".p12 -srcstoretype PKCS12 -srcstorepass "{{ password_ca }}" -alias "{{ item }}"
+  become_user: tak
+  become: yes
+  args:
+    chdir: "{{ dir_cert_creation }}"
+    creates: "{{ item }}.jks"
+  with_items:
+  - "{{ name_takclients }}"
+  # when: tak_ca_key is not defined
+
+
+# Not sure if this is nessessary or what this even does. Its in the original script.
+# - name: Generate 
+#   command: openssl pkcs12 -export -in "{{ name_ca }}"-trusted.pem -out truststore-"{{ name_ca }}".p12 -nokeys -passout {{ password_ca  }}
+#   args:
+#     chdir: "{{ dir_cert_creation }}"
+#     creates: truststore-"{{ name_ca }}.p12"
+#   # when: tak_ca_key is not defined
+
+# - name: Generate  
+#   command: keytool -import -trustcacerts -file "{{ name_ca }}".pem -keystore truststore-"{{ name_ca }}".jks -storepass {{ password_ca | password_hash('sha512') }} -noprompt
+#   args:
+#     chdir: "{{ dir_cert_creation }}"
+#     # creates: 
+#   # when: tak_ca_key is not defined
+
+# - name: Generate ??? include a CA signing keystore; NOT FOR DISTRIBUTION TO CLIENTS
+#   command: openssl pkcs12 -export -in "{{ name_ca }}".pem -inkey "{{ name_ca }}".key -out "{{ name_ca }}"-signing.p12 -name "{{ name_ca }}" -passin {{ password_ca | password_hash('sha512') }} -passout {{ password_ca | password_hash('sha512') }}
+#   args:
+#     chdir: "{{ dir_cert_creation }}"
+#     creates: "{{ name_ca }}-signing.p12"
+#   # when: tak_ca_key is not defined
+
+# - name: Generate ??? include a CA signing keystore; NOT FOR DISTRIBUTION TO CLIENTS
+#   command: keytool -importkeystore -deststorepass {{ password_ca | password_hash('sha512') }} -destkeypass {{ password_ca | password_hash('sha512') }} -destkeystore "{{ name_ca }}"-signing.jks -srckeystore "{{ name_ca }}"-signing.p12 -srcstoretype PKCS12 -srcstorepass {{ password_ca | password_hash('sha512') }} -alias "{{ name_ca }}"
+#   args:
+#     chdir: "{{ dir_cert_creation }}"
+#     # creates: 
+#   # when: tak_ca_key is not defined
+  
+# From original script. "Do you want me to move files around so that future server and client certificates are signed by this new CA? [y/n]"
+# - name: Copy over original CA
+#   copy:
+#     src: '{{ dir_cert_creation }}/{{ item.src }}'
+#     dest: '{{ dir_cert_creation }}/{{ item.dest }}'
+#     remote_src: yes
+#   with_items:
+#     - { src: 'ca.pem', dest: '{{ name_ca }}.pem', }
+#     - { src: 'ca-trusted.pem', dest: "{{ name_ca }}-trusted.pem" }
+#     - { src: 'ca-do-not-share.key', dest: "{{ name_ca }}.key" }
+
+

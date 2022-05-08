@@ -1,0 +1,63 @@
+## Checking for firewalls ##
+- name: Check for firewalld
+  shell: command -v firewall-cmd
+  register: firewalld
+  check_mode: no
+  changed_when: false  # Never report as changed
+  failed_when: false
+
+- name: Check for ufw
+  shell: command -v ufw
+  register: ufw
+  check_mode: no
+  changed_when: false  # Never report as changed
+  failed_when: false
+
+- name: Check for iptables
+  shell: command -v iptables
+  register: iptables
+  check_mode: no
+  changed_when: false  # Never report as changed
+  failed_when: false
+
+- name: Fail on both firewalld & ufw
+  fail:
+    msg: "Both FirewallD and UFW are detected, firewall situation is unknown"
+  when: firewalld.rc == 0 and ufw.rc == 0
+
+- name: Fail on no firewall detected
+  fail:
+    msg: "No firewall detected, install one before proceeding (firewalld||ufw||iptables)"
+  when: firewalld.rc != 0 and ufw.rc != 0 and iptables.rc != 0
+
+
+
+# ## SSH ock out prevention ##
+# - name: SSH lock out prevention
+#   include: prevent_lockout.yml
+#   when: 
+#     - firewall_service == "iptables"
+
+
+
+## Add firewall rules ##
+- name: Add firewall rules common to all (iptables)
+  include: iptables.yml
+  when: 
+    - firewall_service == "iptables"
+
+- name: Add firewall rules common to all (firewalld)
+  include: firewalld.yml
+  when: 
+    - ansible_distribution == "CentOS" or ansible_distribution=="RedHat"
+    - firewall_service == "firewalld"
+
+- name: Add firewall rules common to all (ufw)
+  include: ufw.yml
+  when: 
+    - ansible_distribution == "Ubuntu"
+    - firewall_service == "ufw"
+
+
+
+

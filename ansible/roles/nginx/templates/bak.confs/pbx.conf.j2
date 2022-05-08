@@ -1,0 +1,34 @@
+server {
+    listen 443 ssl; # managed by Certbot
+    server_name pbx.local.drokdev.pro;
+    add_header Referrer-Policy "no-referrer";
+
+    ssl on;
+    ssl_certificate {{dir_ssl_key}}/pbx/cert.pem; 
+    ssl_certificate_key {{dir_ssl_key}}/pbx/key.pem;
+    ssl_prefer_server_ciphers on;
+    ssl_protocols       TLSv1 TLSv1.1 TLSv1.2; #TLSv1.3
+    ssl_ciphers    TLS-CHACHA20-POLY1305-SHA256:TLS-AES-256-GCM-SHA384:TLS-AES-128-GCM-SHA256:HIGH:!aNULL:!MD5;
+
+    location / {
+        proxy_pass http://172.16.36.4:80/;
+        proxy_set_header Host $http_host;
+        proxy_set_header X-Real-IP $remote_addr;
+        proxy_set_header X-Forwarded-For $proxy_add_x_forwarded_for;
+        proxy_set_header X-Forwarded-Proto $scheme;
+        proxy_buffering off;
+    }
+}
+
+
+server {
+    if ($host = pbx.local.drokdev.pro) {
+        return 301 https://$host$request_uri;
+    } # managed by Certbot
+
+
+
+    listen 80;
+    server_name pbx.local.drokdev.pro;
+    return 404; # managed by Certbot
+}

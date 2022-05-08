@@ -1,0 +1,60 @@
+---
+#### Create Directorys ####
+- name: ensure "{{ container_name }}" container files mount point on host
+  tags: mount
+  file:
+    path: "{{docker_exported_container_volumes_basedir}}/{{ item }}"
+    owner: "{{ container_dir_owner }}" ## Make changes according to your needs
+    group: "{{ container_dir_group }}" ## Make changes according to your needs
+    state: directory
+    recurse: yes
+  with_items:
+    - "{{ container_dir_config }}" ## Make changes according to your needs
+    - "{{ container_dir_logs }}" ## Make changes according to your needs
+
+### Install ###
+- name: Docker configurations
+  tags: container
+  import_role:
+    name: docker/docker_run
+
+###### Create
+- name: Get docker group id
+  group:
+    name: docker
+  register: docker_group
+
+
+- name: Template traccar.xml
+  copy:
+    src: traccar.xml
+    owner: "{{ container_dir_owner }}" ## Make changes according to your needs
+    group: "{{ container_dir_group }}" ## Make changes according to your needs
+    dest: "{{docker_exported_container_volumes_basedir}}/conf/traccar.xml"
+
+- name: Traccar Docker Container
+  docker_container:
+    name: traccar
+    hostname: "{{ container_name }}.{{ domain }}"
+    image: traccar/traccar
+    state: started
+    pull: true
+    ports:
+      - "8082:8082"
+      - "5055:5055"
+    volumes:
+      - "{{docker_exported_container_volumes_basedir}}/traccar/logs:/opt/traccar/logs:rw"
+      - "{{docker_exported_container_volumes_basedir}}/traccar/conf/traccar.xml:ro"
+    env:
+      PGID: "{{ docker_group.gid }}"
+    capabilities:
+      - SYS_PTRACE
+    security_opts:
+      - apparmor:unconfined
+    restart_policy: unless-stopped
+    memory: 1g
+    labels:
+      traefik.backend: "traccar"
+      traefik.frontend.rule: "Host:traccar.{{ domain }}"
+      traefik.enable: "{{ available_externally }}"
+      traefik.port: "19999"

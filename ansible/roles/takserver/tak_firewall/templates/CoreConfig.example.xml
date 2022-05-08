@@ -1,0 +1,76 @@
+<Configuration xmlns="http://bbn.com/marti/xml/config">
+    <network multicastTTL="5">
+        <input _name="streamtcp" protocol="stcp" port="8088"/>
+                <!--<Standard TLS Config-->
+        <input _name="stdssl" protocol="tls" port="8089"/>
+                <!--<LDAP TLS Config-->
+        <input auth="ldap" _name="ldapssl" protocol="tls" port="8090"/>
+
+        <connector port="8443" _name="https"/>
+        <connector port="8444" useFederationTruststore="true" _name="fed_https"/>
+        <connector port="8446" clientAuth="false" _name="cert_https"/>
+        <connector port="8080" tls="false" _name="http_plaintext"/>
+        <announce/>
+    </network>
+    <auth x509groups="true" x509addAnonymous="true">
+        <!--LDAP config-->
+        <ldap url="ldap://ipaserver.vanguard.local/" 
+            userstring="uid={username},cn=users,cn=accounts,dc=vanguard,dc=local" 
+            updateinterval="60" 
+            groupprefix="cn=tak_" 
+            style="DS" 
+            ldapSecurityType="simple" 
+            serviceAccountDN="uid=server_tak,cn=users,cn=accounts,dc=vanguard,dc=local" 
+            serviceAccountCredential="atakatak" 
+            groupObjectClass="groups" 
+            groupBaseRDN="cn=takclients"
+            />
+        <!-- Active Directory Config -->
+        <ldap url="ldap://dc1.vanguard.local/dc=vanguard,dc=local" 
+            userstring="VANGUARD\{username}" 
+            updateinterval="60" 
+            groupprefix="cn=tak_" 
+            style="AD" 
+            ldapSecurityType="simple" 
+            serviceAccountDN="cn=server_tak,cn=Users,dc=vanguard,dc=local" 
+            serviceAccountCredential="drokDROK63" 
+            groupObjectClass="group" 
+            groupBaseRDN="cn=tak_"
+            />
+    </auth>
+    <submission ignoreStaleMessages="false" validateXml="false"/>
+    <subscription reloadPersistent="false"/>
+    <repository enable="true" numDbConnections="64" primaryKeyBatchSize="500" insertionBatchSize="500">
+        <connection url="jdbc:postgresql://127.0.0.1:5432/cot" username="martiuser" password="pass4marti"/>
+    </repository>
+    <repeater enable="true" periodMillis="3000" staleDelayMillis="15000">
+        <repeatableType initiate-test="/event/detail/emergency[@type='911 Alert']" cancel-test="/event/detail/emergency[@cancel='true']" _name="911"/>
+        <repeatableType initiate-test="/event/detail/emergency[@type='Ring The Bell']" cancel-test="/event/detail/emergency[@cancel='true']" _name="RingTheBell"/>
+        <repeatableType initiate-test="/event/detail/emergency[@type='Geo-fence Breached']" cancel-test="/event/detail/emergency[@cancel='true']" _name="GeoFenceBreach"/>
+        <repeatableType initiate-test="/event/detail/emergency[@type='Troops In Contact']" cancel-test="/event/detail/emergency[@cancel='true']" _name="TroopsInContact"/>
+    </repeater>
+    <filter>
+        <thumbnail/>
+        <urladd host="http://172.16.1.62:8080"/>
+        <flowtag enable="false" text=""/>
+        <streamingbroker enable="true"/>
+        <scrubber enable="false" action="overwrite"/>
+    </filter>
+    <buffer>
+        <latestSA enable="true"/>
+        <queue>
+            <priority/>
+        </queue>
+    </buffer>
+    <dissemination smartRetry="false"/>
+    <security>
+        <tls keystore="JKS" keystoreFile="certs/files/takserver.jks" keystorePass="atakatak" truststore="JKS" truststoreFile="certs/files/truststore-root.jks" truststorePass="atakatak" context="TLSv1.2" keymanager="SunX509"/>
+    </security>
+    <federation>
+        <federation-server webBaseUrl="https://172.16.1.62:8443/Marti">
+            <tls keystore="JKS" keystoreFile="certs/files/takserver.jks" keystorePass="atakatak" truststore="JKS" truststoreFile="certs/files/fed-truststore.jks" truststorePass="atakatak" keymanager="SunX509"/>
+        </federation-server>
+    </federation>
+    <plugins/>
+    <cluster/>
+</Configuration>

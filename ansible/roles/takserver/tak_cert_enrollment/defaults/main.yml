@@ -1,0 +1,14 @@
+---
+user_webadmin: []
+takclients:
+  groups:
+    admin: []
+    alpha: []
+    bravo: []
+    charlie: []
+    delta: []
+    pf: []
+    rtf: []
+# password_webadmin: atakatak
+# password_takadmin: atakatak
+

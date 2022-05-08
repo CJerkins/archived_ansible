@@ -1,0 +1,44 @@
+---
+## Unique rules template, uncomment and modify as needed ##
+
+# - name: Specific openvpn_NAT input rules
+#   include_tasks: tasks/iptables/input/input_openvpn_NAT.yml
+#   when: (firewall_openvpn_NAT_enable | default(False))
+
+# - name: "Specific server-name" input rules
+#   include_tasks: tasks/iptables/input/input_server-name.yml
+#   when: (firewall_server-name_enable | default(False))
+
+# - name: "Specific server-name" output rules
+#   include_tasks: tasks/iptables/output/output_server-name.yml
+#   when: (firewall_server-name_enable | default(False))
+
+# - name: "Specific server-name" forward rules
+#   include_tasks: tasks/iptables/forward/forward_server-name.yml
+#   when: (firewall_server-name_enable | default(False))
+
+# - name: Specific openvpn_NAT forward rules
+#   include_tasks: tasks/iptables/forward/forward_openvpn_NAT.yml
+#   when: (firewall_openvpn_NAT_enable | default(False))
+
+# - name: "Specific server-name" policy rules
+#   include_tasks: tasks/iptables/policy/policy_server-name.yml
+#   when: (firewall_server-name_enable | default(False))
+
+# - name: "Specific server-name" prerouting rules
+#   include_tasks: tasks/iptables/prerouting/prerouting_server-name.yml
+#   when: (firewall_server-name_enable | default(False))
+
+# - name: "Specific server-name" postrouting rules
+#   include_tasks: tasks/iptables/postrouting/postrouting_server-name.yml
+#   when: (firewall_server-name_enable | default(False))
+
+# - name: Specific openvpn_NAT postrouting rules
+#   include_tasks: tasks/iptables/postrouting/postrouting_openvpn_NAT.yml
+#   when: (firewall_openvpn_NAT_enable | default(False))
+
+
+
+- name: Specific roka fe1 input rules
+  include_tasks: tasks/iptables/roka/roka_fe0.yml
+  when: (firewall_roka_fe0_enable | default(False))

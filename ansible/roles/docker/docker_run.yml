@@ -1,0 +1,22 @@
+---
+- hosts: all
+
+  pre_tasks:
+
+  roles:
+    - role: geerlingguy.docker
+      tags:
+        - docker
+        - skip_ansible_lint
+
+  tasks:
+  - import_tasks: tasks/general.yml
+    tags: general
+
+  - import_tasks: tasks/docker.yml
+    tags: docker
+
+  - import_tasks: tasks/portainer.yml
+    when: (portainer_enabled | default(False))
+    tags: portainer
+

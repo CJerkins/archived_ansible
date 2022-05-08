@@ -1,0 +1,73 @@
+---
+#### Create Directorys ####
+- name: ensure "{{ container_name }}" container files mount point on host
+  tags: mount
+  file:
+    path: "{{docker_exported_container_volumes_basedir}}/{{ item }}"
+    owner: "{{ container_dir_owner }}" ## Make changes according to your needs
+    group: "{{ container_dir_group }}" ## Make changes according to your needs
+    state: directory
+    recurse: yes
+  with_items:
+    - "{{ container_dir_postgresql }}" ## Make changes according to your needs
+    # - "{{ container_dir_mysql }}" ## Make changes according to your needs
+    - "{{ container_dir_upload }}" ## Make changes according to your needs
+    - "{{ container_dir_export }}" ## Make changes according to your needs
+
+### Install ###
+- name: Docker configurations
+  tags: container
+  import_role:
+    name: docker/docker_run
+
+
+###### Create
+- name: Get docker group id
+  group:
+    name: docker
+  register: docker_group
+
+- name: Create postgres container for Firefly
+  docker_container:
+    name: firefly-postgres
+    image: postgres:10
+    pull: true
+    volumes:
+      - "{{docker_exported_container_volumes_basedir}}/postgresql:/var/lib/postgresql/data:rw"
+    env:
+      POSTGRES_PASSWORD: "firefly" 
+      POSTGRES_USER: "firefly"
+    restart_policy: unless-stopped
+    memory: 1g
+
+- name: Wait for postgres to init
+  pause:
+    seconds: 30
+
+- name: Create Firefly III container
+  docker_container:
+    name: firefly
+    image: jc5x/firefly-iii:latest
+    pull: true
+    volumes:
+      - "{{docker_exported_container_volumes_basedir}}/export:/var/www/firefly-iii/storage/export:rw"
+      - "{{docker_exported_container_volumes_basedir}}/upload:/var/www/firefly-iii/storage/upload:rw"
+    links:
+      - firefly-postgres:db
+    ports:
+      - "8066:80"
+    env:
+      APP_ENV: "local"
+      APP_KEY: "S0m3R@nd0mString0f32Ch@rsEx@ct1y"
+      DB_HOST: "db"
+      DB_DATABASE: "firefly"
+      DB_USERNAME: "firefly"
+      DB_PASSWORD: "firefly"
+      TZ: "{{ timezone }}"
+    restart_policy: unless-stopped
+    memory: 1g
+    # labels:
+    #   traefik.backend: "firefly"
+    #   traefik.frontend.rule: "Host:firefly.{{ domain }}"
+    #   traefik.enable: "{{ available_externally }}"
+    #   traefik.port: "8080"

@@ -1,0 +1,151 @@
+# {{ ansible_managed }}
+{% if openvpn_topology  %}
+topology {{openvpn_topology}}
+{% endif %}
+tls-server
+dev-type tun
+dev {{openvpn_ifname_server}}
+{% if openvpn_dualstack %}
+proto {{openvpn_proto}}6
+{% else %}
+proto {{openvpn_proto}}
+{% endif %}
+port {{openvpn_port}}
+{% if openvpn_server_network %}
+server {{openvpn_server_network}} {{openvpn_server_netmask}}
+ifconfig-pool-persist ipp.txt
+{% endif %}
+{% if openvpn_server_address %}
+ifconfig {{openvpn_server_address}} {{openvpn_client_address}}
+mode server
+push "topology p2p"
+{% endif %}
+{% if client_config %}
+client-config-dir ccd
+{% endif %}
+status status-{{ openvpn_server_config_file }}.log
+status-version {{ openvpn_status_version }}
+log-append {{ openvpn_log_dir }}/{{ openvpn_server_log_file }}
+verb {{ openvpn_verbose }}
+keepalive {{ openvpn_keepalive_ping }} {{ openvpn_keepalive_timeout }}
+{% if openvpn_ncp_disable %}
+ncp-disable
+{% endif %}
+cipher {{ openvpn_cipher }}
+{% if openvpn_use_modern_tls %}
+tls-cipher {{ openvpn_tls_cipher }}
+{% endif %}
+{% if openvpn_use_hardened_tls %}
+tls-version-min {{ openvpn_tls_version }}
+{% endif %}
+{% if openvpn_diffi_hellman is sameas false %}
+dh none
+{% endif %}
+auth {{ openvpn_auth_alg | default('SHA256') }}
+{% if openvpn_verify_cn %}
+verify-x509-name {{openvpn_server_name}} name-prefix
+remote-cert-tls client
+{% endif %}
+{% if tls_auth_required %}
+tls-auth {{openvpn_key_dir}}/ta.key 0
+{% endif %}
+{% if openvpn_jails %}
+chroot {{openvpn_server_name}}-jail
+{% endif %}
+persist-key
+persist-tun
+user {{ openvpn_service_user }}
+group {{ openvpn_service_group }}
+{% for option in openvpn_addl_server_options %}
+{{ option }}
+{% endfor %}
+{% if openvpn_push is defined %}
+{% for opt in openvpn_push %}
+push "{{ opt }}"
+{% endfor %}
+{% endif %}
+{% if openvpn_redirect_gateway %}
+push "redirect-gateway def1"
+{% endif %}
+{% if openvpn_set_dns %}
+{% if openvpn_custom_dns %}
+{% for srv in openvpn_dns_servers %}
+push "dhcp-option DNS {{ srv }}"
+{% endfor %}
+{% else %}
+push "dhcp-option DNS 1.0.0.1"
+push "dhcp-option DNS 1.1.1.1"
+push "dhcp-option DNS 8.8.8.8"
+push "dhcp-option DNS 8.8.4.4"
+{% endif %}
+{% endif %}
+{% if openvpn_duplicate_cn %}
+duplicate-cn
+{% endif %}
+{% if openvpn_client_to_client %}
+client-to-client
+{% endif %}
+{% if openvpn_tun_mtu %}
+tun-mtu {{ openvpn_tun_mtu }}
+{% endif %}
+{% if openvpn_use_crl %}
+crl-verify {{openvpn_server_name}}_ca-crl.pem
+{% endif %}
+
+{% if openvpn_use_ldap %}
+### LDAP AUTH ###
+{% if ansible_os_family == 'Debian' %}
+plugin /usr/lib/openvpn/openvpn-auth-ldap.so "{{ openvpn_base_dir }}/auth/ldap.conf"
+{% elif ansible_machine == "x86_64" %}
+plugin /usr/lib64/openvpn/plugin/lib/openvpn-auth-ldap.so "{{ openvpn_base_dir }}/auth/ldap.conf"
+{% else %}
+plugin /usr/lib/openvpn/plugin/lib/openvpn-auth-ldap.so "{{ openvpn_base_dir }}/auth/ldap.conf"
+{% endif %}
+{% if ldap.verify_client_cert is defined %}
+verify-client-cert {{ ldap.verify_client_cert }}
+{% else %}
+client-cert-not-required
+{% endif %}
+{% endif %}
+
+
+
+<ca>
+{{ ca_cert.content|b64decode }}
+</ca>
+
+<cert>
+{{ server_certs.content|b64decode }}
+</cert>
+
+{% if tls_auth_required %}
+<tls-auth>
+{{ tls_key.content|b64decode }}
+</tls-auth>
+{% else %}
+<tls-crypt>
+{{ tls_key.content|b64decode }}
+</tls-crypt>
+{% endif %}
+
+<key>
+{{ server_keys.content|b64decode }}
+</key>
+
+{% if openvpn_diffi_hellman is sameas true %}
+dh {{openvpn_key_dir}}/dh.pem
+{% endif %}
+
+{# ca {{openvpn_key_dir}}/ca.crt
+cert {{openvpn_key_dir}}/server.crt
+{% if tls_auth_required|bool %}
+tls-auth {{openvpn_key_dir}}/ta.key 0
+{% else %}
+tls-crypt {{openvpn_key_dir}}/ta.key
+{% endif %}
+key {{openvpn_key_dir}}/server.key
+{% if openvpn_diffi_hellman is sameas true %}
+dh {{openvpn_key_dir}}/dh.pem
+{% endif %} #}
+
+

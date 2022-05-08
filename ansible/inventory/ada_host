@@ -1,0 +1,6 @@
+[relays]
+relay0			ansible_host=54.198.177.108       ansible_user=debian
+relay1			ansible_host=54.198.177.108       ansible_user=debian
+
+[nodes]
+node0			ansible_host=54.198.177.108       ansible_user=debian

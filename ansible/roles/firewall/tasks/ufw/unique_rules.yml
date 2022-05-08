@@ -1,0 +1,26 @@
+---
+## Unique rules template, uncomment and modify as needed ##
+
+# - name: "Specific server-name" allow rules
+#   include_tasks: tasks/ufw/allow/allow_server-name.yml
+#   when: (firewall_server-name | default(False))
+
+- name: "Specific openvpn_NAT" allow rules
+  include_tasks: tasks/ufw/allow/allow_openvpn_NAT.yml
+  when: (firewall_openvpn_NAT | default(False))
+
+- name: "Specific NAT" allow rules
+  include_tasks: tasks/ufw/allow/allow_NAT.yml
+  when: (firewall_NAT | default(False))
+
+# - name: "Specific server-name" deny rules
+#   include_tasks: tasks/ufw/deny/deny_server-name.yml
+#   when: (firewall_server-name | default(False))
+
+# - name: "Specific server-name" limit rules
+#   include_tasks: tasks/ufw/limit/limit_server-name.yml
+#   when: (firewall_server-name | default(False))
+
+# - name: "Specific server-name" reject rules
+#   include_tasks: tasks/ufw/reject/reject_server-name.yml
+#   when: (firewall_server-name | default(False))

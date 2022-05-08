@@ -1,0 +1,65 @@
+<!-- Managed by ansible -->
+<?xml version="1.0" encoding="UTF-8"?>
+
+<!--
+    This file stores bootstrap properties needed by Openfire.
+    Property names must be in the format: "prop.name.is.blah=value"
+    That will be stored as:
+        <prop>
+            <name>
+                <is>
+                    <blah>value</blah>
+                </is>
+            </name>
+        </prop>
+
+    Most properties are stored in the Openfire database. A
+    property viewer and editor is included in the admin console.
+-->
+<!-- root element, all properties must be under this element -->
+<jive>
+  <adminConsole>
+    <!-- Disable either port by setting the value to -1 -->
+    <port>9090</port>
+    <securePort>9091</securePort>
+  </adminConsole>
+  <locale>en</locale>
+  <!-- Network settings. By default, Openfire will bind to all network interfaces.
+      Alternatively, you can specify a specific network interfaces that the server
+      will listen on. For example, 127.0.0.1. This setting is generally only useful
+       on multi-homed servers. -->
+  <!--
+    <network>
+        <interface></interface>
+    </network>
+    -->
+  <!--
+        One time token to gain temporary access to the admin console.
+    -->
+  <!--
+    <oneTimeAccessToken>secretToken</oneTimeAccessToken>
+    -->
+  <connectionProvider>
+    <className>org.jivesoftware.database.EmbeddedConnectionProvider</className>
+  </connectionProvider>
+  <database>
+    <defaultProvider>
+      <driver>com.mysql.cj.jdbc.Driver</driver>
+      <serverURL>jdbc:mysql://127.0.0.1:3306/DATABASENAME?rewriteBatchedStatements=true&amp;characterEncoding=UTF-8&amp;characterSetResults=UTF-8</serverURL>
+      <username encrypted="true">05b6a76a265a99fcb2078965b29ff9e01442d33eac6d0829880dd557c26567b4</username>
+      <password encrypted="true">18cfaaa5873457efcffde3965afd82ef</password>
+      <testSQL>select 1</testSQL>
+      <testBeforeUse>false</testBeforeUse>
+      <testAfterUse>false</testAfterUse>
+      <testTimeout>500</testTimeout>
+      <timeBetweenEvictionRuns>30000</timeBetweenEvictionRuns>
+      <minIdleTime>900000</minIdleTime>
+      <maxWaitTime>500</maxWaitTime>
+      <minConnections>5</minConnections>
+      <maxConnections>25</maxConnections>
+      <connectionTimeout>1.0</connectionTimeout>
+    </defaultProvider>
+  </database>
+  <setup>true</setup>
+  <fqdn>openfire.vanguard.local</fqdn>
+</jive>

@@ -1,0 +1,13 @@
+---
+## -- Remove hosts and DNS record -- ##
+- hosts: ipaserver
+  gather_facts: yes
+  # vars:
+  #     action: remove
+  #     hostname: server
+  #     zone_name: vanguard.local
+  #     record_type: 'A'
+  #     record_value: '172.16.1.56'
+  roles:
+  - role: hosts
+    # state: absent

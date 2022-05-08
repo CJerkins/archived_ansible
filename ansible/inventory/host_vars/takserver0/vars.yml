@@ -1,0 +1,63 @@
+---
+tak_version: 1.3.12-RELEASE6
+postgres_package: pgdg-redhat-repo-latest
+additional_packages: 
+  - vim
+  - htop
+firewall_ports:
+  # - '8087/tcp'
+  # - '8087/udp'
+  - '8089/tcp'
+  - '8090/tcp'
+  # - '8080/tcp'
+  - '8443/tcp'
+  # - '5432/tcp'
+  # - '8446/tcp'
+  # - '8444/tcp'
+  - '387/tcp'
+  - '636/tcp'
+## -- CoreConfig.xml -- ##
+# Inputs
+input_tcp_port: 8087
+input_udp_port: 8087
+# input_stcp_port: 8088
+input_tls_port: 8089
+input_ldap_port: 8090
+# input_ad_port: 8091
+input_https_port: 8443
+input_federation_port: 8444
+input_clientauth_port: 8446
+input_http_port: 8080
+# input_custom:
+#   # - {auth: ldap, name: stdssl, protocol: tls, port: 8092}
+  # - {name: stdssl, protocol: tls, port: 8092}
+
+# LDAP Config
+ldap_server_url: ldap://ipaserver0.local.drokdev.pro/
+ldap_userstring: uid={username},cn=users,cn=accounts,dc=local,dc=drokdev,dc=pro
+ldap_update_interval: 60
+ldap_group_prefix: cn=tak_
+ldap_security_type: simple
+ldap_account_domain: uid=server_tak,cn=users,cn=accounts,dc=local,dc=drokdev,dc=pro
+# ldap_account_password: Paddle#Tibia1#Thirsty
+# ldap_group_class: groups
+ldap_group_basedn: memberof=cn=tak_users,cn=groups,cn=accounts,dc=local,dc=drokdev,dc=pro
+
+## -- cert vars -- ##
+dir_takserver_key: /opt/tak/certs/files
+dir_cert_creation: /tmp/takcerts
+dir_local: /Users/drok/Desktop/tak_certs/
+name_country: US
+name_state: NC
+name_city: Southern Pines
+name_company: drokdev
+name_unit: family
+# name_common: CN=takserver
+
+## -- CA vars -- ##
+name_ca: takTT # "Please give a name for your CA (no spaces).  It should be unique.  If you don't enter anything, or try something under 5 characters
+password_ca: Padd#Tibi
+# 
+## -- server and client certs vars -- ##
+name_takserver: takserver
+

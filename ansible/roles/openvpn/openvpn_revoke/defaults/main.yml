@@ -1,0 +1,2 @@
+---
+openvpn_revoke_these_certs: [] ## place the list of the clients that were created here

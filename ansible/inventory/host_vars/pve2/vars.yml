@@ -1,0 +1,6 @@
+---
+# --- Informasi Proxmox --- #
+node        : pve2
+api_user    : root@pam
+api_password: api_password
+api_host    : pve2 # this is not pve2.vanguard.local

@@ -1,0 +1,175 @@
+apiVersion: v1
+kind: Pod
+metadata:
+  labels:
+    app: {{ pod_label }}
+  name: {{ pod_name }}
+spec:
+  #
+  # define exported volumes for permanent data
+  #
+  volumes:
+  - name: data-volume
+    hostPath:
+      path: {{podman_exported_container_volumes_basedir}}/{{ container_dir_example }}
+      type: Directory
+  - name: db-volume
+    hostPath:
+      path: {{podman_exported_container_volumes_basedir}}/{{ container_dir_example }}
+      type: Directory
+
+
+  #### example container outline  ####    
+  containers:
+  #
+  # postgres container
+  #
+  - command:
+    - docker-entrypoint.sh
+    - postgres
+    env:
+    - name: PATH
+      value: /usr/local/sbin:/usr/local/bin:/usr/sbin:/usr/bin:/sbin:/bin:/usr/lib/postgresql/{{ pod_postgres_version }}/bin
+    - name: POSTGRES_USER
+      value: {{ pod_postgres_user }}
+    - name: POSTGRES_DB
+      value: exmaple
+    - name: PGDATA
+      value: /var/lib/postgresql/data/pgdata
+    - name: POSTGRES_PASSWORD
+      value: {{ pod_postgres_password }}
+    image: docker.io/library/postgres:{{ pod_postgres_version }}
+    name: postgres
+    volumeMounts:
+    - mountPath: /var/lib/postgresql/data/pgdata:z
+      name: db-volume
+  #
+  # memcached container
+  #
+  - command:
+    - docker-entrypoint.sh
+    - memcached
+    env:
+    image: docker.io/library/memcached:alpine
+    name: memcached
+  #
+  # awx-web container
+  #
+  - command:
+    - /tini
+    - --
+    - /bin/sh
+    - -c
+    - /usr/bin/launch_awx.sh
+    env:
+    - name: AWX_ADMIN_USER
+      value: {{ awx_admin_user }}
+    - name: AWX_ADMIN_PASSWORD
+      value: {{ awx_admin_password }}
+    - name: HOSTNAME
+      value: awxweb
+    - name: DATABASE_NAME
+      value: awx
+    - name: DATABASE_USER
+      value: {{ pod_postgres_user }}
+    - name: DATABASE_PASSWORD
+      value: {{ pod_postgres_password }}
+    - name: DATABASE_PORT
+      value: "5432"
+    - name: DATABASE_HOST
+      value: 127.0.0.1
+    - name: RABBITMQ_HOST
+      value: 127.0.0.1
+    - name: RABBITMQ_VHOST
+      value: awx
+    - name: RABBITMQ_USER
+      value: {{ pod_rabbitmq_user }}
+    - name: RABBITMQ_PASSWORD
+      value: {{ pod_rabbitmq_password }}
+    - name: SECRET_KEY
+      value: {{ pod_rabbitmq_secret_key }}
+    - name: RABBITMQ_PORT
+      value: "5672"
+    - name: MEMCACHED_HOST
+      value: 127.0.0.1
+    - name: MEMCACHED_PORT
+      value: "11211"
+    image: docker.io/ansible/awx_web:{{ awx_awxweb_version }}
+    name: awxweb
+    workingDir: /var/lib/awx
+    volumeMounts:
+    - mountPath: /var/lib/awx/projects:z
+      name: awx-data-volume
+    ports:
+      - containerPort: 8052
+        hostPort: 8052
+        protocol: TCP
+  #
+  # awx-task container
+  #
+  - command:
+    - /tini
+    - --
+    - /bin/sh
+    - -c
+    - /usr/bin/launch_awx_task.sh
+    env:
+    - name: AWX_ADMIN_USER
+      value: {{ awx_admin_user }}
+    - name: AWX_ADMIN_PASSWORD
+      value: {{ awx_admin_password }}
+    - name: HOSTNAME
+      value: awx
+    - name: DATABASE_NAME
+      value: awx
+    - name: DATABASE_USER
+      value: {{ pod_postgres_user }}
+    - name: DATABASE_PASSWORD
+      value: {{ pod_postgres_password }}
+    - name: DATABASE_PORT
+      value: "5432"
+    - name: DATABASE_HOST
+      value: 127.0.0.1
+    - name: RABBITMQ_HOST
+      value: 127.0.0.1
+    - name: RABBITMQ_VHOST
+      value: awx
+    - name: RABBITMQ_USER
+      value: {{ pod_rabbitmq_user }}
+    - name: RABBITMQ_PASSWORD
+      value: {{ pod_rabbitmq_password }}
+    - name: SECRET_KEY
+      value: {{ pod_rabbitmq_secret_key }}
+    - name: RABBITMQ_PORT
+      value: "5672"
+    - name: MEMCACHED_HOST
+      value: 127.0.0.1
+    - name: MEMCACHED_PORT
+      value: "11211"
+    image: docker.io/ansible/awx_task:{{ awx_awxtask_version }}
+    name: awxtask
+    workingDir: /var/lib/awx
+    volumeMounts:
+    - mountPath: /var/lib/awx/projects:z
+      name: awx-data-volume
+  #
+  # rabbitmq container
+  #
+  - command:
+    - docker-entrypoint.sh
+    - /bin/sh
+    - -c
+    - /launch.sh
+    env:
+    - name: PATH
+      value: /opt/rabbitmq/sbin:/usr/local/sbin:/usr/local/bin:/usr/sbin:/usr/bin:/sbin:/bin
+    - name: RABBITMQ_DEFAULT_VHOST
+      value: awx
+    - name: RABBITMQ_ERLANG_COOKIE
+      value: {{ podf_rabbitmq_erlang_cookie }}
+    - name: RABBITMQ_DEFAULT_USER
+      value: {{ pod_rabbitmq_user }}
+    - name: RABBITMQ_DEFAULT_PASS
+      value: {{ pod_rabbitmq_password }}
+    image: docker.io/ansible/awx_rabbitmq:{{ pod_rabbitmq_version }}
+    name: rabbitmq

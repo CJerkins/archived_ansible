@@ -1,0 +1,158 @@
+- name: Change facts to use netfilter-persistent on Debian >= 9 or Ubuntu >= 16
+  set_fact:
+    iptables_save_command: "/usr/sbin/netfilter-persistent save"
+    iptables_service: netfilter-persistent
+  when: (ansible_distribution == 'Debian' and ansible_distribution_version|int >= 9) or (ansible_distribution == 'Ubuntu' and ansible_lsb.major_release|int >= 16)
+
+- name: Install iptables-persistent (Debian/Ubuntu)
+  apt:
+    name: iptables-persistent
+    state: present
+  register: __iptables_installed
+  when: ansible_os_family == "Debian"
+
+- name: Install iptables-services (RedHat/CentOS)
+  package:
+    name: iptables-services
+    state: present
+  register: __iptables_installed
+  when: ansible_os_family == "RedHat"
+
+- name: Set the policy for the filter table chain to ACCEPT
+  iptables:
+    chain: "{{ item }}"
+    policy: ACCEPT
+  with_items:  [ 'INPUT', 'FORWARD', 'OUTPUT' ]
+
+- name: iptables flush all
+  iptables:
+    chain: "{{ item }}"
+    flush: yes
+  with_items:  [ 'INPUT', 'FORWARD', 'OUTPUT' ]
+
+## -- Common to all -- ##
+## -- Input rules -- ##
+- name: Allow related and established connections
+  iptables:
+    chain: INPUT
+    ctstate: ESTABLISHED,RELATED
+    jump: ACCEPT
+
+- name: Drop invalid connections
+  iptables:
+    chain: INPUT
+    ctstate: INVALID
+    jump: DROP
+
+- name: Accept connections to lo
+  iptables:
+    chain: INPUT
+    in_interface: lo
+    jump: ACCEPT
+
+- name: Accept icmp
+  iptables:
+    chain: INPUT
+    protocol: icmp
+    jump: ACCEPT
+  when:
+    - iptables_allow_ping
+
+- name: iptables - Allow incoming SSH connection
+  iptables:
+    chain: INPUT
+    protocol: tcp
+    destination_port: "{{ ansible_port | default(22) }}"
+    ctstate: NEW
+    jump: ACCEPT
+    action: insert
+    comment: "Allow incoming SSH connection"
+
+## -- Common to all -- ##
+## -- Output rules -- ##
+- name: Allow related and established connections
+  iptables:
+    chain: OUTPUT
+    ctstate: ESTABLISHED,RELATED
+    jump: ACCEPT
+
+- name: Drop invalid connections
+  iptables:
+    chain: OUTPUT
+    ctstate: INVALID
+    jump: DROP
+
+- name: Accept connections to lo
+  iptables:
+    chain: OUTPUT
+    out_interface: lo
+    jump: ACCEPT
+
+- name: Accept icmp
+  iptables:
+    chain: OUTPUT
+    protocol: icmp
+    jump: ACCEPT
+  when:
+    - iptables_allow_ping
+
+## -- Common to all -- ##
+
+
+## -- Common to all -- ##
+## -- Forwarding rules -- ##
+- name: Allow related and established connections
+  iptables:
+    chain: FORWARD
+    ctstate: ESTABLISHED,RELATED
+    jump: ACCEPT
+
+- name: Drop invalid connections
+  iptables:
+    chain: FORWARD
+    ctstate: INVALID
+    jump: DROP
+
+- name: Accept icmp
+  iptables:
+    chain: FORWARD
+    protocol: icmp
+    jump: ACCEPT
+  when:
+    - iptables_allow_ping
+
+- name: unique iptables rule sets (See README in unique rule folders for more inforation how to configure)
+  include_tasks: tasks/iptables/unique_rules.yml
+
+## -- Common to all -- ##
+## -- Input rules -- ##
+- name: Input log
+  iptables:
+    chain: INPUT
+    jump: LOG
+    log_prefix: "iptables input dropped: "
+
+## -- Output rules -- ##
+- name: Output log
+  iptables:
+    chain: OUTPUT
+    jump: LOG
+    log_prefix: "iptables output dropped: "
+
+## -- Forwarding rules -- ##
+- name: Forward log
+  iptables:
+    chain: FORWARD
+    jump: LOG
+    log_prefix: "iptables Forward dropped: "
+
+- name: Save existing iptables rule before start iptables service
+  shell: "{{ iptables_save_command }}"
+  when: __iptables_installed.changed
+
+- name: Enable iptables
+  service:
+    name: iptables
+    enabled: true
+    state: started
+  notify: "save iptables"

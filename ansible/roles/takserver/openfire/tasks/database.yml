@@ -1,0 +1,67 @@
+---
+###Installing packages###
+- name: Install postgresql
+  yum:
+    name:
+      - postgresql
+      - postgresql-server
+      - postgresql-devel
+      - postgresql-libs
+      - python-psycopg2
+  when: ansible_distribution == 'CentOS'
+
+   
+# - name: Install mariadb-server
+#   apt:
+#     name: mariadb-server
+#   when: ansible_distribution == 'Ubuntu'
+
+# - name: Install additional packages
+#   yum:
+#     name: "{{ item }}"
+#   with_items:
+#     - "{{ init_setup_additional_packages }}"
+#   when: ansible_distribution == 'Ubuntu'
+- name: Check that the database exists
+  stat:
+    path: /var/lib/pgsql/data
+  register: database
+
+- name: Ensure PostgreSQL database is initialized.
+  command: postgresql-setup initdb
+  when: database.stat.exists == False
+
+- name: Enable and start postgresql
+  systemd:
+    name: postgresql
+    state: started
+    enabled: yes
+
+- name: Create PostgreSQL database.
+  postgresql_db:
+    name: openfire
+  become: yes
+  become_user: postgres
+
+- name: Create openfire user
+  postgresql_user:
+    db: openfire
+    name: openfire
+    password: Modified#Cozy#Sterilize3
+  become: yes
+  become_user: postgres
+
+- name: Setup password for administration postgres user by the following command
+  command: psql -U postgres -d postgres -c "ALTER USER postgres WITH PASSWORD 'Modified#Cozy#Sterilize3';"
+  become: yes
+  become_user: postgres
+  
+- name: Configure host based authentication (if entries are configured).
+  template:
+    src: "pg_hba.conf.j2"
+    dest: /var/lib/pgsql/data/pg_hba.conf
+    owner: postgres
+    group: postgres
+    mode: 0600
+  notify: restart postgresql
+

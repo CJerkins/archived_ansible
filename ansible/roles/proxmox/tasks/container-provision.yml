@@ -1,0 +1,45 @@
+---
+# Task file for Container
+
+- name: Download OS Template
+  get_url:
+    url: "http://download.proxmox.com/images/system/{{ OS_Template }}"
+    dest: "/var/lib/vz/template/cache/{{ OS_Template }}"
+
+- name: Create CT
+  proxmox:
+    vmid: "{{ ctid | default(omit) }}"
+    node: "{{ node }}"
+    api_user: "{{ api_user }}"
+    api_password: "{{ api_password }}"
+    api_host: "{{ api_host }}"
+    hostname: "{{ cthostname | default(omit) }}"
+    password: "{{ ctpassword | default(omit) }}"
+    searchdomain: "{{ searchdomain | default(omit) }}"
+    nameserver: "{{ ctnameserver | default(omit) }}"
+    cores: "{{ ctcores }}"
+    swap: "{{ ctswap }}"
+    memory: "{{ ctmemory }}"
+    disk: "{{ ctdisk }}"
+    storage: "{{ ctstorage }}"
+    # netif: "{{ ctnetif | default(omit) }}"
+    netif: '{"net0":"name=eth0,ip={{ ctip | default(omit) }},gw={{ ctgw | default(omit) }},bridge={{ ctbridge }}"}'
+    ostemplate: 'local:vztmpl/{{ OS_Template }}'
+    state: present
+
+    mounts: "{{ ctmounts | default(omit) }}"
+    unprivileged: "{{ ctunprivileged | default(omit) }}"
+    pubkey: "{{ ctpubkey | default(omit) }}"
+    onboot: "{{ ctonboot | default(omit) }}"
+
+
+- name: Start CT
+  proxmox:
+    vmid: "{{ ctid }}"
+    node: "{{ node }}"
+    api_user: "{{ api_user }}"
+    api_password: "{{ api_password }}"
+    api_host: "{{ api_host }}"
+    state: started
+    timeout: 90
+  when: ctid

@@ -1,0 +1,8 @@
+---
+- name: http install
+  hosts: https_centos
+  become: yes
+  become_user: root
+  # vars:
+  roles:
+    - apache

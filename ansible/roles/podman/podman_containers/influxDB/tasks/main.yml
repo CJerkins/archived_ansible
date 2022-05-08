@@ -1,0 +1,52 @@
+---
+- name: ensure "{{ container_name }}" container files mount point on host
+  tags: mount
+  file:
+    path: "{{podman_exported_container_volumes_basedir}}/{{ item }}"
+    owner: "{{ container_dir_owner }}" ## Make changes according to your needs
+    group: "{{ container_dir_group }}" ## Make changes according to your needs
+    state: directory
+    recurse: yes
+  with_items:
+    - "{{ container_dir_config }}" ## Make changes according to your needs
+    - "{{ container_dir_db }}" ## Make changes according to your needs
+
+- name: Template influxdb.conf
+  copy:
+    src: influxdb.conf
+    owner: "{{ container_dir_owner }}" ## Make changes according to your needs
+    group: "{{ container_dir_group }}" ## Make changes according to your needs
+    dest: "{{podman_exported_container_volumes_basedir}}/{{ container_dir_config }}/influxdb.conf"
+
+- name: ensure "{{ container_name }}" container state
+  tags: container
+  import_role:
+    name: podman_container_systemd
+
+- name: stoping single container if it exists
+  command: "podman stop {{ container_name }}"
+  when: container_image is defined
+
+# - name: create a default config file
+#   command: podman run --rm influxdb influxd config > config/influxdb.conf
+#   when: container_image is defined
+
+- name: intialize database
+  command: "podman run --name influxdb_initializeddb {{ container_db_args }} {{ container_image }} /init-influxdb.sh"
+
+- name: stoping influxdb_initializeddb
+  command: podman stop influxdb_initializeddb
+
+- name: removing influxdb_initializeddb
+  command: podman rm influxdb_initializeddb
+
+- name: starting single container if it exists
+  command: "podman start {{ container_name }}"
+
+- debug:
+    msg: "container is running"
+  when: pull_status_finial == "running"
+
+- debug:
+    msg: "container is running"
+  when: pull_status_finial != "running"

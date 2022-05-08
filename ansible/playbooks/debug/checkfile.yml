@@ -1,0 +1,28 @@
+---
+- hosts: takserver
+  gather_facts: yes
+  become: yes
+  vars:
+    ipaddress: "{{ ansible_host }}"
+      # "{{ hostvars[inventory_hostname]['ansible_default_ipv4']['address'] }}"
+  tasks:
+    #- debug:
+    #    msg: "{{ inventory_hostname }}"
+    #- debug:
+    #    msg: "{{ hostvars[item]['ansible_default_ipv4']['address'] }} {{ inventory_hostname }} {{ inventory_hostname_short }} "
+    #  when: hostvars[item].ansible_default_ipv4.address is defined
+    #  with_items: "{{ inventory_hostname }}"
+    #
+    - name: "DEBUG HOSTVARS"
+      debug:
+        msg: "{{ ipaddress }}"
+
+    - name: Check that the somefile.conf exists
+      stat:
+        path: /var/lib/pgsql/10/data
+      register: database
+
+    - name: run db-utility script
+      debug:
+        msg: File doesn't exists
+      when: database.stat.exists == False

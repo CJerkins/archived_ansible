@@ -1,0 +1,23 @@
+---
+###Set Hostname from host setup in ansible host
+- name: Set the timezone for the server to be UTC
+  command: file state=link /usr/share/zoneinfo/UTC /etc/localtime
+
+- name: Set up a unique hostname
+  hostname: name="{{ inventory_hostname }}.{{ domain }}"
+
+- name: Add the server's domain to the hosts file
+  lineinfile: dest=/etc/hosts
+              regexp='.*{{ inventory_hostname }}.{{ domain }}$'
+              line='{{ hostvars[inventory_hostname]['ansible_default_ipv4']['address'] }} {{ inventory_hostname }}.{{ domain }} {{ inventory_hostname_short }}'
+              state=present
+  when: hostvars[inventory_hostname].ansible_default_ipv4.address is defined
+  #with_items: '{{ inventory_hostname }}'
+
+
+  
+- name: "Configure resolv.conf"
+  template:
+    src: "resolv.conf.j2"
+    dest: "/etc/resolv.conf"
+    mode: "0644"

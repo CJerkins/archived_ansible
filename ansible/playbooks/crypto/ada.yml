@@ -1,0 +1,10 @@
+---
+- hosts: nodes
+  become: yes
+  gather_facts: yes
+  tags: 
+    - harden
+    - install
+    - config
+  roles:
+    - role: cardano

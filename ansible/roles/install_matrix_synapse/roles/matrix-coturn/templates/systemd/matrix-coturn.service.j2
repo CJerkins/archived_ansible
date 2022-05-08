@@ -1,0 +1,47 @@
+[Unit]
+Description=Matrix Coturn server
+{% for service in matrix_coturn_systemd_required_services_list %}
+Requires={{ service }}
+After={{ service }}
+{% endfor %}
+
+[Service]
+Type=simple
+ExecStartPre=-/usr/bin/docker kill matrix-coturn
+ExecStartPre=-/usr/bin/docker rm matrix-coturn
+
+ExecStart=/usr/bin/docker run --rm --name matrix-coturn \
+			--log-driver=none \
+			--user={{ matrix_user_uid }}:{{ matrix_user_gid }} \
+			--cap-drop=ALL \
+			--entrypoint=turnserver \
+			--read-only \
+			--tmpfs=/var/tmp:rw,noexec,nosuid,size=100m \
+			--network={{ matrix_coturn_docker_network }} \
+			-p 3478:3478 \
+			-p 3478:3478/udp \
+			-p 5349:5349 \
+			-p 5349:5349/udp \
+			-p {{ matrix_coturn_turn_udp_min_port }}-{{ matrix_coturn_turn_udp_max_port }}:{{ matrix_coturn_turn_udp_min_port }}-{{ matrix_coturn_turn_udp_max_port }}/udp \
+			-v {{ matrix_coturn_config_path }}:/turnserver.conf:ro \
+			{% for volume in matrix_coturn_container_additional_volumes %}
+			-v {{ volume.src }}:{{ volume.dst }}:{{ volume.options }} \
+			{% endfor %}
+			{% for arg in matrix_coturn_container_extra_arguments %}
+			{{ arg }} \
+			{% endfor %}
+			{{ matrix_coturn_docker_image }} \
+			-c /turnserver.conf
+
+ExecStop=-/usr/bin/docker kill matrix-coturn
+ExecStop=-/usr/bin/docker rm matrix-coturn
+
+# This only reloads certificates (not other configuration).
+# See: https://github.com/coturn/coturn/pull/236
+ExecReload=/usr/bin/docker exec matrix-coturn kill -USR2 1
+
+Restart=always
+RestartSec=30
+
+[Install]
+WantedBy=multi-user.target

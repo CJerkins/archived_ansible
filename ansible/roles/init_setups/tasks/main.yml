@@ -1,0 +1,71 @@
+---
+- name: Setup resolve.conf DNS
+  import_tasks: dns.yml
+  when: init_setup_dns_setup
+  tags:
+    - setup-all
+    - dns-setup
+
+- name: Update OS
+  import_tasks: update.yml
+  tags:
+    - setup-all
+    - update
+
+- name: Install common packages
+  import_tasks: common-packages.yml
+  tags:
+    - setup-all
+    - update
+
+- name: Modfiy hostname
+  import_tasks: hostname.yml
+  tags:
+    - setup-all
+    - hostname
+
+- name: add motd
+  import_tasks: motd.yml
+  tags:
+    - setup-all
+    - motd
+  when: init_setup_use_motd
+
+- name: Add ipaclients
+  import_tasks: ipa-clients.yml
+  when: init_setup_use_ldap
+  tags:
+    - ldap
+
+- name: Add users
+  import_tasks: users.yml
+  when: init_setup_use_pam
+  tags:
+    - pam
+
+- name: ssh-copy-id
+  import_tasks: ssh-copy-id.yml
+  when: 
+    - init_setup_admin_users is defined
+  tags:
+    - setup-all
+    - ssh-copy-id
+
+- name: sshd config # may cause a disconnect
+  import_tasks: sshd_config.yml
+  tags:
+    - setup-all
+    - sshd
+
+- name: Logging config
+  import_tasks: logging.yml
+  tags:
+    - setup-all
+    - log-setup
+  when: init_setup_use_log
+
+# - name: Reboot servers
+#   import_tasks: reboot.yml
+#   tags:
+#     - setup-all
+#     - update

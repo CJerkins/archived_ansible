@@ -1,0 +1,18 @@
+---
+- name: ensure "{{ container_name }}" container files mount point on host
+  tags: mount
+  file:
+    path: "{{podman_exported_container_volumes_basedir}}/{{ item }}"
+    owner: "{{ container_dir_owner }}" ## Make changes according to your needs
+    group: "{{ container_dir_group }}" ## Make changes according to your needs
+    state: directory
+    recurse: yes
+  with_items:
+    # - "{{ container_dir_config }}" ## Make changes according to your needs
+    - "{{ container_dir_data }}" ## Make changes according to your needs
+
+- name: ensure "{{ container_name }}" container state
+  tags: container
+  import_role:
+    name: podman_container_systemd
+

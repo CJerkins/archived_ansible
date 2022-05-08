@@ -1,0 +1,21 @@
+---
+- name: Playbook to handle hosts
+  hosts: ipaserver
+  # become: yes
+
+  tasks:
+  - name: Ensure host is present
+    ipa_host:
+      name: host02.vanguard.local
+      description: Example host
+      ip_address: 172.16.1.102
+      ns_host_location: Lab
+      ns_os_version: CentOS 7
+      ns_hardware_platform: Lenovo T61
+      mac_address:
+      - "08:00:27:E3:B1:2D"
+      - "52:54:00:BD:97:1E"
+      state: present
+      ipa_host: ipaserver.vanguard.local
+      ipa_user: admin
+      ipa_pass: drokDROK63

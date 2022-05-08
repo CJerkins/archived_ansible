@@ -1,0 +1,17 @@
+---
+- name: ensure "{{ container_name }}" container files mount point on host
+  tags: mount
+  file:
+    path: "{{podman_exported_container_volumes_basedir}}/{{ item }}"
+    state: directory
+    owner: "{{ container_dir_owner }}"
+    group: "{{ container_dir_group }}"
+    recurse: yes
+  with_items:
+    - "{{ container_dir_config }}"
+    - "{{ container_dir_ssl }}"
+
+- name: ensure "{{ container_name }}" container state
+  tags: container
+  import_role:
+    name: podman_container_systemd

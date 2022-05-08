@@ -1,0 +1,43 @@
+---
+## -- hosts tasks -- ##
+- name: Add Hosts
+  import_tasks: add_hosts.yml
+  when: 
+    - freeipa_action|default(omit) == 'add'
+    - freeipa_task|default(omit) == 'hosts'
+  # when: 
+  #   - state|default(omit) == 'present'
+  tags:
+    - hosts
+
+- name: Remove Hosts
+  import_tasks: remove_hosts.yml
+  when: 
+    - freeipa_action|default(omit) == 'remove'
+    - freeipa_task|default(omit) == 'hosts'
+  # when: 
+  #   - state|default(omit) == 'absent'
+  tags:
+    - hosts
+
+
+## -- user tasks -- ##
+- name: Add Users
+  import_tasks: add_users.yml
+  when: 
+    - freeipa_action|default(omit) == 'add'
+    - freeipa_task|default(omit) == 'users'
+  # when: 
+  #   - state|default(omit) == 'present'
+  tags:
+    - users
+
+- name: Remove Users
+  import_tasks: remove_users.yml
+  when: 
+    - freeipa_action|default(omit) == 'remove'
+    - freeipa_task|default(omit) == 'users'
+  # when: 
+  #   - state|default(omit) == 'absent'
+  tags:
+    - users

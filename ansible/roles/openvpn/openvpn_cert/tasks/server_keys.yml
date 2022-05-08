@@ -1,0 +1,241 @@
+## Create certs ##
+- name: Copy openssl server/ca extensions
+  copy:
+    src: "{{item}}"
+    dest: "{{openvpn_key_dir}}"
+    owner: root
+    group: root
+    mode: 0400
+  with_items:
+    - openssl-server.ext
+    - openssl-ca.ext
+
+- name: Generate CA key
+  command: openssl req -nodes -newkey rsa:{{openvpn_rsa_bits}} -keyout ca-key.pem -out ca-csr.pem -days 3650 -subj /CN=OpenVPN-CA-{{inventory_hostname[:53]}}/
+  args:
+    chdir: "{{openvpn_key_dir}}"
+    creates: ca-key.pem
+  when: openvpn_ca_key is not defined
+
+- name: Protect CA key
+  file:
+    path: "{{openvpn_key_dir}}/ca-key.pem"
+    mode: 0400
+  when: openvpn_ca_key is not defined
+
+- name: Sign CA key
+  command: openssl x509 -req -in ca-csr.pem -out ca.crt -CAcreateserial -signkey ca-key.pem -sha256 -days 3650 -extfile openssl-ca.ext
+  args:
+    chdir: "{{openvpn_key_dir}}"
+    creates: ca.crt
+  when: openvpn_ca_key is not defined
+
+- name: generate server key
+  command: openssl req -nodes -newkey rsa:{{openvpn_rsa_bits}} -keyout {{openvpn_server_config_file}}.key -out {{openvpn_server_config_file}}.csr -days 3650 -subj /CN={{openvpn_server_config_file}}/
+  args:
+    chdir: "{{openvpn_key_dir}}"
+    creates: "{{openvpn_server_config_file}}.key"
+
+- name: protect {{openvpn_server_config_file}} key
+  file:
+    path: "{{openvpn_key_dir}}/{{openvpn_server_config_file}}.key"
+    mode: 0400
+
+- name: sign server key
+  command: openssl x509 -req -in {{openvpn_server_config_file}}.csr -out {{openvpn_server_config_file}}.crt -CA ca.crt -CAkey ca-key.pem -sha256 -days 3650 -CAcreateserial -extfile openssl-server.ext
+  args:
+    chdir: "{{openvpn_key_dir}}"
+    creates: "{{openvpn_server_config_file}}.crt"
+
+- name: generate tls key
+  command: openvpn --genkey --secret {{openvpn_server_name}}-ta.key
+  args:
+    chdir: "{{openvpn_key_dir}}"
+    creates: "{{openvpn_server_name}}-ta.key"
+  when: openvpn_tls_auth_key is not defined
+
+
+# Alternatively, if you're concerned about logjam attacks
+# - name: generate dh params
+#   command: openssl dhparam -out {{openvpn_key_dir}}/{{openvpn_server_name}}-dh.pem {{openvpn_rsa_bits}}
+#   args:
+#     chdir: "{{openvpn_key_dir}}"
+#     creates: "{{openvpn_server_name}}-dh.pem"
+#   when: not (openvpn_use_pregenerated_dh_params|bool)
+
+- name: install ca.conf config file
+  template:
+    src: ca.conf.j2
+    dest: "{{openvpn_key_dir}}/ca.conf"
+    owner: root
+    group: root
+    mode: 744
+
+- name: install ca.conf config file
+  template:
+    src: ca.conf.j2
+    dest: "{{openvpn_key_dir}}/configs/server/ca.conf"
+    owner: root
+    group: root
+    mode: 744
+
+- name: create initial certificate revocation list squence number
+  shell: "echo 00 > {{openvpn_server_name}}_crl_number"
+  args:
+    chdir: "{{openvpn_key_dir}}/configs/server"
+    creates: "crl_number"
+  when: openvpn_use_crl
+
+- name: install revocation script
+  template:
+    src: revoke.sh.j2
+    dest: "{{openvpn_key_dir}}/configs/server/{{openvpn_server_name}}_revoke.sh"
+    owner: root
+    group: root
+    mode: 744
+  when: openvpn_use_crl
+
+- name: check if certificate revocation list database exists
+  stat:
+    path: "{{openvpn_key_dir}}/configs/server/{{openvpn_server_name}}_index.txt"
+  register: file_result
+  when: openvpn_use_crl
+
+- name: create certificate revocation list database if required
+  file:
+    path: "{{openvpn_key_dir}}/configs/server/{{openvpn_server_name}}_index.txt"
+    state: touch
+  when:
+    - openvpn_use_crl
+
+- name: set up certificate revocation list
+  command: sh {{openvpn_server_name}}_revoke.sh
+  args:
+    chdir: "{{ openvpn_key_dir }}"
+    creates: "{{ openvpn_key_dir }}/configs/server/{{openvpn_server_name}}_ca-crl.pem"
+  when: openvpn_use_crl
+
+- name: install crl-cron script
+  template:
+    src: crl-cron.sh.j2
+    dest: "{{ openvpn_key_dir }}/configs/server/{{openvpn_server_name}}_crl-cron.sh"
+    owner: root
+    group: root
+    mode: 744
+
+# - name: Add cron to check every Saturday if the CRL needs to be renewed
+#   cron:
+#     name: "check if CRL will expire soon"
+#     special_time: weekly
+#     job: "sh {{ openvpn_base_dir }}/{{openvpn_server_name}}_crl-cron.sh"
+#   when: not ci_build
+
+- name: register server ca key
+  slurp:
+    src: "{{openvpn_key_dir}}/ca.crt"
+  register: ca_cert
+
+- name: register tls-key
+  slurp:
+    src: "{{openvpn_key_dir}}/{{openvpn_server_name}}-ta.key"
+  register: tls_key
+
+- name: register server certs
+  slurp:
+    src: "{{openvpn_key_dir}}/{{openvpn_server_config_file}}.crt"
+  register: server_certs
+
+- name: register server keys
+  slurp:
+    src: "{{openvpn_key_dir}}/{{openvpn_server_config_file}}.key"
+  register: server_keys
+
+### Assemble config files ###
+- name: Create openvpn {{openvpn_server_name}} config file
+  template:
+    src: server.conf.j2
+    dest: "{{ openvpn_key_dir }}/configs/server/{{openvpn_server_config_file}}.conf"
+    owner: root
+    group: root
+
+- name: Create client-config
+  template:
+    src: client-config.j2
+    dest: "{{ openvpn_key_dir }}/configs/server/ccd/{{item}}"
+    owner: root
+    group: root
+  with_items: "{{clients}}"
+  when: client_config
+
+- name: register {{openvpn_server_name}} config file
+  slurp:
+    src: "{{ openvpn_key_dir }}/configs/server/ccd/{{item}}"
+  register: client_config
+  with_items: "{{clients}}"
+  when: client_config
+
+## additional configs ##
+- name: Install LDAP config
+  template:
+    src: ldap.conf.j2
+    dest: "{{ openvpn_key_dir }}/configs/server/ldap.conf"
+    owner: root
+    group: root
+  when: openvpn_use_ldap
+
+- name: Copy openvpn logrotate config file
+  template:
+    src: openvpn_logrotate.conf.j2
+    dest: "{{ openvpn_key_dir }}/configs/server/{{ openvpn_server_name }}-logrotate.conf"
+    owner: root
+    group: root
+    mode: 0400
+  when: ansible_os_family != 'Solaris'
+
+
+
+
+
+### slurp to copy paste ###
+# - name: register crl
+#   slurp:
+#     src: "{{openvpn_key_dir}}/configs/server/{{openvpn_server_name}}_crl_number"
+#   register: crl_number
+#   when: openvpn_use_crl  
+
+# - name: register certificate revocation list database
+#   slurp:
+#     src: "{{openvpn_key_dir}}/configs/server/{{openvpn_server_name}}_index.txt"
+#   register: revo_data
+#   when: openvpn_use_crl 
+
+# - name: register revocation certificate  
+#   slurp:
+#     src: "{{ openvpn_key_dir }}/configs/server/{{openvpn_server_name}}_ca-crl.pem"
+#   register: revo_pem
+#   when: openvpn_use_crl 
+
+# - name: register crl-cron script  
+#   slurp:
+#     src: "{{ openvpn_key_dir }}/configs/server/{{openvpn_server_name}}_crl-cron.sh"
+#   register: crl_cron
+#   when: openvpn_use_crl 
+
+# - name: register {{openvpn_server_name}} config file
+#   slurp:
+#     src: "{{ openvpn_key_dir }}/configs/server/{{openvpn_server_config_file}}.conf"
+#   register: server_config
+
+# - name: register LDAP config
+#   slurp:
+#     src: "{{ openvpn_key_dir }}/configs/server/ldap.conf"
+#   register: ldap
+#   when: openvpn_use_ldap
+
+# - name: register LDAP config
+#   slurp:
+#     src: "{{ openvpn_key_dir }}/configs/server/{{ openvpn_server_name }}-logrotate.conf"
+#   register: logrotate
+#   when: 
+#     - openvpn_use_ldap
+#     - ansible_os_family != 'Solaris'

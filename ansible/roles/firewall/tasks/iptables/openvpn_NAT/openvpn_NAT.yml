@@ -1,0 +1,46 @@
+---
+- name: iptables - Allow incoming VPN connection
+  iptables:
+    chain: INPUT
+    protocol: "{{ openvpn_proto | default('udp') }}"
+    destination_port: "{{openvpn_port | default(1194) }}"
+    jump: ACCEPT
+    action: insert
+    comment: "Allow incoming VPN connection"
+
+- name: iptables - Accept packets from VPN tunnel adaptor
+  iptables:
+    chain: INPUT
+    in_interface: "{{ openvpn_ifname_server | default('tun') }}"
+    jump: ACCEPT
+    action: insert
+    comment: "Accept packets from VPN tunnel adaptor"
+
+- name: iptables - Allow VPN forwarding
+  iptables:
+    chain: FORWARD
+    source: "{{openvpn_server_network}}/24"
+    jump: ACCEPT
+    action: insert
+    comment: "Allow VPN forwarding"
+
+- name: iptables - Perform NAT readdressing
+  iptables:
+    table: nat
+    chain: POSTROUTING
+    source: "{{ openvpn_server_network }}/24"
+    to_source: "{{ansible_default_ipv4.address}}"
+    jump: SNAT
+    action: insert
+    comment: "Perform NAT readdressing"
+  when: not firewall_masquerade_not_snat
+
+- name: iptables - Perform NAT readdressing with MASQUERADE
+  iptables:
+    table: nat
+    chain: POSTROUTING
+    source: "{{ openvpn_server_network }}/24"
+    jump: MASQUERADE
+    action: insert
+    comment: "Perform NAT readdressing"
+  when: firewall_masquerade_not_snat

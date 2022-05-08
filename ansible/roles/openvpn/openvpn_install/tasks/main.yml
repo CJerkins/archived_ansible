@@ -1,0 +1,44 @@
+---
+# tasks file for openvpn
+- name: Set facts
+  include_tasks: set_facts.yml
+  tags: [always]
+
+- name: Uninstall OpenVPN
+  include_tasks: uninstall.yml
+  when: openvpn_uninstall
+  tags:
+    - uninstall
+
+- name: Install OpenVPN
+  include_tasks: install.yml
+  tags:
+    - install
+
+- name: Install server dependencys
+  import_tasks: server_deps.yml
+  when: openvpn_install == 'server'
+  tags:
+    - server_deps
+
+- name: Send server config and supporting files to server
+  include_tasks: sendfiles.yml
+  tags:
+    - sendfile
+
+# For permanent selinux disabling just carefully edit /etc/selinux/config put SELINUX=permissive or disabled and reboot the system
+- name: Setup openvpn auto-start & start
+  service:
+    name: "{{openvpn_server_service_name}}"
+    enabled: yes
+    state: started
+  ignore_errors: yes
+  when: openvpn_install == 'server'
+
+- name: Setup openvpn auto-start & start
+  service:
+    name: "{{openvpn_client_service_name}}"
+    enabled: yes
+    state: started
+  ignore_errors: yes
+  when: openvpn_install == 'client'

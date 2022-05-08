@@ -1,0 +1,29 @@
+---
+container_state: running
+setenforce: false
+container_name: mosquitto
+container_image: docker.io/eclipse-mosquitto:latest
+container_dir_config: config
+container_dir_owner: root
+container_dir_group: root
+container_dir_data: data
+container_dir_log: log
+container_run_args: >-
+  -d
+  -v "{{podman_exported_container_volumes_basedir}}/{{ container_dir_config }}:/mosquitto/config:Z"
+  -v "{{podman_exported_container_volumes_basedir}}/{{ container_dir_data }}:/mosquitto/data:Z"
+  -p 1883:1883
+  -p 9001:9001
+  --memory=1g
+  --net=host
+container_firewall_ports:
+  - 1883/tcp
+  - 9001/tcp 
+
+## goes to host_vars ##
+# setenforce: false
+# podman_exported_container_volumes_basedir: /var/lib/containers/exported_volumes
+# domain: localdomain
+# timezone: "Europe/Helsinki"
+
+  # -v "{{podman_exported_container_volumes_basedir}}/{{ container_dir_log }}:/mosquitto/log:Z"

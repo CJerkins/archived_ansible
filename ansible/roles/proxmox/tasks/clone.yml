@@ -1,0 +1,17 @@
+---
+# tasks file for clone-vm
+- name: Clone "{{ vmname | default(random_name) }}"
+  proxmox_kvm:
+    vmid: "{{ vmid | default(omit) }}" # The source VM id
+    node: "{{ node }}"
+    api_user: "{{ api_user }}"
+    api_password: "{{ api_password }}"
+    api_host: "{{ api_host }}" 
+    newid: "{{ vmnewid | default(random_id) }}" # The target VM name
+    clone: "{{ vmsource | default('stuff') }}" # src vm name
+    name: "{{ vmname | default(random_name) }}" # The target VM name # Cannot clone clones to the same name???
+    storage: "{{ vmstorage }}"
+    net: '{"net0":"virtio,bridge={{ vmbridge | default(omit) }},tag={{ vmvlan | default(omit) }}"}'
+    format: "{{ vmformat | default(omit) }}"
+    onboot: "{{ vmonboot | default(omit) }}"
+    timeout: 500  # Note: The task can take a while. Adapt

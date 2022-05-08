@@ -1,0 +1,44 @@
+{# default_crl_days= 365                             # how long before next CRL
+
+[ ca ]
+        default_ca      = CA_default              # The default ca section
+
+[ CA_default ]
+dir             = {{ dir_ssl_key }}       # Where everything is kept
+certs           = $dir/certs              # Where the issued certs are kept
+crl_dir         = $dir/crl                # Where the issued crl are kept
+database        = $dir/crl_index.txt      # database index file.
+default_md      = default                 # use public key default MD #}
+[ policy_anything ]
+countryName             = optional
+stateOrProvinceName     = optional
+localityName            = optional
+organizationName        = optional
+organizationalUnitName  = optional
+commonName              = supplied
+emailAddress            = optional
+
+[ req ]
+#default_bits           = 2048
+#default_md             = sha256
+#default_keyfile        = privkey.pem
+distinguished_name      = req_distinguished_name
+attributes              = req_attributes
+
+
+[ req_distinguished_name ]
+countryName                    = {{ name_country }}
+countryName_min                = 2
+countryName_max                = 2
+stateOrProvinceName            = {{ name_state }}
+localityName                   = {{ name_city }}
+0.organizationName             = {{ name_company }}
+organizationalUnitName         = {{ name_unit }}
+commonName                     = {{ name_common }}
+commonName_max                 = 64
+
+
+[ req_attributes ]
+challengePassword               = A challenge password
+challengePassword_min           = 4
+challengePassword_max           = 20

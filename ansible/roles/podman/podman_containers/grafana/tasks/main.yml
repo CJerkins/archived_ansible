@@ -1,0 +1,63 @@
+---
+# - name: ensure "{{ container_name }}" container files mount point on host
+#   tags: mount
+#   file:
+#     path: "{{podman_exported_container_volumes_basedir}}"
+#     state: directory
+#     owner: root
+#     group: root
+
+- name: ensure "{{ container_name }}" container files mount point on host
+  tags: mount
+  file:
+    path: "{{podman_exported_container_volumes_basedir}}/{{ item }}"
+    state: directory
+    owner: 472
+    group: 0
+  with_items:
+    - "{{ container_dir_lib }}"
+
+- name: ensure "{{ container_name }}" container files mount point on host
+  tags: mount
+  file:
+    path: "{{podman_exported_container_volumes_basedir}}/{{ item }}"
+    state: directory
+    owner: 0
+    group: 0
+  with_items:
+    - "{{ container_dir_dashboards }}"
+    - "{{ container_dir_datasources }}"
+
+
+# - name: Copy custom dashboard configs
+#   copy:
+#     src: grafana.dashboards.yaml
+#     dest: "{{podman_exported_container_volumes_basedir}}/{{ container_dir_dashboards }}/{{item}}"
+#     owner: "{{ container_dir_owner }}"
+#     group: "{{ container_dir_group }}"
+#   with_items:
+#     - grafana.dashboards.yaml
+#     - grafana.dash.json
+
+# - name: Copy custom datasource configs
+#   copy:
+#     src: grafana.datasource.yaml
+#     dest: "{{podman_exported_container_volumes_basedir}}/{{ container_dir_datasource }}/{{item}}"
+#     owner: "{{ container_dir_owner }}"
+#     group: "{{ container_dir_group }}"
+#   with_items:
+#     - grafana.datasource.influxdb.yaml
+
+- name: ensure "{{ container_name }}" container state
+  tags: container
+  import_role:
+    name: podman_containers/influxdb
+
+- name: Wait for database to init
+  pause:
+    seconds: 30
+
+- name: ensure "{{ container_name }}" container state
+  tags: container
+  import_role:
+    name: podman_container_systemd

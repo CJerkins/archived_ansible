@@ -1,0 +1,27 @@
+## Read file ##
+qrencode -o duh.png -r webAdmin0.key
+
+## qrcode for file ##
+qrencode -o duh.png -t ansiutf8 < webAdmin0.key
+
+# qrencode -t ansiutf8 < client.conf
+
+## VCARD ##
+qrencode -o address.png 'BEGIN:VCARD VERSION:3.0 N:Haines;Darrell FN:Schuermann Tim ORG: TITLE: ADR:;;Putzbrunner Str. 71;Munich;NC;81739;United States TEL;WORK;VOICE: TEL;CELL:9103087218 TEL;FAX: EMAIL;WORK;INTERNET:fortified@gmail.com URL: END:VCARD'
+
+
+## Gen URL ##
+qrencode -o lpm.png http://www.linuxpromagazine.com
+
+
+## for wifi password ##
+qrencode -s 7 -o qr-wifi.png "WIFI:S:$(zenity --entry --text="Network name (SSID)" --title="Create WiFi QR");T:WPA;P:$(zenity --password --title="Wifi Password");;"
+
+echo "WIFI:S:PineneedlesZ;T:WPA;P:blackchar;;" | qrencode -o wifi.png -s 10
+
+
+## SMS ##
+qrencode -s 7 -o sms.png SMSTO:9103087261:test
+
+## Email ##
+qrencode -s 7 -o email.png 'MATMSG:TO:fort@gmail.com;SUB:fuck;BODY:me'

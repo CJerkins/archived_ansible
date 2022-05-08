@@ -1,0 +1,35 @@
+---
+- name: setenforce
+  shell: sudo setenforce 0
+  when: 
+    - ansible_distribution == "CentOS" or ansible_distribution=="RedHat"
+    - setenforce | bool
+
+- name: check if service file exists already
+  stat:
+    path: "{{ service_files_dir }}/{{ service_name }}"
+  register: service_file_before_template
+
+- name: do tasks when "{{ service_name }}" state is "running"
+  import_tasks: running.yml
+  when: container_state == "running"
+
+- name: configure firewall if container_firewall_ports is defined
+  import_tasks: firewall.yml
+  when: container_firewall_ports is defined
+
+- name: do cleanup stuff when container_state is "absent"
+  import_tasks: absent.yml
+  when: container_state == "absent"
+
+- name: finial check that container is running
+  command: "podman inspect -f '{{ '{{' }}.State.Status{{ '}}' }}'  {{ container_name }}"
+  register: pull_status_finial
+
+- debug:
+    msg: "container is running"
+  when: pull_status_finial == "running"
+
+- debug:
+    msg: "container is running"
+  when: pull_status_finial != "running"

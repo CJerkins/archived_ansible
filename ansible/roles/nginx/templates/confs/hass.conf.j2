@@ -1,0 +1,54 @@
+server {
+    listen 443 ssl http2;
+    listen [::]:443 ssl http2;
+
+    server_name hass.local.drokdev.pro;
+    root /usr/share/nginx/html;
+    {# root /var/www/hass.local.drokdev.pro/public; #}
+
+    # SSL
+    ssl_certificate {{dir_ssl_key}}/hass/cert.pem;
+    ssl_certificate_key {{dir_ssl_key}}/hass/key.pem;
+
+    # security
+    include security.conf;
+
+    # reverse proxy
+    location / {
+        proxy_pass http://172.16.100.46.8123;
+        include proxy.conf;
+    }
+
+    location /api/websocket {
+        proxy_pass http://172.16.100.46:8123/api/websocket;
+        include proxy.conf;
+    }
+
+    # additional config
+    include general.conf;
+}
+
+# subdomains redirect
+server {
+    listen 443 ssl http2;
+    listen [::]:443 ssl http2;
+
+    server_name *.hass.local.drokdev.pro;
+
+    # SSL
+    ssl_certificate {{dir_ssl_key}}/hass/cert.pem;
+    ssl_certificate_key {{dir_ssl_key}}/hass/key.pem;
+
+    return 301 https://hass.local.drokdev.pro$request_uri;
+}
+
+# HTTP redirect
+server {
+    listen 80;
+    listen [::]:80;
+
+    server_name hass.local.drokdev.pro;
+
+    return 301 https://hass.local.drokdev.pro$request_uri;
+}
+

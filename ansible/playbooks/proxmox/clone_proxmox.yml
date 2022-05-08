@@ -1,0 +1,121 @@
+---
+- hosts: proxmox
+  gather_facts: no
+  become: yes
+  vars:
+    ## Clone vars ##
+    action: start
+    build_type: clone
+    # vmid: 101
+    vmnewid: 1106
+    vmname: bitwarden.local.drokdev.pro
+    vmsource: template.CloudInit.Centos7 # source VM name
+    # vmcores: 4 # defaults
+    # vmsockets: 1 # defaults
+    # vmmemory: 4096 # defaults
+    vmbridge: vmbr0
+    vmvlan      : 1
+
+    ## Cloud init vars ##
+    # vmdisk      : 20G
+    ciuser: drok
+    cipassword: drokDROK63
+    vmsearchdomain: vanguard.intra
+    vmnameserver: 172.16.1.4
+    # sshkey: 
+    # vmmacaddr: 02:00:00:02:80:de
+    vmip: 172.16.1.106/24
+    vmgw: 172.16.1.1
+  roles:
+  - proxmox
+
+- hosts: proxmox
+  gather_facts: no
+  become: yes
+  vars:
+    ## Clone vars ##
+    action: start
+    build_type: clone
+    # vmid: 101
+    vmnewid: 1111
+    vmname: tak.local.drokdev.pro
+    vmsource: template.CloudInit.Centos7 # source VM name
+    # vmcores: 4 # defaults
+    # vmsockets: 1 # defaults
+    # vmmemory: 4096 # defaults
+    vmbridge: vmbr5
+    ## Cloud init vars ##
+    # vmdisk      : 20G
+    ciuser: drok
+    cipassword: drokDROK63
+    vmsearchdomain: vanguard.intra
+    vmnameserver: 172.16.1.4
+    # sshkey: 
+    # vmmacaddr: 02:00:00:02:80:de
+    vmip: 172.16.1.111/24
+    vmgw: 172.16.1.1
+  roles:
+  - proxmox
+
+# - hosts: proxmox
+#   gather_facts: no
+#   become: yes
+#   vars:
+#     ## Clone vars ##
+#     action: start
+#     build_type: clone
+#     # vmid: 101
+#     vmnewid: 1105
+#     vmname: webserver.local.drokdev.pro
+#     vmsource: template.CloudInit.Centos7 # source VM name
+#     # vmcores: 4 # defaults
+#     # vmsockets: 1 # defaults
+#     # vmmemory: 4096 # defaults
+#     vmbridge: vmbr5
+#     ## Cloud init vars ##
+#     # vmdisk      : 20G
+#     ciuser: drok
+#     cipassword: drokDROK63
+#     vmsearchdomain: vanguard.intra
+#     vmnameserver: 172.16.1.4
+#     # sshkey: 
+#     # vmmacaddr: 02:00:00:02:80:de
+#     vmip: 172.16.1.105/24
+#     vmgw: 172.16.1.1
+#   roles:
+#   - proxmox
+
+# 
+
+  
+#   ## -- Container vars -- ##
+#   action      : start
+#   ctid        : 247 # Varible has to be set in playbook
+#   ctpassword  : lukmanlab # Varible has to be set in playbook
+#   ctip        : 172.16.1.183/24
+#   ctgw        : 172.16.1.1
+#   ctbridge    : vmbr0
+#   OS_Template : centos-7-default_20171212_amd64.tar.xz
+#   # ubuntu-18.04-standard_18.04-1_amd64.tar.gz 
+#   # ubuntu-16.04-standard_16.04-1_amd64.tar.gz 
+#   # centos-7-default_20171212_amd64.tar.xz
+#   action: add
+
+## -- Additional vars -- ##
+# cthostname  : server.vanguard.local
+# searchdomain: vanguard.local
+# ctnameserver: 8.8.8.8
+# ctcores     : 2
+# ctmemory    : 1024
+# ctswap      : 512
+# ctdisk      : 8
+# ctstorage   : local-lvm
+# ctnetif     : 
+#   net0: "name=eth0,ip=dhcp,bridge=vmbr0"
+  # net0: "name=eth0,ip=8.8.8.8,gw=9.9.9.9,bridge=vmbr0"
+# ctmounts    : 
+#   mp0: "/mnt/pve/cephfs_data/downloads/,mp=/downloads"
+#   mp1: "/mnt/pve/cephfs_data/media,mp=/media"
+# ctunprivileged: yes
+# ctpubkey    : "ssh-rsa myPublicKey engonzal@hostname"
+# ctonboot    : no

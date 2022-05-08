@@ -1,0 +1,11 @@
+---
+- name: atak_pref
+  hosts: localhost
+  gather_facts: no
+  vars:
+    device_name:
+      - '3411_45'
+      - '3411_30'
+    qr_code: false
+  roles:
+    - takserver/atak_pref_test

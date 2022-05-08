@@ -1,0 +1,60 @@
+---
+- include_vars: "{{ item }}"
+  with_first_found:
+    - "../vars/{{ ansible_distribution }}{{ ansible_distribution_major_version }}.yml"
+    - "../vars/{{ ansible_distribution }}.yml"
+    - "../vars/{{ ansible_os_family }}.yml"
+    - "../vars/empty.yml"
+  tags: [always]
+  
+- name: Detect firewall type and disable ufw and firewalld
+  include_tasks: firewall.yml
+  tags:
+    - firewall
+
+
+## disable unwanted firewalls if iptables has been choosen
+- name: disable firewalld
+  systemd:
+    name: firewalld
+    enabled: no
+    masked: no
+    state: stopped
+  when: 
+    - ansible_distribution == "CentOS" or ansible_distribution=="RedHat"
+    - firewall_service == "iptables"
+
+- name: disable ufw
+  systemd:
+    name: ufw
+    enabled: no
+    masked: no
+    state: stopped
+  when: 
+    - ansible_distribution == "Ubuntu"
+    - firewall_service == "iptables"
+
+
+
+
+
+
+
+
+- name: enable ipv4 forwarding
+  sysctl:
+    name: net.ipv4.ip_forward
+    value: '1'
+    ignoreerrors: yes
+  failed_when: false
+  when: firewall_ip_forward
+
+- name: Enable IPv4 forwarding continued
+  command: echo 1 > /proc/sys/net/ipv4/ip_forward
+  when: firewall_ip_forward
+  
+- name: setenforce
+  shell: sudo setenforce 0
+  when: 
+    - ansible_distribution == "CentOS" or ansible_distribution=="RedHat"
+    - firewall_setenforce

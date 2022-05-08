@@ -1,0 +1,38 @@
+---
+## Checking for firewalls ##
+- name: Check for firewalld
+  shell: command -v firewall-cmd
+  register: firewalld
+  check_mode: no
+  changed_when: false  # Never report as changed
+  failed_when: false
+
+
+# - name: Add WireGuard repository
+#   get_url:
+#     url: https://copr.fedorainfracloud.org/coprs/jdoss/wireguard/repo/epel-7/jdoss-wireguard-epel-7.repo
+#     dest: /etc/yum.repos.d/wireguard.repo
+
+- name: Install EPEL repository
+  yum:
+    name: epel-release
+    update_cache: yes
+
+# - name: Install elrepo repository
+#   yum:
+#     name: yum-plugin-elrepo
+#     state: present
+
+# - name: Install kmod-wireguard repository
+#   yum:
+#     name: kmod-wireguard
+#     state: present
+
+- name: mkdir /etc/wireguard
+  file:
+    path: /etc/wireguard
+    state: directory
+
+# sudo yum install epel-release https://www.elrepo.org/elrepo-release-7.el7.elrepo.noarch.rpm
+# sudo yum install yum-plugin-elrepo
+# sudo yum install kmod-wireguard wireguard-tools

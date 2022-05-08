@@ -1,0 +1,10 @@
+---
+- name: "Check if {{ server }}.conf already exists"
+  stat:
+    path: /etc/wireguard/{{ server }}.conf
+  register: interface_conf
+
+- name: "Check if {{ admin_client }} keys already exists"
+  stat:
+    path: /root/client_{{ admin_client }}/{{ server }}-client.conf
+  register: admin_client_keys

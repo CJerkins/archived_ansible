@@ -1,0 +1,58 @@
+---
+- hosts: proxmox
+  gather_facts: yes
+  become: true
+  vars:
+    ## Clone vars ##
+    action: start
+    build_type: clone
+    vmid: 101
+    vmnewid: 237
+    # vmname: zabbix.vanguard.intra
+    # vmsource: template.CloudInit.Centos7 # source VM name
+    # vmcores: 4 # defaults
+    # vmsockets: 1 # defaults
+    # vmmemory: 4096 # defaults
+    vmbridge: vmbr5
+    ## Cloud init vars ##
+    # vmdisk      : 20G
+    ciuser: drok
+    cipassword: drokDROK63
+    vmsearchdomain: vanguard.intra
+    vmnameserver: 172.16.1.4
+    # sshkey: 
+    # vmmacaddr: 02:00:00:02:80:de
+    vmip: 172.16.1.30/24
+    vmgw: 172.16.1.1
+  roles:
+  - role: ansible_role_proxmox
+
+## -- To clone more than one VM run multiple times -- ##
+# - hosts: proxmox
+#   gather_facts: yes
+#   become: root
+#   vars:
+      # ## Clone vars ##
+      # action: start
+      # build_type: clone
+      # # vmid: 101
+      # vmnewid: 230
+      # vmname: zabbix.vanguard.intra
+      # vmsource: template.CloudInit.Centos7 # source VM name
+      # # vmcores: 4 # defaults
+      # # vmsockets: 1 # defaults
+      # # vmmemory: 4096 # defaults
+      # vmbridge: vmbr5
+
+      # ## Cloud init vars ##
+      # # vmdisk      : 20G
+      # ciuser: drok
+      # cipassword: drokDROK63
+      # vmsearchdomain: vanguard.intra
+      # vmnameserver: 172.16.1.4
+      # # sshkey: 
+      # # vmmacaddr: 02:00:00:02:80:de
+      # vmip: 172.16.1.30/24
+      # vmgw: 172.16.1.1
+#   roles:
+#   - role: vm

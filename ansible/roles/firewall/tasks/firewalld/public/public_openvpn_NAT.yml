@@ -1,0 +1,35 @@
+---
+- name: Enable OpenVPN Port (firewalld)
+  firewalld:
+    port: "{{openvpn_port}}/{{openvpn_proto}}"
+    zone: public
+    permanent: true
+    immediate: true
+    state: enabled
+
+- name: Set tun0 interface to internal
+  firewalld:
+    interface: tun0
+    zone: internal
+    permanent: true
+    immediate: true
+    state: enabled
+
+- name: Set default interface to external
+  firewalld:
+    interface: "{{ansible_default_ipv4.interface}}"
+    zone: public
+    permanent: true
+    immediate: true
+    state: enabled
+
+- name: Enable masquerading on external zone
+  firewalld:
+    masquerade: true
+    zone: public
+    permanent: true
+    state: enabled
+    #Workarround ansible issue: https://github.com/ansible/ansible/pull/21693
+    #immediate: true
+  notify:
+    - restart firewalld

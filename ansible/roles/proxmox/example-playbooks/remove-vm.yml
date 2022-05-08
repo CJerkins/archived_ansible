@@ -1,0 +1,24 @@
+---
+- hosts: proxmox
+  gather_facts: yes
+  vars:
+    ## -- VM vars -- ##
+    action      : remove
+    vmid        : 357 # source VM name or the VM ID in provisioning
+    # vmname      : vanguard.local # The target VM Name
+  roles:
+  - role: ansible_role_proxmox
+
+
+
+## -- To remove more than one VM run multiple times -- ##
+# ---
+# - hosts: proxmox
+#   gather_facts: yes
+#   vars:
+#     ## -- VM vars -- ##
+#     action      : remove
+#     vmid        : 357 # source VM name or the VM ID in provisioning
+#     # vmname      : vanguard.local # The target VM Name
+#   roles:
+#   - role: vm

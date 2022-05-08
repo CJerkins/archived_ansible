@@ -1,0 +1,115 @@
+# Start VM
+- proxmox_kvm:
+    api_user    : root@pam
+    api_password: secret
+    api_host    : helldorado
+    name        : spynal
+    node        : sabrewulf
+    state       : started
+
+# Stop VM
+- proxmox_kvm:
+    api_user    : root@pam
+    api_password: secret
+    api_host    : helldorado
+    name        : spynal
+    node        : sabrewulf
+    state       : stopped
+
+# Stop VM with force
+- proxmox_kvm:
+    api_user    : root@pam
+    api_password: secret
+    api_host    : helldorado
+    name        : spynal
+    node        : sabrewulf
+    state       : stopped
+    force       : yes
+
+# Restart VM
+- proxmox_kvm:
+    api_user    : root@pam
+    api_password: secret
+    api_host    : helldorado
+    name        : spynal
+    node        : sabrewulf
+    state       : restarted
+
+# Remove VM
+- proxmox_kvm:
+    api_user    : root@pam
+    api_password: secret
+    api_host    : helldorado
+    name        : spynal
+    node        : sabrewulf
+    state       : absent
+
+# Get VM current state
+- proxmox_kvm:
+    api_user    : root@pam
+    api_password: secret
+    api_host    : helldorado
+    name        : spynal
+    node        : sabrewulf
+    state       : current
+
+# Update VM configuration
+- proxmox_kvm:
+    api_user    : root@pam
+    api_password: secret
+    api_host    : helldorado
+    name        : spynal
+    node        : sabrewulf
+    cores       : 8
+    memory      : 16384
+    update      : yes
+
+# Start container
+- proxmox:
+    vmid: 100
+    api_user: root@pam
+    api_password: 1q2w3e
+    api_host: node1
+    state: started
+
+# Start container with mount. You should enter a 90-second timeout because servers with additional disks take longer to boot.
+- proxmox:
+    vmid: 100
+    api_user: root@pam
+    api_password: 1q2w3e
+    api_host: node1
+    state: started
+    timeout: 90
+
+# Stop container
+- proxmox:
+    vmid: 100
+    api_user: root@pam
+    api_password: 1q2w3e
+    api_host: node1
+    state: stopped
+
+# Stop container with force
+- proxmox:
+    vmid: 100
+    api_user: root@pam
+    api_password: 1q2w3e
+    api_host: node1
+    force: yes
+    state: stopped
+
+# Restart container(stopped or mounted container you can't restart)
+- proxmox:
+    vmid: 100
+    api_user: root@pam
+    api_password: 1q2w3e
+    api_host: node1
+    state: restarted
+
+# Remove container
+- proxmox:
+    vmid: 100
+    api_user: root@pam
+    api_password: 1q2w3e
+    api_host: node1
+    state: absent

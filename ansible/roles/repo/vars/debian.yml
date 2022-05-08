@@ -1,0 +1,28 @@
+---
+httpd_packages:
+  - hostname  # needed for generating default certificate file
+  - apache2
+  - apache2-utils
+
+httpd_config: /etc/apache2/apache2.conf
+httpd_ssl_config: /etc/httpd/conf.d/ssl.conf
+httpd_status_config: /etc/httpd/conf.d/status.conf
+
+httpd_cert_dir: /etc/pki/tls/certs
+httpd_key_dir: /etc/pki/tls/private
+
+
+
+apache_service: apache2
+apache_daemon: apache2
+apache_daemon_path: /usr/sbin/
+apache_server_root: /etc/apache2
+apache_conf_path: /etc/apache2
+
+__apache_packages:
+  - apache2
+  - apache2-utils
+
+apache_ports_configuration_items:
+  - regexp: "^Listen "
+    line: "Listen {{ apache_listen_port }}"

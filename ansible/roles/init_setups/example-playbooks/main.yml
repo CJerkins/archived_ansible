@@ -1,0 +1,57 @@
+---
+- hosts: all
+  gather_facts: yes
+  # become: true
+  remote_user: root
+  vars:
+    ## -- Hostname -- ##
+    # inventory_hostname: # pulls from inventory but can manually define
+    ## -- Packages -- ##
+    additional_packages:
+      - nano
+    ## -- User init -- ##
+    CentOS_users:
+    - username: "tom"
+      groups: 
+        - "wheel"
+        - "centos"
+    - username: "kat"
+      groups: 
+        - "wheel"
+    Ubuntu_users:
+    - username: "cat"
+      groups: 
+        - "admin"
+        - "centos"
+    password: ChangeME # set as a default for all users. At first login users will change.
+    admin_users:
+    - admin_username: tom
+      user_admin_path: /Users/user/.ssh/id_rsa.pub # "{{ lookup('file', '{{ user_admin_path }}/'{{ user_admin }}'/.ssh/i{{ ssh_pub_file }}') }}"
+    - admin_username: kat
+      user_admin_path: /Users/user/.ssh/id_rsa.pub # "{{ lookup('file', '{{ user_admin_path }}/'{{ user_admin }}'/.ssh/i{{ ssh_pub_file }}') }}"
+    ## -- PAM init -- ##
+    use_pam: true
+    ## -- sshd_config -- ##
+    no_pass_auth: true
+    disable_root: true
+    ## -- DNS setup -- ##
+    init_dns_setup: true
+    resolv_nameservers:
+      - "8.8.8.8"
+      - "8.8.4.4"
+    resolv_domain: "foo.org"
+    resolv_search:
+      - "foo.bar"
+      - "foobar.com"
+    resolv_options:
+      - "timeout:2"
+      - "rotate"
+    ## -- FreeIPA client init -- ##
+    use_ldap: false
+    freeipa_client_domain: vanguard.intra
+    freeipa_client_server: ipaserver.vanguard.intra
+    freeipa_client_realm: VANGUARD.INTRA
+    freeipa_client_principal: admin
+    freeipa_client_password: password
+  roles:
+    - ansible_role_init_setups

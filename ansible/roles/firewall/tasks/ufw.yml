@@ -1,0 +1,44 @@
+- name: Install ufw
+  package:
+   name: ufw
+   state: present
+
+- name: Start ufw service
+  systemd:
+    name: ufw
+    enabled: true
+    masked: no
+    state: started
+
+- name: Enable ufw
+  ufw:
+    state: enabled
+    policy: allow
+
+- name: Enable SSH Port
+  ufw:
+    direction: in
+    rule: limit
+    port: "{{ ansible_port | default(ssh) }}"
+    proto: tcp
+
+- name: ufw disable ping
+  lineinfile: dest=/etc/ufw/before.rules 
+    regexp: "icmp-type {{ item }}" 
+    line: "-A ufw-before-input -p icmp --icmp-type {{ item }} -j DROP" 
+    backup: yes
+  with_items:
+    - destination-unreachable
+    - source-quench
+    - time-exceeded
+    - parameter-problem
+    - echo-request
+  when: 
+    - ufw_block_ping
+  notify:
+    - restart ufw
+
+- name: unique ufw rule sets (See README in unique rule folders for more inforation how to configure)
+  include_tasks: tasks/ufw/unique_rules.yml
+  notify:
+    - restart ufw

@@ -1,0 +1,18 @@
+---
+container_state: running
+available_externally: "false"
+setenforce: false
+
+
+### Example varibles ###
+container_name: netdata
+# container_dir_owner: root
+# container_dir_group: root
+# container_dir_config: config
+# docker_firewall_ports:
+#   - 8123/tcp 
+
+## goes to group_vars ##
+# docker_exported_container_volumes_basedir: /var/lib/containers/exported_volumes
+# domain: localdomain
+# timezone: "Europe/Helsinki"

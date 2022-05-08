@@ -1,0 +1,9 @@
+---
+## need to check db is runing before play
+- name: Setup admin access
+  import_tasks: setup-admin.yml
+  tags: admin
+
+- name: Setup user groups
+  import_tasks: setup-user-groups.yml
+  tags: groups

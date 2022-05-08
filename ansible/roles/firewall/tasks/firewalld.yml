@@ -1,0 +1,62 @@
+- name: Install firewalld
+  package:
+   name: firewalld
+   state: present
+
+- name: Enable firewalld
+  systemd:
+    name: firewalld
+    masked: no
+    enabled: yes
+    state: started
+
+- name: Install python2-firewall (Fedora)
+  package:
+    name: python-firewall
+    state: present
+  when:
+    - ansible_distribution == "Fedora"
+    - ansible_python.version.major == 2
+
+- name: Enable SSH Port
+  firewalld:
+    port: "{{ ansible_port | default(22/tcp) }}"
+    permanent: yes
+    immediate: yes
+    state: enabled
+
+- firewalld:
+    zone: public
+    state: present
+    permanent: yes
+    immediate: yes
+    icmp_block: "{{ item }}"
+  with_items:
+    - destination-unreachable
+    - source-quench
+    - time-exceeded
+    - parameter-problem
+    - echo-request
+  when:
+    - firewalld_block_ping
+  notify:
+    - restart firewalld
+
+- name: unique firewalld rule sets (See README in unique rule folders for more inforation how to configure)
+  include_tasks: tasks/firewalld/unique_rules.yml
+  notify:
+    - restart firewalld
+
+# workaround for --permanent not working on non-NetworkManager managed ifaces
+# https://bugzilla.redhat.com/show_bug.cgi?id=1112742
+- name: Check if ifcfg-{{ansible_default_ipv4.interface}} exists
+  stat:
+    path: "/etc/sysconfig/network-scripts/ifcfg-{{ansible_default_ipv4.interface}}"
+  register: ifcfg
+
+- name: Persist default interface in ifcfg file
+  lineinfile:
+    dest: /etc/sysconfig/network-scripts/ifcfg-{{ansible_default_ipv4.interface}}
+    regexp: "^ZONE="
+    line: "ZONE={{firewalld_default_interface_zone}}"
+  when: ifcfg.stat.exists

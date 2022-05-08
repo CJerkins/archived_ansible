@@ -1,0 +1,30 @@
+---
+- name: Determine the running kernel release
+  command: uname -r
+  register: kernel_release
+
+- name: Add the WireGuard PPA
+  apt_repository:
+    repo: 'ppa:wireguard/wireguard'
+
+# Using with_items loop for apt module is deprecated
+- name: Install WireGuard and other requirements 
+  apt:
+    name:
+      - linux-headers-{{ kernel_release.stdout }}
+      - linux-headers-generic
+      - wireguard-dkms
+      - wireguard-tools
+      - python2.7        
+    state: present
+    update_cache: true
+
+- name: Update all packages to the latest version
+  apt:
+    upgrade: dist
+  register: upgrade
+
+- name: Reboot a slow machine that might have lots of updates to apply
+  reboot:
+    reboot_timeout: 60
+  when: upgrade.changed

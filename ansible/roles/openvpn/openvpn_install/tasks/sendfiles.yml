@@ -1,0 +1,189 @@
+---
+- name: Send configs and supporting files via localhost
+  block: 
+  - name: Send configs and supporting files
+    copy:
+      src: '{{ openvpn_key_dir }}/configs/server/{{item.src}}'
+      dest: '{{ openvpn_base_dir }}/{{item.dest}}'
+    with_items:
+      - { src: '{{openvpn_server_config_file}}.conf', dest: '{{openvpn_server_config_file}}.conf', }
+    when: 
+      - openvpn_install == 'server'
+
+  - name: Send configs and supporting files
+    copy:
+      src: '{{ openvpn_key_dir }}/configs/server/{{item.src}}'
+      dest: '{{ openvpn_base_dir }}/{{item.dest}}'
+    with_items:
+      - { src: 'revoke.sh', dest: 'revoke.sh', }
+      - { src: 'index.txt', dest: 'index.txt', }
+      - { src: '{{openvpn_server_name}}_ca-crl.pem', dest: '{{openvpn_server_name}}_ca-crl.pem', }
+      - { src: '{{openvpn_server_name}}_crl_number', dest: '{{openvpn_server_name}}_crl_number', }
+      - { src: '{{openvpn_server_name}}_index.txt', dest: '{{openvpn_server_name}}_index.txt', }
+      - { src: '{{openvpn_server_name}}_crl-cron.sh', dest: '{{openvpn_server_name}}_crl-cron.sh', }
+    when: 
+      - openvpn_use_crl
+      - openvpn_install == 'server'
+
+  - name: Send configs and supporting files
+    copy:
+      src: '{{ openvpn_key_dir }}/configs/server/{{item.src}}'
+      dest: '{{ openvpn_base_dir }}/{{item.dest}}'
+    with_items:
+      - { src: 'ldap.conf', dest: 'auth/ldap.conf', }
+    when: 
+      - openvpn_use_ldap
+      - openvpn_install == 'server'
+
+  - name: Send client configs
+    copy:
+      src: '{{ openvpn_key_dir }}/configs/server/ccd/{{item.src}}'
+      dest: '{{ openvpn_base_dir }}/ccd/{{item.dest}}'
+    with_items:
+      - "{{clients}}"
+    when: 
+      - openvpn_install == 'server'
+
+  - name: Send logrotate.conf
+    copy:
+      src: '{{ openvpn_key_dir }}/configs/server/{{ openvpn_server_name }}-logrotate.conf'
+      dest: '/etc/logrotate.d/{{ openvpn_server_name }}-logrotate.conf'
+    when: 
+      - openvpn_install == 'server'
+
+  - name: Send configs and supporting files
+    copy:
+      src: '{{ openvpn_key_dir }}/configs/client/{{item.src}}'
+      dest: '{{ openvpn_base_dir }}/{{item.dest}}'
+    with_items:
+      - { src: '{{openvpn_client_config_file}}*', dest: '{{openvpn_client_config_file}}*', }
+    when: 
+      - openvpn_install == 'client'  
+
+  when: 
+    - openvpn_gen_machine == 'localhost'
+
+### remote_src copy ##
+- name: Send configs and supporting files via remote_src
+  block:
+
+  - name: use find to get the files list which you want to copy/fetch
+    find: 
+      paths: "{{ openvpn_key_dir }}/configs/server"
+    register: fetch_server_conf
+    delegate_to: "{{ openvpn_gen_machine }}"
+    when: 
+      - openvpn_install == 'server'
+      - openvpn_fetch_config_dir is defined
+    tags:
+      - fetch
+
+  - name: use find to get the files list which you want to copy/fetch
+    find: 
+      paths: "{{ openvpn_key_dir }}/configs/clients"
+    register: fetch_client_conf
+    delegate_to: "{{ openvpn_gen_machine }}"
+    when: 
+      - openvpn_install == 'client'
+      - openvpn_fetch_config_dir is defined
+    tags:
+      - fetch
+
+  - name: use fetch to get the files
+    fetch:
+      src: "{{ item.path }}"
+      dest: "{{ openvpn_fetch_config_dir }}"
+      flat: yes
+    with_items: 
+        - "{{ fetch_server_conf.files }}"
+    delegate_to: "{{ openvpn_gen_machine }}"
+    when: 
+      - openvpn_install == 'server'
+      - openvpn_fetch_config_dir is defined
+    tags:
+      - fetch
+
+  - name: use fetch to get the files
+    fetch:
+      src: "{{ item.path }}"
+      dest: "{{ openvpn_fetch_config_dir }}"
+      flat: yes
+    with_items: 
+        - "{{ fetch_client_conf.files }}"
+    delegate_to: "{{ openvpn_gen_machine }}"
+    when: 
+      - openvpn_install == 'client'
+      - openvpn_fetch_config_dir is defined
+    tags:
+      - fetch
+
+  - name: Send configs and supporting files
+    copy:
+      # ignore_errors: true
+      src: '{{ openvpn_fetch_config_dir }}{{item.src}}'
+      dest: '{{ openvpn_base_dir }}/{{item.dest}}'
+    with_items:
+      - { src: '{{openvpn_server_config_file}}.conf', dest: '{{openvpn_server_config_file}}.conf', }
+    # delegate_to: localhost
+    when: 
+      - openvpn_install == 'server'
+
+  - name: Send configs and supporting files
+    copy:
+      # ignore_errors: true
+      src: '{{ openvpn_fetch_config_dir }}{{item.src}}'
+      dest: '{{ openvpn_base_dir }}/{{item.dest}}'
+    with_items:
+      - { src: 'revoke.sh', dest: 'revoke.sh', }
+      - { src: 'index.txt', dest: 'index.txt', }
+      - { src: '{{openvpn_server_name}}_ca-crl.pem', dest: '{{openvpn_server_name}}_ca-crl.pem', }
+      - { src: '{{openvpn_server_name}}_crl_number', dest: '{{openvpn_server_name}}_crl_number', }
+      - { src: '{{openvpn_server_name}}_index.txt', dest: '{{openvpn_server_name}}_index.txt', }
+      - { src: '{{openvpn_server_name}}_crl-cron.sh', dest: '{{openvpn_server_name}}_crl-cron.sh', }
+    when: 
+      - openvpn_use_crl
+      - openvpn_install == 'server'
+
+  - name: Send configs and supporting files
+    copy:
+      # ignore_errors: true
+      src: '{{ openvpn_fetch_config_dir }}{{item.src}}'
+      dest: '{{ openvpn_base_dir }}/{{item.dest}}'
+    with_items:
+      - { src: 'ldap.conf', dest: 'auth/ldap.conf', }
+    when: 
+      - openvpn_use_ldap
+      - openvpn_install == 'server'
+
+  - name: Send client configs
+    copy:
+      src: '{{ openvpn_fetch_config_dir }}{{item.src}}'
+      dest: '{{ openvpn_base_dir }}/ccd/{{item.dest}}'
+    with_items:
+      - "{{clients}}"
+    when: 
+      - openvpn_install == 'client'
+
+  - name: Send logrotate.conf
+    copy:
+      src: '{{ openvpn_fetch_config_dir }}{{ openvpn_server_name }}-logrotate.conf'
+      dest: '/etc/logrotate.d/{{ openvpn_server_name }}-logrotate.conf'
+    when: 
+      - openvpn_install == 'client'
+
+  - name: Send configs and supporting files
+    copy:
+      src: '{{ openvpn_fetch_config_dir }}{{item.src}}'
+      dest: '{{ openvpn_base_dir }}/{{item.dest}}'
+    with_items:
+      - { src: '{{openvpn_client_config_file}}*', dest: '{{openvpn_client_config_file}}*', }
+    when: 
+      - openvpn_install == 'client'
+
+  when: 
+    - openvpn_gen_machine != 'localhost'
+
+
+
+
+    # - { src: '{{openvpn_server_name}}_ca.srl', dest: '{{openvpn_server_name}}_ca.srl', }

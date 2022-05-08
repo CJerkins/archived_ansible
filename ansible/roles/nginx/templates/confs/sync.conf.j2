@@ -1,0 +1,46 @@
+server {
+	listen 443 ssl http2;
+	listen [::]:443 ssl http2;
+
+	server_name sync.local.drokdev.pro;
+
+	# SSL
+	ssl_certificate {{dir_ssl_key}}/sync/cert.pem;
+	ssl_certificate_key {{dir_ssl_key}}/sync/key.pem;
+
+	# security
+	include security.conf;
+
+	# reverse proxy
+	location /syncthing {
+		proxy_pass http://172.16.100.47:80;
+		include proxy.conf;
+	}
+
+	# additional config
+	include general.conf;
+}
+
+# subdomains redirect
+server {
+	listen 443 ssl http2;
+	listen [::]:443 ssl http2;
+
+	server_name *.sync.local.drokdev.pro;
+
+	# SSL
+	ssl_certificate {{dir_ssl_key}}/sync/cert.pem;
+	ssl_certificate_key {{dir_ssl_key}}/sync/key.pem;
+
+	return 301 https://sync.local.drokdev.pro$request_uri;
+}
+
+# HTTP redirect
+server {
+	listen 80;
+	listen [::]:80;
+
+	server_name .sync.local.drokdev.pro;
+
+	return 301 https://sync.local.drokdev.pro$request_uri;
+}

@@ -1,0 +1,73 @@
+---
+- name: Get Wowza
+  get_url:
+    url: http://{{ wowza_download_path }}/{{ wowza_file }}
+    dest: /root/{{ wowza_file }}
+    owner: root
+    group: root
+    mode: 0755
+
+- name: Install packages; epel-release, vim, java8, expect
+  yum:
+      name: "{{ packages }}"
+      state: present
+  vars:
+      packages:
+      - epel-release
+      - java-1.8.0-openjdk
+      - vim
+      - expect
+
+- name: Update and upgrade packages
+  yum:
+    name: '*'
+    state: latest
+
+- name: Push expect templates
+  template:
+    src: script.exp.j2
+    dest: /root/script.exp
+    owner: root
+    group: root
+    mode: 0755
+
+- name: Run expect script, which runs Wowza installer
+  args:
+    creates: /usr/local/WowzaStreamingEngine/conf/Server.license
+  shell: /root/script.exp
+
+- name: Restart WowzaStreamingEngine
+  service: name=WowzaStreamingEngine state=restarted
+
+- name: Restart WowzaStreamingEngineManager
+  service: name=WowzaStreamingEngineManager state=restarted
+
+- name: Chmod /root/script.exp
+  file:
+    path: /root/script.exp
+    owner: root
+    group: root
+    mode: 0400
+
+- name: Chmod /root/{{ wowza_file }}
+  file:
+    path: /root/{{ wowza_file }}
+    owner: root
+    group: root
+    mode: 0400
+
+- name: start firewalld and enabled
+  systemd:
+    state: started
+    name: firewalld
+    enabled: yes
+
+- name: open firewall port for takserver
+  firewalld:
+    port: "{{item}}" 
+    zone: public
+    immediate: yes # this is the firewall-cmd --reload
+    permanent: true
+    state: enabled
+  with_items:
+    ['1935','8088/tcp'] 

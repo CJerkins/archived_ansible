@@ -1,0 +1,32 @@
+---
+- name: Add a new user
+  user:
+    name: "{{ item.admin_username }}"
+    groups: wheel
+    shell: /bin/bash
+  with_items:
+    - '{{ init_setup_admin_users }}'
+  when: ansible_facts['os_family'] == "RedHat"
+
+
+
+- name: Add a new user
+  user:
+    name: "{{ item.admin_username }}"
+    shell: /bin/bash
+  with_items:
+    - '{{ init_setup_admin_users }}'
+  when: ansible_facts['os_family'] == "Debian"
+
+
+
+- name: Set authorized key taken from file
+  authorized_key:
+    user: '{{ item.admin_username }}'
+    state: present
+    key: "{{ lookup('file', '{{ item.user_admin_path }}') }}"
+    exclusive: True
+  with_items:
+    - '{{ init_setup_admin_users }}'
+
+# "{{ lookup('file', lookup('env','HOME') + '/.ssh/id_rsa.pub') }}"

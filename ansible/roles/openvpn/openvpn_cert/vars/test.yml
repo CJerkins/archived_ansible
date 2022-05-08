@@ -1,0 +1,19 @@
+---
+openvpn_server_name: vpn-test0
+openvpn_port: 1194
+openvpn_server_network: 10.8.0.0          ## format 192.168.1.0 ONLY define for subnet configurations.
+openvpn_server_netmask: 255.255.255.0     ## format 255.255.255.0 ONLY define for subnet configurations.
+openvpn_addl_server_options: 
+  - route 172.16.1.0 255.255.255.0 10.8.0.1
+openvpn_push: 
+  - block-outside-dns
+openvpn_redirect_gateway: true ## if true inputs, push "redirect-gateway def1", in server config
+openvpn_set_dns: true      ## enables dns push settings
+openvpn_verbose: 7          ## Default is 3. Options: 1 - 11. SEE https://openvpn.net/community-resources/reference-manual-for-openvpn-2-4/ for mor inforamation
+clients: 
+  - client0
+  - client1
+server_public_ipaddress: 54.174.30.38 ## vpn server publiaddress. 
+openvpn_addl_client_options: 
+  - log vpn-test0-client.log 
+openvpn_install: server ## Options server or client

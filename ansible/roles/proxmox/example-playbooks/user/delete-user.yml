@@ -1,0 +1,6 @@
+- ipa_user:
+    name: brain
+    state: absent
+    ipa_host: ipa.example.com
+    ipa_user: admin
+    ipa_pass: topsecret

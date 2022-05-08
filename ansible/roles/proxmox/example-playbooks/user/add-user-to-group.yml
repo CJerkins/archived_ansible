@@ -1,0 +1,8 @@
+- ipa_group:
+    name: sysops
+    user:
+    - linus
+    - larry
+    ipa_host: ipa.example.com
+    ipa_user: admin
+    ipa_pass: topsecret

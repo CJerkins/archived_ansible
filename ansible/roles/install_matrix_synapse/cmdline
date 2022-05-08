@@ -1,0 +1,7 @@
+ansible-playbook -i inventory/hosts setup.yml --tags=setup-all
+
+ansible-playbook -i inventory/hosts setup.yml --tags=start
+
+ansible-playbook -i inventory/hosts setup.yml --extra-vars='username=drok password=drokDROK63 admin=yes' --tags=register-user
+
+ansible-playbook -i inventory/hosts setup.yml --tags=self-check

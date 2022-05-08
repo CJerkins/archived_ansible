@@ -1,0 +1,15 @@
+---
+- name: restart nginx
+  systemd:
+    state: restarted
+    name: nginx
+
+- name: restart firewalld
+  systemd:
+    state: restarted
+    name: firewalld
+
+- name: restart ufw
+  systemd:
+    state: restarted
+    name: ufw

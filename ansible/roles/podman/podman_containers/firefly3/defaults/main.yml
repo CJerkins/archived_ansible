@@ -1,0 +1,61 @@
+---
+container_state: running
+setenforce: false
+
+### Example varibles ###
+container_name: firefly
+container_image: docker.io/jc5x/firefly-iii:latest
+container_dir_owner: root
+container_dir_group: root
+# container_dir_postgresql: postgresql
+container_dir_upload: upload
+container_dir_export: export
+container_run_args: >-
+  -d
+  -p 80:80
+  -e APP_KEY="{{ firefly_app_key }}"
+  -e APP_ENV:"{{ firefly_app_env }}"
+  -v "{{podman_exported_container_volumes_basedir}}/{{ container_dir_upload }}:/var/www/firefly-iii/storage/upload:Z"
+  -v "{{podman_exported_container_volumes_basedir}}/{{ container_dir_export }}:/var/www/firefly-iii/storage/export:Z"
+  -e DB_HOST="{{ postgres_db_host }}"
+  -e DB_PORT="{{ postgres_db_port }}"
+  -e DB_DATABASE="{{ postgres_database }}"
+  -e DB_USERNAME="{{ postgres_database_user }}"
+  -e DB_PASSWORD="{{ postgres_database_password }}"
+  -e "TZ={{ timezone }}"
+  --net=host
+database_run_args: >-
+  -d
+  -v "{{podman_exported_container_volumes_basedir}}/{{ container_dir_data }}:/data:Z"
+  -p 5432
+  -e POSTGRES_USER="{{ postgres_database_user }}"
+  -e POSTGRES_PASSWORD="{{ postgres_database_password }}"
+  -e POSTGRES_DB="{{ postgres_database }}"
+  --net=host
+container_firewall_ports:
+  - 8066/tcp 
+
+
+  
+
+
+## goes to group_vars ##
+# podman_exported_container_volumes_basedir: /var/lib/containers/exported_volumes
+# domain: localdomain
+# timezone: "Europe/Helsinki"
+
+
+# - name: Wait for MySQL to init
+#   pause:
+#     seconds: 30
+
+# podman run -d \
+# --name firefly \
+# -p 8066:80 \
+# -e APP_KEY=0m3R@nd0mString0f32Ch@rsEx@ct1y \
+# -e DB_HOST=localhost \
+# -e DB_PORT=5432 \
+# -e DB_DATABASE=firefly \
+# -e DB_USERNAME=drok \
+# -e DB_PASSWORD=drokDROK63 \
+# jc5x/firefly-iii:latest

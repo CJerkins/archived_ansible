@@ -1,0 +1,9 @@
+---
+- hosts: localhost
+  gather_factbrew rmtree python3s: yes
+  become: nop
+  pip install "hvac[parser]"pip install "hvac[parser]"brew uninstall python3
+  tasks:
+  - name: Return all secrets from a path
+    debug:
+      msg: "{{ lookup('hashi_vault', 'secret=kv/stuff token=s.VkeGa3s80yPJTFBl8PdA60p9 url=http://localhost:8200')}}"

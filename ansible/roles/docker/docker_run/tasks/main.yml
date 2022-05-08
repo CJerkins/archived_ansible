@@ -1,0 +1,30 @@
+---
+- name: Install docker
+  tags: container
+  import_role:
+    name: geerlingguy.docker
+
+- include_tasks: setup-RedHat.yml
+  when: ansible_os_family == 'RedHat'
+
+- include_tasks: setup-Debian.yml
+  when: ansible_os_family == 'Debian'
+
+- name: Install docker
+  import_tasks: install.yml
+
+- name: do tasks when "{{ service_name }}" state is "running"
+  import_tasks: docker.yml
+  when: container_state == "running"
+
+- name: configure firewall if container_firewall_ports is defined
+  import_tasks: firewall.yml
+  when: container_firewall_ports is defined
+
+- name: do cleanup stuff when container_state is "absent"
+  import_tasks: absent.yml
+  when: container_state == "absent"
+
+- name: do tasks when admin service is true
+  import_tasks: portainer.yml
+  when: docker_admin

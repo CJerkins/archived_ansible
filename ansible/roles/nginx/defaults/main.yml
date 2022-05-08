@@ -1,0 +1,14 @@
+---
+server_configs: []
+firewall_ports: []
+servers: []
+dir_ssl_key: /etc/nginx/ssl
+
+name_country: "US"
+name_state: "NC" 
+name_city: "So Pines"
+name_company: "drokdev.pro"
+name_unit: "drok"
+name_common: "local.drokdev.pro"
+
+

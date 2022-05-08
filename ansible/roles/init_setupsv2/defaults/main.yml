@@ -1,0 +1,97 @@
+---
+## 1_adduser ##
+init_setup_CentOS_users:
+- username: admin
+  groups: 
+    - "wheel"
+init_setup_Ubuntu_users:
+- username: admin
+  groups: 
+    - "admin"
+init_setup_ssh_public_key: 
+
+## 2_install ##
+init_setup_common_packages:
+  - vim
+  - 
+# init_setup_additional_packages: place in playbook
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+## -- Hostname -- ##
+init_setup_use_ldap: true
+init_setup_use_pam: false
+## -- Firewall -- ##
+## deprecated!!! use firewall role
+# install_firewall: false
+## -- Packages -- ##
+centos_common_packages:
+  - vim
+  - epel-release
+  - sudo
+ubuntu_common_packages:
+  - vim
+  - sudo
+init_setup_additional_packages: []
+keep_packages_updated: false
+## -- User init -- ##
+#init_setup_admin_users:
+# - admin_username: admin
+#  user_admin_path: /Users/centos/.ssh/id_rsa.pub # "{{ lookup('file', '{{ user_admin_path }}/'{{ user_admin }}'/.ssh/i{{ ssh_pub_file }}') }}"
+## -- sshd_config -- ##
+init_setup_no_pass_auth: true
+init_setup_disable_root: true
+
+## -- Logging setup -- ##
+init_setup_use_log: false
+init_setup_use_motd: false
+
+## -- Network setup -- ##
+init_setup_dns_setup: false
+init_setup_resolv_nameservers: []
+init_setup_resolv_domain: ""
+init_setup_resolv_search: []
+init_setup_resolv_sortlist: []
+init_setup_resolv_options: []
+
+## -- FreeIPA-client setup -- ##
+centos_freeipa_packages:
+  - freeipa-client 
+  - ipa-admintools
+ubuntu_freeipa_packages:
+  - freeipa-client 
+  - freeipa-admintools
+freeipa_client_install_base_command: ipa-client-install --unattended
+freeipa_client_fqdn: '{{ inventory_hostname }}'
+freeipa_client_install_options:
+  - "--domain={{ domain }}"
+  - "--server={{ freeipa_host }}"
+  - "--realm={{ init_setup_freeipa_client_realm }}"
+  - "--principal={{ init_setup_freeipa_client_principal }}"
+  - "--password={{ init_setup_freeipa_client_password }}"
+  - "--mkhomedir"
+  - "--hostname={{ inventory_hostname }}.{{ domain }}"
+
+  

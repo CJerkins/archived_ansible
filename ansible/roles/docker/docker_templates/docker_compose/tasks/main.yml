@@ -1,0 +1,31 @@
+---
+- name: Make pkgtemplate directorys.
+  file:
+    path: "{{docker_exported_container_volumes_basedir}}/pkgtemplate/{{ item }}"
+    state: directory
+  with_items:
+    - conf
+
+
+### Install ###
+- name: Docker configurations
+  tags: container
+  import_role:
+    name: docker_run
+
+- name: Copy pkgtemplate docker-compose.yml file into place.
+  template:
+    src: docker-compose.pkgtemplate.yml.j2
+    dest: /var/homelabos/pkgtemplate/docker-compose.pkgtemplate.yml
+
+- name: Configure pkgtemplate systemd service.
+  template:
+    src: service.j2
+    dest: /etc/systemd/system/pkgtemplate.service
+
+- name: Start pkgtemplate
+  systemd:
+    name: pkgtemplate
+    enabled: "yes"
+    daemon-reload: "yes"
+    state: started

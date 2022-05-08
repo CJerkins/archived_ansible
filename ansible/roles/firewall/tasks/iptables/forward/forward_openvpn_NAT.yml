@@ -1,0 +1,8 @@
+---
+- name: iptables - Allow VPN forwarding
+  iptables:
+    chain: FORWARD
+    source: "{{openvpn_server_network}}/24"
+    jump: ACCEPT
+    action: insert
+    comment: "Allow VPN forwarding"

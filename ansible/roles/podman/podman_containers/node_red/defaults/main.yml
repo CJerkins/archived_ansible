@@ -1,0 +1,24 @@
+---
+container_state: running
+setenforce: false
+
+container_name: nodered
+container_image: nodered/node-red-docker
+container_dir_config: node-red
+container_dir_owner: 1001
+container_dir_group: root
+container_run_args: >-
+  -d
+  -p 1880:1880/tcp
+  -v "{{podman_exported_container_volumes_basedir}}/{{ container_dir_config }}:/data:Z"
+  --hostname="nodered.{{ domain }}"
+  --memory=512M
+  -e FLOWS="flows_nodered.{{ domain }}.json"
+  --net=host
+container_firewall_ports:
+  - 1880/tcp
+## goes to host_vars ##
+
+# podman_exported_container_volumes_basedir: /var/lib/containers/exported_volumes
+# domain: localdomain
+# timezone: "Europe/Helsinki"

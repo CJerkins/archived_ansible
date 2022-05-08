@@ -1,0 +1,576 @@
+CHANGES
+=======
+
+* ipahost: Fail on action member for new hosts, fix dnsrecord\_add reverse flag
+* tests/host/test\_host: Fix use of wrong host in the host5 test
+* ipahost: Add support for several IP addresses and also to change them
+* Modify roles README for consistency
+* ansible\_freeipa\_module: Fix comparison of bool parameters in compare\_args\_ipa
+* tests: Fix top name tags in tests
+* ipahbacrule: Fix handing of members with action hbacrule
+* ipapwpolicy: Use global\_policy if name is not set
+* Add missing attributes to ipasudorule
+* ipareplica: Use ipaserver\_realm as a fallback for realm
+* Add missing validation in ipasudocmd
+* Update README-sudorule.md
+* Update README-hbacsvcgroup.md
+* ipahost: Enhanced failure msg for member params used without member action
+* ipauser: Allow reset of userauthtype, do not depend on first,last for mod
+* ipahost: Fix choices of auth\_ind parameter, allow to reset parameter
+* New vault management module
+
+v0.1.8
+------
+
+* utils/build-galaxy-release.sh: Use ansible-galaxy instead of mazer
+* Update galaxy.yml: Add empty dependencies to calm down ansible-agalxy command
+* ipauser: Extend email addresses with default email domain if no domain is set
+* Update README-host: Drop options from allow\_\*\_keytab\_ parameters docs
+* Allow execution of API commands that do not require a name
+* ipaserver\_test: Do not use zone\_overlap\_check for domain name validation
+* Install and enable firewalld if it is configured for ipareplica role
+* Install and enable firewalld if it is configured for ipaserver role
+* Update README.md
+* roles/ipaclient/README.md: Add information about ipaclient\_otp
+
+v0.1.7
+------
+
+* ipahost: Extension to be able handle several hosts and all settings
+* ipa[server,replica,client]: Add support for CentOS-8
+* ansible\_freeipa\_module: Better support for KRB5CCNAME environment variable
+* Added context configuration to api\_connect
+* ipahost: Return generated random password
+* ipauser: Return generated random password
+* ipaclient: Fix misspelled sssd options
+* Update README-user.md
+* Update README-user.md
+* Update ipauser.py: Fix typo in users.name description
+* Update galaxy.yml: Update description, drop empty dependencies
+* Update README.md: Add ansible-galaxy collection command for ansible 2.9+
+* Add 'sn' as an alias of 'last'
+* Only change one to test that 'sn' returns the same value as 'last'
+* Support 'sn' alias of 'last' for surname
+* New sudorule (Sudo Rule) management module
+* ipahostgroup: Fix changed flag, support IPA 4.6 on RHEL-7, new test cases
+* New hbacrule (HBAC Rule) management module
+* ipauser: Add info about version limitation of passwordexpiration
+* ipagroup: Fix changed flag, new test cases
+* ipagroup: Properly support IPA versions 4.6 and RHEL-7
+* New hbacsvcgroup (HBAC Service Group) management module
+* Update README.md
+* New hbacsvc (HBAC Service) management module
+* New pwpolicy management module
+* ansible\_freeipa\_module: Convert int to string in compare\_args\_ipa
+* New sudocmdgroup management module
+* New sudocmd management module
+* ipauser: User module extension
+* ansible\_freeipa\_module: New function api\_get\_realm
+* ansible\_freeipa\_module: Convert tuple to list in compare\_args\_ipa
+* ansible\_freeipa\_module: Add missing to\_text import for \_afm\_convert
+* ansible\_freeipa\_module: New functions module\_params\_get and \_afm\_convert
+* ansible\_freeipa\_module: New function api\_check\_param
+* ansible\_freeipa\_module: compare\_args\_ipa needs to compare lists orderless
+* ansible\_freeipa\_module: api\_command should not have extra try clause
+* fix various typos in README files
+* ipagroup: Rework to use same mechanisms as ipahostgroup module
+* tests/external-signed-ca tests: Fix external-ca.sh to use proper serials
+* external-ca tests: Fix typo in inventory files
+* ipagroup: Remove unused member\_[present,absent] states
+* README-group: Fix typo in state description
+* New hostgroup management module
+* New hostgroup management module
+* Update README files for proper description of states
+* New host management module
+* ansible\_ipa\_client: Drop import of configure\_nsswitch\_database
+* utils/ansible-ipa-[server,replica,client]-install: New --ansible-verbose option
+* utils/ansible-ipa-server-install: Add deprecated (unused) --domain-level option
+* ansible\_freeipa\_module: Add support for GSSAPI
+* ansible\_freeipa\_module: Add ansible module argument to valid\_creds function
+* ipauser, ipagroup: Fix typo in only one error message
+* utils/ansible-ipa-[server,replica,client]-install: New --become-method option
+* utils/ansible-ipa-[server,replica,client]-install: Print excessive args
+* utils/ansible-ipa-[server,replica,client]-install: Add p.wait() for returncode
+* utils/ansible-ipa-[server,replica,client]-install: New --playbook-dir option
+* ipaserver\_test,ipareplica\_prepare: Do not return \_pkcs12\_file settings
+* ansible-ipa-\*-install: Get continuous output working for python2 also
+* ansible-ipa-client-install: The proper option is ipaclient-install-packages
+* ansible-ipa-\*-install: Use /usr/bin/python by default, fix \_install\_packages
+* Utils scripts: ansible-ipa-[server,replica,client]-install
+* ipatopologysegment: Fail for missing entry with reinitialized
+* ipatopologysegment: Store suffix for commands in command list
+* roles/ipareplica/README: \_http\_cert\_files and \_pkinit\_cert\_files are lists
+* utils/galaxyify-playbook.py: Support to galaxify rule lines in playbooks
+* utils/[galaxyify-playbook,gen\_module\_docs].py: flake8 fixes
+* Update README.md: Add information about roles in usage
+* Added support for predefining client OTP using ipaclient\_otp
+* Add debian support for ipaclient
+* utils/build-galaxy-release.sh: Fix module\_utils import in management modules
+* utils/gen\_module\_docs.py: Drop parameter name dirserv\_cert\_files
+
+v0.1.6
+------
+
+* New utils script to update module docs
+* utils/build-galaxy-release.sh: New build script for galaxy release
+* galaxy.yml: Use A.B.C as version, use new build script for release
+* ipareplica\_prepare: Update module documentation
+* Update READEME.md: Update galaxy information
+* ipa[server,replica]: Set \_packages\_adtrust for Ubuntu
+* ipaclient: Fix typo in dnsok assignment for ipaclient\_setup\_nss
+* ipareplica\_setup\_custodia: create\_replica only available in newer releases
+* ipaserver\_test: Initialize value from options.zonemgr
+* ipaclient\_setup\_nss: paths.GETENT is not available before freeipa-4.6.90.pre1
+* iipaclient: RawConfigParser is not always provided by six.moves.configparser
+* ipareplica/tasks/install: Add space for ipareplica\_pki\_config\_override
+* ipa[server,replica,client]: Update module documentation
+* ansible\_ipa\_server: Initialize .external\_cert\_files and .dirsrv\_cert\_files
+* ipaserver\_prepare: Initialize options.\_subject\_base and options.\_ca\_subject
+* ansible\_ipa\_replica: Dropped unused ds\_init\_info and krb\_init\_info functions
+* ipa[server,replica,client]: Update import and export of global module utils
+* ipa[server,replica,client]: flake8 and pylint fixes
+* Update README.md
+* Update README.md
+* Update README.md
+* Update README.md: Add information about RPM package and galaxy
+* Update README.md: Update lik for SERVER readme
+* ipaserver: Properly set settings related to pkcs12 files
+* ipaserver\_test: Properly initialize pin and cert\_name variables
+* ipaserver\_setup\_dns: Properly set ip\_addresses, domain and realm
+* module\_utils/ansible\_ipa\_replica: Initialize skip\_schema\_check to None
+* ipareplica\_setup\_ds: Do not trace back for ScriptError and RuntimeError
+* ipareplica\_prepare: Fail with proper error messages
+* ipareplica\_prepare: Properly initialize pin and cert\_name variables
+* ipareplica: Initialize dns.ip\_addresses and dns.reverse\_zones for dns setup
+* ipareplica: Add support for pki\_config\_override
+* ipaclient: Fix description of ipaclient\_on\_master in ipaclient README
+* ipaclient/library/ipaclient\_setup\_nss: Add dnsok for no-sssd compatibility code
+* ipa[server,replica,client]: No not use wildcard imports for modules
+* ipa[server,replica,client]: pylint fixes
+* ipa[server,replica,client]: Remove unused variables and wrong doc strings
+* ipaserver: Remove unused ipaserver/library/ipaserver.py
+* Fixed wrong path to CheckedIPAddress class
+* Update ipaclient/README.md: Remove "and replica" from ipaclient\_on\_master decription
+* Update README-topology.md: Fix exmple for list of topology segments
+* ipagroup: Fail on member addition/removal from not existing group
+* plugins: flake8 fixes to calm down ansible galaxy
+* library/ipaclient\_get\_otp: Enable force mode for host\_add call
+* ipaserver\_setup\_kra: Since 4.7.1 FIRST\_MASTER needs to be used
+* ipauser exmaple playbooks: More updates
+* Update README-user.md: Fixed examples, new example for unlocked
+
+v0.1.5
+------
+
+* galaxy.yml: Prepare for release 0.1.5
+* ipagroup playbooks: Add names for tasks
+* ipauser playbooks: Add names for tasks
+* Update README-user.md: Fixed givenname highlighting
+* README.md: Add references to new user and group management modules
+* New group management module
+* New user management module
+* ansible\_freeipa\_module: New functions date\_format and compare\_args\_ipa
+* ipaserver: Support sync\_time changes of 4.8.0
+* ipaclient: Support sync\_time changes of 4.8.0
+* ipaclient/action\_plugins/ipaclient\_get\_otp: Enhanced error reporting
+* roles/ipaclient/README.md: OTP needs kinit on controller
+* README.md:  OTP needs kinit on controller
+* ipaserver\_prepare: Properly report error, do show trace back
+* ipatopology modules: Use ipaadmin\_ prefix for principal and password
+* New tests folder
+* README: Update information about external signed CA
+* ipaserver: Add support for external signed CA
+* ipa[server,replica,client]: Remove tasks folder prefix for include\_tasks
+* ipa[server,replica,client]: RHEL-8 specific vars files
+* ansible\_ipa\_replica: installer.add\_sids should default to False
+* ipareplica\_krb\_enable\_ssl: Initialize krb.pkcs12\_info and krb.master\_fqdn
+* ipareplica: Set all needed settings for kra
+* ipareplica: Make sure that certmonger picks the right master
+* ansible\_ipa\_client: Always set options.unattended
+
+v0.1.4
+------
+
+* ipatopologysegment: Use commands, not command
+
+v0.1.3
+------
+
+* Update README-topology.md
+* Update README.md
+* Update README.md
+* ipatopologysegment: Allow domain+ca suffix, new state: checked
+* ipareplica: Add default(omit) for ipaclient role varaibles
+* ipareplica: Use ipareplica\_server if set
+* ipareplica: The dm password is not needed for ipareplica\_master\_password
+* ipaclient: Report error message if ipaclient\_get\_otp failed
+* ipaclient: Fix test of newly supported ipaadmin\_keytab use in ipaclient\_join
+* Update README.md
+* Update README.md
+* Update README.md
+* Update README.md
+* Update README.md
+* Update README.md
+* Update README.md
+* Update README.md
+* ipaclient: Do not fail if ipaadmin\_password is not used
+* ipaclient\_join: Support to use ipaadmin\_keytab without ipaclient\_use\_otp
+* ipaclient: Use omit (None) for password, keytab, no string length checks
+* ipaclient\_get\_otp: Remove ansible\_python\_interpreter handling
+* ipaclient\_test: Fix Python2 decode use with Python3
+
+v0.1.2
+------
+
+* ipaserver\_test: Treat host, domain and realm settings in the same was as the cli
+* ipaserver: Only use install checks in \_prepare, not also in \_test
+* ipaserver: Add log, debug and info to AnsibleModuleLog
+* ipaserver: Add support for pki\_config\_override
+* ipaserver\_setup\_http: Only use tasks.restore\_context for old releases
+* ipaserver: Remove old section for client side deployment using command line
+* ipaclient\_test: Use validate\_hostname with constants.MAXHOSTNAMELEN
+* Increase minimal Ansible version to 2.8
+* New galaxy.yml file for Ansible 2.8 and Ansible Galaxy 3.2
+* New topology managament modules
+* Move role documentation into the specific role locations as README.md
+* New playbook folder for sample playbooks
+* Fixes #17 Improve how tasks manage package installation
+* ipa[server,replica,client]: Deactivate Python2/3 test
+* ipareplica: Use result from ipareplica\_test for freeipa-trust enablement
+* ipareplica: Add support for hidden replica
+* ipa[server,replica]: Enable freeipa-trust service if adtrust is enabled
+* ipareplica: Disable automatic removal of replication agreements in uninstall
+* roles/ipareplica/tasks/uninstall.yml: Add changed\_when for uninstall
+* roles/ipareplica/tasks/install.yml: Drop unused ipareplica\_backend\_disconnect
+* roles/ipareplica/library/ipareplica\_prepare.py: Drop double sstore and fstore
+* roles/ipareplica/library/ipareplica\_enable\_ipa.py: Do not use textwrap
+* ipa[server,replica]: Fix wrong ansible argment types
+* ipaclient/tasks/install.yml: Save and restore ipaadmin\_password with OTP
+* ipaclient/tasks/install.yml: Disable One-Time Password for on\_master
+* ipaclient/action\_plugins/ipaclient\_get\_otp: Only require gssapi for keytab
+* Ignore "\*.retry" and "\*.pyc" files
+* Update README.md
+* ipaclient install role length typo
+* Fix errors when ipaservers variable is not set
+
+v0.1.1
+------
+
+* Comment out EL-8 for now. It is not known by ansible galaxy so far
+* ipa[server,replica]: Calm down ansible and yaml lint in ansible-galaxy
+* ipa[server,replica]: Remove ipaclient dependency again
+* ipaclient: Replace empty string test with length 0 test
+* ipaclient: Fix indent in install.yml
+* ipaclient: Calm down ansible and yaml lint in ansible-galaxy
+* Remove unused ipa-krb5, ipa-sssd and ipaconf roles
+* ipa[server,replica]: Use proper dependency for ipaclient role
+* ipa[server,replica,client]: Update galaxy info
+* Fix white space issues in yaml files and ansible vars
+
+v0.1.0
+------
+
+* Removed ipa-krb5 from the data\_files section
+* ipaclient\_setup\_nss: Create DNS SSHFP records, update to latest FreeIPA
+* ipaclient\_setup\_ntp: Fixed NTP config for FreeIPA versions without sync\_time
+* ipaclient\_api: Do not use version numbers for backward compatibility checks
+* ipaclient\_setup\_sssd: Use proper setting for no\_krb5\_offline\_passwords
+* Update REPLICA.md
+* Update Supported FreeIPA Versions section
+* Revert "ipa[server,replica,client]: Do not enforce ansible\_fqdn as hostname"
+* Updated setup.cfg to include all the necessary roles and remove unused roles
+* ipareplica\_setup\_adtrust: Add missing settings for adtrust and module
+* ipaserver\_setup\_adtrust: Add missing settings for adtrust and module
+* roles/ipareplica/defaults/main.yml: Remove unused settings
+* ipaserver\_test: Fix traceback caused by an Error
+* ipa[server,replica,client]: Do not use meta end\_play
+* ipa[server,replica,client]: Do not enforce ansible\_fqdn as hostname
+* ipaclient\_setup\_ntp: Use time sync code from 4.6.4 if sync\_time is not defined
+* ipa[client,replica,server]: Make sure that installer logs are created
+* ipareplica/tasks/install.yml: Omit forward\_policy if not set in ipareplica\_test
+* ipaclient\_setup\_ntp: Add missing cli\_servers, fix options.ntp\_servers check
+* ansible\_ipa\_replica: Add import of ntpinstance again
+* Revert "ipa[client,replica,server]: Make sure that installer logs are created"
+* ansible\_ipa\_server: Add missing inspect import
+* ipaclient: Fix issues with FreeIPA 4.6 and prior
+* ipa[client,server]: Inspect validate\_domain\_name for 4.6 and prior
+* ipaserver\_test: Do not show traceback in case of testing failures
+* ipaclient: Use ipaclient\_all\_ip\_addresses instead of ipahost\_all\_ip\_addresses (2)
+* ipareplica\_test: Deactivate adtrust\_imported and kra\_imported tests
+* ipareplica\_prepare: Properly fail if replica\_conn\_check failed
+* ipareplica: Fix DNS setup issues
+* ansible\_ipa\_server: Remove user\_input, add missing DN and ntpinstance
+* ipaserver: Use ipaserver\_install\_packages for ipaclient deployment part
+* ipareplica: Use ipareplica\_install\_packages for ipaclient deployment part
+* ipareplica\_enable\_ipa: DO not create unused replica config
+* ipareplica\_setup\_ds: Cleanup of unused dns settings in options
+* ipareplica\_install\_ca\_certs: Cleanup of unused dns settings in options
+* ipareplica\_create\_ipa\_conf: Cleanup of unused dns settings in options
+* ipareplica: Replace ipaserver\_master\_password, remove ipaserver\_setup\_ntp
+* ipa[client,replica,server]: Make sure that installer logs are created
+* ipaclient: Use ipaclient\_all\_ip\_addresses instead of ipahost\_all\_ip\_addresses
+* ipaclient: Krb5 should only be configured if ipaclient\_on\_master is not set
+* ipa[server,replica,client]: Do not try to execute tasks after the role test
+* python\_2\_3\_test: Make sure that python\_2\_3\_test is also executed in test mode
+* ipaserver\_test: Do not mark ipaserver\_test as changed
+* ipareplica\_test: Dop not fail, but end play if replica is already installed
+* python\_2\_3\_test: Add result\_ prefix to registered result from py3test.py script
+* New ipareplica\_enable\_ipa: Use of ipaserver\_enable\_ipa is not possible anymore
+* ipareplica\_setup\_adtrust: Fix setup\_ca, master\_host\_name and ldap2 backend connection
+* ipareplica\_setup\_krb: Use inspect on install\_krb
+* ipareplica\_setup\_http: Use inspect on install\_http
+* ipareplica\_setup\_ds: Use inspect on install\_replica\_ds and install\_dns\_records
+* ansible\_ipa\_replica: Cleaned up double and unused imports
+* ipareplica\_test: Added ntp\_server, ntp\_pool and some ntp related tests
+* ipareplica\_prepare: Use MIN\_DOMAIN\_LEVEL instead of DOMAIN\_LEVEL\_1 in checks
+* ipareplica py3test: Try to import promote\_check if install\_check is not defined
+* ipaclient\_test: Added error message to ScriptError calls only using rval
+* ipaclient/tasks/install.yml: Removed empty line in ipaclient\_setup\_sssd section
+* ipaclient/tasks/install.yml: Removed default(omit) for bool variables
+* module\_utils/ansible\_ipa\_client: Deactivate \_\_getattr\_\_ in installer\_obj
+* ipaclient\_test: Remove debugging warning output
+* ipaclient\_get\_otp: Fix password encoding
+* ipaclient: End install if already installed and no allow\_repair and force\_join
+* New ipaclient\_setup\_krb5: Use ipaclient\_setup\_krb5 instead of ipa-krb5 role
+* New ipaclient\_ipa\_conf: Use ipaclient\_ipa\_conf instead of ipaconf role
+* ipaclient\_setup\_ssh: Keep no\_ for prefix for settings, use ssh\_trust\_dns
+* ipaclient\_setup\_sssd: Update and cleanup
+* ipaclient\_test: More tests from ipaclient installer, updated ansible\_ipa\_client
+* ipaclient/library/ipaclient\_setup\_ntp: Fix import of ansible\_ipa\_client
+* ipaclient: New module ipaclient\_setup\_ntp, dropped ipaclient\_ntp setting
+* ipaclient: Replace extras module with ssh, automount, firefox and nis modules
+* ipaclient role: Fix naming of modules, action\_plugins and registered vars
+* Move module\_utils to role specific locations
+* ipa[server,replica]: Renamed X\_no\_firewalld to X\_setup\_firewalld
+* ipa[server,replica,client]: New setting X\_install\_packages
+* Update README.md
+* Update README.md
+* Fixes #51 upstream
+* ipareplica: Make ipaserver\_enable\_ipa module working for ipareplica role
+* ipareplica: Fix typo in tasks/install.yml
+* ipaserver\_setup\_custodia: options.promote needs to be set
+* Replace deprecated include with import\_tasks and include\_tasks
+* ipaserver: Fix NameError: name 'api\_Backend\_ldap2\_connect' is not defined
+* ipaserver: Transform DNS overlap end\_play into a failure
+* ipaserver: Fix use of subject\_validator in ipaserver\_test
+* Revert "ipareplica: Limit the number of concurrent executions for the setup of CA"
+* ipaserver: Delay enabling services until end of installer
+* ipaserver: Use Custodia instance in installers and setup before CA
+* ipaclient: Fix gathering of subject\_base from server in ipaapi.py module
+* Ubuntu support added (partly pick from pyguy)
+* ipareplica: Limit the number of concurrent executions for the setup of CA
+* ipareplica: Use ipaclient role to deploy client
+* ipaclient,ipareplica: Set ipaclient\_ssh\_trust\_dns to no by default
+* ipaclient: Backup and set hostname explicitly
+* ipa-krb5/tasks/main.yml: Create additional .ipabkp for krb5.conf
+* ipaclient: Set default\_domain in krb5.conf in the same way as ipa-client-install
+* Added ipa- prefix to krb5 and sssd roles as these are ansible-freeipa specific
+* ipareplica/library/ipareplica\_custodia\_import\_dm\_password: Fix post 4.7 use
+* New REPLICA.md file
+* ipareplica/library/ipareplica\_custodia\_import\_dm\_password: Also use custodia here
+* ipareplica: Do no use IPA version to check for get\_custodia\_instance existance
+* ipaserver/library/ipaserver\_test: adtrust message should be warning
+* ipaserver: Do no use IPA version to check for get\_custodia\_instance existance
+* ansible\_ipa\_replica: Do not use warn for debug output
+* ipareplica: Drop debugging remain show\_obj
+* Added missing parameter realm to setup\_kra
+* var files for CentOS 7 (now that the default is compatible with Fedora not RHEL)
+* CentOS 7 compatibility. Lowered version check to be compatible with CentOS 7.5 Added missing attributes to setup\_kra to be compatible with latest python2-ipaserver librarty on CentOS 7.5 (python2-ipaserver-4.5.4-10.el7.centos.3.noarch)
+* Lowered Version for Setup CA | Tested on CentOS 7.5
+* Update CLIENT.md
+* ipaclient/library/ipanss.py: Fixed wrong name in paths.GETENT compat check
+* Update CLIENT.md
+* Update CLIENT.md
+* ipadiscovery.py - fix typo of timconf to timeconf
+* Update README.md
+* ipareplica/vars: New Fedora-27 specific file, updated ipareplica\_packages\_adtrust
+* ipaserver/vars: New Fedora-27 specific file, updated ipaserver\_packages\_adtrust
+* Added "Supported Distributions" section
+* ipareplica: Add support for 4.7 (4.6.90-pre2)
+* ipareplica: Link used ipaserver modules instead of using a copy
+* ipareplica/library/ipareplica\_restart\_kdc.py: Comemnted out \_pkinit\_pkcs12\_info
+* ipaserver/vars/default.yml: Use python3-libselinux instead of libselinux-python
+* ipaserver: Fixed typos
+* ipaserver: Add support for 4.7 (4.6.90-pre2)
+* ipaclient/vars/default.yml: Use python3-libselinux instead of libselinux-python
+* ipaclient: Fix OTP action plugin to work with python3 bindings
+* ipaclient: Add support for IPA 4.7 (4.6.90-pre2)
+* ipaclient/library/ipa\_facts.py: Fix version\_info for new pre versions
+* ipaclient: Use paths variables for executables used in modules
+* module\_utils/ansible\_ipa\_replica.py: Cleanup
+* ipaserver\_setup\_ds: Fix tasks.create\_tmpfiles\_dirs call (issue#19) (2nd try)
+* ipclient: Move library and action\_plugins into ipaclient role directory
+* ipaserver: Fix issue with setup\_dns and forwarders or no\_forwarders
+* ipaclient: Make krb5 DNS lookup possible in cluster environments
+* ipaclient: Fix krb5 DNS lookup and servers
+* Capturing python3 check result is not a change
+* Add example client and cluster playbooks and also cluster inventory file
+* New role for ipareplica installation
+* Incorporate "Use os.path.isfile() and isdir()" from freeipa upstream
+* Fix typo
+* ipaserver\_setup\_ds: Fix tasks.create\_tmpfiles\_dirs call (issue#19)
+* Introduce setup files that copy roles to relevant directories
+* ipaserver\_{test,prepare}: Add kasp\_db\_file to options
+* Server: Configure firewalld by default, new switch: ipaserver\_no\_firewalld
+* ipaclient/tasks/install: Fix client installation on master within server role
+* Added requirements.txt file
+* Client: Added version checks for save\_state and configure\_nisdomain calls
+* Added GPLv3 COPYING file, fixed licenses in ipaconf, krb5 and sssd roles
+* server install force and allow\_zone\_overlap fixes
+* Update SERVER.md
+* Create SERVER.md
+* Create README.md
+* Update CLIENT.md
+* ipaserver/tasks/install.yml: Finally use include\_role for client setup on master
+* ipaserver/tasks/uninstall.yml: Fix error for using uninstall on not installed server
+* ipaserver: End play if server is already configured or client is configured
+* ipaserver/tasks/install.yml: Add no-log got master password generation again
+* ipaserver: Add no\_host\_dns for ipaserver\_test
+* ipaclient/tasks/main.yml: Fix undefined ipaclient\_packages error with include\_role
+* ipaclient/tasks/install.yml: Fix possible ipajoin.already\_joined undefined issue
+* ipaclient/tasks/install.yml: Support client usage in server role
+* module\_utils/ansible\_ipa\_server.py: Deactivate debug log using warn output
+* module\_utils/ansible\_ipa\_client.py: Fix client module util to work with python3
+* library/ipahost.py: Fix ipahost to work with Python3
+* Rename README.md to CLIENT.md
+* ipaserver: Fix DNS installation forward policy and DNSSEC validation
+* ipaserver\_prepare: Add missing no\_dnssec\_validation setting
+* ipaserver/tasks/install.yml: Properly order settings for ipaserver\_prepare
+* ipaserver: Use result\_ prefix for results
+* ipaserver: Use ipaclient\_ prefix for client settings
+* ipaserver: Renamed ipaserver\_\*\_password
+* ipaserver/library/ipaserver\_master\_password.py: Renamed name of password return
+* roles/ipaserver/tasks/install.yml: Remove test section remain
+* ipaclient,ipaserver: Better names for package tasks
+* ipaserver: Drop unused test file install\_cache
+* ipaserver: Drop ipaserver\_allow\_repair
+* ipaserver/library/ipaserver\_prepare.py: Add missing allow\_zone\_overlap
+* ipaserver/library/ipaserver\_test.py: Use check\_zone\_overlap directly
+* Make ipaserver role working with ipa 4.5(.4)
+* roles/ipaserver/library/ipaserver\_test: Return dns.ip\_adresses and dns.reverse\_zones
+* module\_utils/ansible\_ipa\_server.py: New function ansible\_module\_get\_parsed\_ip\_addresses
+* library/ipadiscovery: Add time synchronization calls
+* library/ipadiscovery: Drop unused check parameter
+* Add support for on\_master flag
+* Remove test remains from new ipasever role
+* New role for ipaserver installation
+* roles/ipaclient/tasks/install.yml: Allow to specify different hostname
+* roles/ipaclient/tasks/uninstall.yml: No need to use python3 test for uninstall
+* roles/ipaclient/tasks/[un]install.yml: Use better formatting for commands
+* roles/ipaclient/defaults/main.yml: Do not use false string for bool values
+* library/ipadiscovery.py: Fix domain error message
+* New global ansible\_ipa\_client utils module
+* ipahost module: fix the module for IPA 4.4 server
+* roles/ipaclient/tasks/install.yml: Add keytab or password required test
+* roles/ipaclient/tasks/install.yml: Use ipadiscovery.hostname for ipahost
+* library/ipanss.py: Add standard\_logging\_setup call to fix logger.error behaviour
+* Extended python3 test to do an additional client test
+* Simplify ipaclient uninstall
+* Remove unused inventory variables
+* Fix otp + force-join usecase
+* Fix modules documentation and remove unused variables
+* Use Python2/3 to detect ansible\_python\_interpreter
+* change pkinit\_anchors to kdc-ca-bundle
+* library/ipajoin.py: Fixed comment for missing keytab
+* library/ipajoin.py: Fixed white spaces for comments and imports
+* library/ipatest.py: Fixed example descriptions
+* library/ipatest.py: Drop unused prinipal from module parameters
+* New module ipafixca to fix a missing ca.crt file
+* roles/ipaclient/tasks/install.yml: New fail for missing ca.crt file
+* roles/ipaclient/tasks/install.yml: New fails, no end\_play with ipajoin.changed
+* roles/ipaclient/vars/rhel.yml: Removed unused file
+* ipaclient vars: Renamed ipaclient\_package to ipaclient\_packages
+* library/ipatest.py: New validation tests: krb5.conf and ipa ping
+* library/ipafstore.py: Fix example to user proper module name
+* library/ipaapi.py: Fixed create\_db version check
+* library/ipatest.py: Additional ccache removal
+* library/ipatest.py: New return value ca\_crt\_exists
+* library/ipatest.py: Fix krb5\_keytab\_ok detection to work always
+* roles/ipaclient/tasks/install.yml: ccache cleanup, new always clause
+* Add support for Python3 based freeipa versions (F-27+), make Python3 default
+* library/ipaclient.py: Fix mixture of tabs and spaces for Python3
+* Fix raise call for Python3 support
+* roles/ipaclient/tasks/install.yml: Better message for cleanup and stop
+* library/ipajoin.py: Drop unused subject base gathering from certificate
+* library/ipadiscovery.py: Drop subject base guessing
+* library/ipaapi.py: Add call to api to get subject base form server
+* library/ipajoin.py: Fail for already joined hosts if krb5.keytab is missing
+* roles/ipaclient/tasks/install.yml: Set no\_log:yes for OTP generation and usage
+* Renamed ipaclient\_{principal,password} to ipaadmin\_{principal,password}
+* library/ipanss.py: mkhomedir is a bool, added missing type
+* README.md: Fixed typo, minimal ipa version
+* roles/ipaclient/tasks/install.yml: Use ipajoin also if force\_join is set
+* roles/ipaclient/tasks/install.yml: Drop ipaclient\_keytab empty string test
+* roles/ipaclient/tasks/install.yml: Fix use of wrong quotes
+* roles/ipaclient/tasks/install.yml: Properly test ipaclient\_keytab for join
+* README.md: Added description about ipaclient\_use\_otp and ipaclient\_allow\_repair
+* New ipaclient\_allow\_repair switch
+* roles/ipaclient/tasks/install.yml: Add ipatest, disable otp and join if ipatest.krb5\_keytab\_ok
+* library/ipajoin.py: Return changed state and new parameter already\_joined
+* roles/ipaclient/tasks/install.yml: Test for empty ipaclient\_principal and ipaclient\_keytab
+* library/ipanss.py: Check if principal is an empty string
+* library/ipajoin.py: Enhanced tests for password and keytab
+* library/ipatest.py: New ipa test module
+* roles/ipaclient/tasks/install.yml: Do not set principal with keytab for join
+* roles/ipaclient/tasks/install.yml: Use ipaadmin\_keytab for admin keytab
+* roles/ipaclient/tasks/install.yml: Purge realm from keytab also needed for force\_join
+* roles/ipaclient/tasks/install.yml: Purge realm from keytab after otp generation
+* roles/ipaclient/tasks/install.yml: Fix principal/keytab check, set default principle early
+* library/ipajoin.py: Fix principal usage with otp
+* Fix logic trying to obtain a keytab
+* roles/ipaclient/tasks/install.yml: Fix typo in comment
+* roles/ipaclient/tasks/install.yml: Set default principal if not set
+* roles/ipaclient/tasks/install.yml: Checks for principal, keytab and password
+* roles/ipaclient: New ipaclient\_use\_otp setting to force otp usage
+* library/ipajoin.py: Add kinit\_attempts default value
+* library/ipajoin.py: Fix required\_one\_of, add mutually\_exclusive
+* library/ipa{api,discovery,extras,nss,sssd}.py: Drop unused required\_one\_of
+* roles/ipaclient/tasks/install.yml: Tew additional checks for password, keytab and otp
+* library/ipaclient.py: Compatibility to ipa 4.4 and later
+* library/ipaextras.py: Compatibility to ipa 4.4 and later, new version check
+* library/ipanss.py: Compatibilty to ipa 4.4 and later, new version check
+* library/ipaapi.py: Compatibilty to ipa 4.4 and later, new version check
+* roles/krb5: Compatibility for ipa 4.4 and later
+* library/ipasssd.py: Compatibilty to ipa 4.4 and later, new version check
+* library/sssd.py: Renamed to ipasssd
+* library/ipajoin.py: Compatibilty to ipa 4.4 and later, new version check
+* library/ipafstore.py: Compatibilty to ipa 4.4 and later, new version check
+* library/ipadiscovery.py: Compatibilty to ipa 4.4 and later, new version check
+* library/ipadiscovery.py: New return: ipa\_python\_version
+* library/ipadiscovery.py: Add ca\_cert\_file argument for discovery
+* library/ipadiscovery.py: Allow to use server only also
+* library/fstore.py: Renaed to ipafstore
+* New module fstore to backup files using IPA client sysrestore
+* roles/ipaclient/defaults/main.yml: Remove default values for some vars
+* roles/ipaclient/tasks/install.yml: Replace ipaserver\_ by ipaclient\_
+* library/ipanss.py: principal option is optional
+* library/ipajoin.py: Fix required tags for servers and domain in docs
+* Add newline in authors list
+* iRenamed README to README.md
+* New README
+* inventory/hosts: Updated inventory file
+* roles/ipaclient/tasks/install.yml: Use new roles and modules
+* New module to configure IPA extras like NTP, SSH, firefox and NIS
+* New module to cteate IPA NSS database
+* New module to create temporary NSS database, call IPA API for remaining enrollment parts
+* New module to configure sssd using SSSDConfig
+* New role to configure ipa default.conf
+* roles/krb5: New krb5\_no\_default\_domain setting
+* roles/sssd: Fixed several small defects, added libselinux-python to sssd\_packages
+* roles/ipaclient/defaults/main.yml: ipaclient\_ntp should default to no
+* library/ipajoin.py: New documentation, debug flag, added missing kdestroy call
+* library/ipadiscovery.py: New documentation, conflict check from ipaclient.py
+* library/ipajoin.py: Doc updates, renamed ca\_certs\_file
+* roles/ipaclient/tasks/install.yml: Test code for krb5 and sssd
+* New role for krb5
+* New sssd role
+* library/ipajoin.py: New module for ipajoin
+* roles/ipaclient/tasks/install.yml: Install IPA client early
+* roles/ipaclient/defaults/main.yml: Remove unused ipaclient\_servers
+* library/ipadiscovery.py: Renamed server to servers output argument
+* library/ipadiscovery.py: New module for ipa discovery
+* library/ipaclient.py: servers needs to be a list
+* New ipaclient options: force\_join, kinit\_attempts, ntp and mkhomedir
+* library/ipaclient.py: Fix white spaces
+* Modify ipahost module: the authentication is done locally on the controller node and the credential cache is copied to the managed node
+* Ansible for IPA

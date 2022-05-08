@@ -1,0 +1,25 @@
+
+---
+- hosts: pve2.vanguard.intra
+  gather_facts: yes
+  become: true
+  vars:
+    ## -- VM vars -- ##
+    build_type     : provision
+    vmnewid        : 357 # The target VM ID or the VM ID in provisioning
+    # vmname      : vanguard.local # The target VM Name
+  roles:
+  - role: proxmox
+
+## -- You will need to go on the WebUI to select the iso file -- ##
+
+## -- Additional vars -- ##
+# vmcores     : 4
+# vmsockets   : 1
+# vmvcpus     : 1
+# vmmemory    : 4096
+# vmdisk      : 16
+# vmbridge    : vmbr0
+# vmstorage   : local-lvm
+# vmonboot    : no
+# vmformat    : qcow2

@@ -1,0 +1,30 @@
+---
+- hosts: pve2.vanguard.intra
+  gather_facts: no
+  become: yes
+  
+  vars:
+    ## Clone vars ##
+    action: start
+    build_type: clone
+    vmsource: template.CloudInit.CentOS7
+    # vmnewid: "{{ 3000 | random(start=2000) }}"
+    # vmname: devops
+    # vmcores: 4 # defaults
+    # vmsockets: 1 # defaults
+    # vmmemory: 4096 # defaults
+    # vmbridge: vmbr0
+    vmvlan: 130
+
+    ## Cloud init vars ##
+    # vmdisk      : 20G
+    # ciuser: drok
+    # cipassword: drokDROK63
+    vmsearchdomain: vanguard.intra
+    vmnameserver: 172.16.2.1
+    # sshkey: 
+    # vmmacaddr: 02:00:00:02:80:de
+    # vmip: 172.16.1.106/24
+    # vmgw: 172.16.1.1
+  roles:
+  - proxmox
